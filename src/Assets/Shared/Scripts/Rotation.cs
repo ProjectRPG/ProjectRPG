@@ -35,7 +35,7 @@ public class Rotation : MonoBehaviour
     {
         if (canMove)
         {
-            if (Input.mousePosition.x > prevMousePos.Value.x)
+            if (Input.mousePosition.x > Screen.width / 2)
             {
                 rotationCounter -= 1;
                 Vector3 rotate = new Vector3(0, rotationCounter, 0);
@@ -43,7 +43,7 @@ public class Rotation : MonoBehaviour
                 rigidbody.MoveRotation(rotationDelta);
             }
 
-            if (Input.mousePosition.x < prevMousePos.Value.x)
+            if (Input.mousePosition.x < Screen.width / 2)
             {
                 rotationCounter += 1;
                 Vector3 rotate = new Vector3(0, rotationCounter, 0);
