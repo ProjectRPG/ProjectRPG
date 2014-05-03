@@ -46,10 +46,11 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Dragable.cs" />
-     <Compile Include="Assets\Rotation.cs" />
-     <Compile Include="Assets\SelectedScript.cs" />
-     <None Include="Assets\textures\3D_pattern_58\readme.txt" />
+     <Compile Include="Assets\CharacterCreation\Scripts\CharacterInfoGUI.cs" />
+     <Compile Include="Assets\CharacterCreation\Scripts\SelectedScript.cs" />
+     <Compile Include="Assets\Shared\Scripts\Dragable.cs" />
+     <Compile Include="Assets\Shared\Scripts\Rotation.cs" />
+     <None Include="Assets\Shared\textures\3D_pattern_58\readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -10,12 +10,18 @@ public class Rotation : MonoBehaviour
 
     private int rotationCounter = 0;
 
-    private string headerText = "Select Your Rebel";
+    private readonly int screenCenter = Screen.width / 2;
+
+    public int CenterVoid = 200;
+
+    public double AccelerationFactor = 0.05;
+
+    public int RotationIncrement = 1;
 
     // Use this for initialization
     public void Start()
     {
-
+        Debug.Log(AccelerationFactor);
     }
 
     public void Update()
@@ -33,19 +39,20 @@ public class Rotation : MonoBehaviour
 
     public void FixedUpdate()
     {
+        int currMousePos = (int)Input.mousePosition.x;
         if (canMove)
         {
-            if (Input.mousePosition.x > prevMousePos.Value.x)
+            if (currMousePos < screenCenter - CenterVoid)
             {
-                rotationCounter -= 1;
+                rotationCounter -= (int)((screenCenter - CenterVoid - currMousePos) * AccelerationFactor) + RotationIncrement;
                 Vector3 rotate = new Vector3(0, rotationCounter, 0);
                 Quaternion rotationDelta = Quaternion.Euler(rotate);
                 rigidbody.MoveRotation(rotationDelta);
             }
 
-            if (Input.mousePosition.x < prevMousePos.Value.x)
+            if (currMousePos > screenCenter + CenterVoid)
             {
-                rotationCounter += 1;
+                rotationCounter += (int)((currMousePos - screenCenter + CenterVoid) * AccelerationFactor) + RotationIncrement;
                 Vector3 rotate = new Vector3(0, rotationCounter, 0);
                 Quaternion rotationDelta = Quaternion.Euler(rotate);
                 rigidbody.MoveRotation(rotationDelta);
