@@ -4,3 +4,6 @@
 *.user*
 *.suo
 src/Library
+*.meta
+*.pdb
+src/obj
