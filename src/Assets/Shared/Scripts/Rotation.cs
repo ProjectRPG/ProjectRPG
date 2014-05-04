@@ -16,8 +16,32 @@ public class Rotation : MonoBehaviour
 
     public int RotationIncrement = 1;
 
+    public bool HasArrow = false;
+
+    public Texture2D ArrowLeftTexture = null;
+
+    public Texture2D ArrowRightTexture = null;
+
+    public int ArrowTop = 0;
+
+    public int ArrowLeft = 0;
+
+    public int ArrowWidth = 10;
+
+    public int ArrowHeigh = 10;
+
     public void Start()
     {
+        Debug.Log(screenCenter);
+    }
+
+    public void OnGUI()
+    {
+        if (HasArrow)
+        {
+            GUI.DrawTexture(new Rect(ArrowLeft, ArrowTop, ArrowWidth, ArrowHeigh), ArrowLeftTexture);
+            GUI.DrawTexture(new Rect(Screen.width - ArrowLeft - ArrowWidth, ArrowTop, ArrowWidth, ArrowHeigh), ArrowRightTexture);
+        }
     }
 
     public void Update()
@@ -41,6 +65,7 @@ public class Rotation : MonoBehaviour
         {
             if (currentMousePosition < screenCenter - CenterVoid)
             {
+                Debug.Log("Left: " + currentMousePosition);
                 rotationCounter -= (int)((screenCenter - CenterVoid - currentMousePosition) * AccelerationFactor) + RotationIncrement;
                 Vector3 rotate = new Vector3(0, rotationCounter, 0);
                 Quaternion rotationDelta = Quaternion.Euler(rotate);
@@ -49,7 +74,8 @@ public class Rotation : MonoBehaviour
 
             if (currentMousePosition > screenCenter + CenterVoid)
             {
-                rotationCounter -= (int)((screenCenter + CenterVoid - currentMousePosition) * AccelerationFactor) + RotationIncrement;
+                Debug.Log("Right: " + currentMousePosition);
+                rotationCounter += (int)(Mathf.Abs((screenCenter + CenterVoid - currentMousePosition)) * AccelerationFactor) + RotationIncrement;
                 Vector3 rotate = new Vector3(0, rotationCounter, 0);
                 Quaternion rotationDelta = Quaternion.Euler(rotate);
                 rigidbody.MoveRotation(rotationDelta);
