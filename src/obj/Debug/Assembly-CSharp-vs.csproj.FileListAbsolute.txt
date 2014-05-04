@@ -9,14 +9,3 @@ D:\git\ProjectRPG\src\Temp\bin\Debug\Unity.DataContract.dll
 D:\git\ProjectRPG\src\Temp\bin\Debug\ICSharpCode.NRefactory.dll
 D:\git\ProjectRPG\src\obj\Debug\Assembly-CSharp.dll
 D:\git\ProjectRPG\src\obj\Debug\Assembly-CSharp.pdb
-C:\git\ProjectRPG\src\Temp\bin\Debug\Assembly-CSharp.dll
-C:\git\ProjectRPG\src\Temp\bin\Debug\Assembly-CSharp.pdb
-C:\git\ProjectRPG\src\Temp\bin\Debug\UnityEditor.dll
-C:\git\ProjectRPG\src\Temp\bin\Debug\UnityEngine.dll
-C:\git\ProjectRPG\src\Temp\bin\Debug\Mono.Cecil.dll
-C:\git\ProjectRPG\src\Temp\bin\Debug\nunit.framework.dll
-C:\git\ProjectRPG\src\Temp\bin\Debug\Unity.DataContract.dll
-C:\git\ProjectRPG\src\Temp\bin\Debug\ICSharpCode.NRefactory.dll
-C:\git\ProjectRPG\src\obj\Debug\Assembly-CSharp-vs.csprojResolveAssemblyReference.cache
-C:\git\ProjectRPG\src\obj\Debug\Assembly-CSharp.dll
-C:\git\ProjectRPG\src\obj\Debug\Assembly-CSharp.pdb
