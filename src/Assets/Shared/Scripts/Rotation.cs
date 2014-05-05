@@ -12,6 +12,8 @@ public class Rotation : MonoBehaviour
 
     public int CenterVoid = 200;
 
+    public int OuterVoid = 400;
+
     public double AccelerationFactor = 0.05;
 
     public int RotationIncrement = 1;
@@ -32,7 +34,6 @@ public class Rotation : MonoBehaviour
 
     public void Start()
     {
-        Debug.Log(screenCenter);
     }
 
     public void OnGUI()
@@ -63,18 +64,16 @@ public class Rotation : MonoBehaviour
 
         if (canMove)
         {
-            if (currentMousePosition < screenCenter - CenterVoid)
+            if (currentMousePosition < screenCenter - CenterVoid && currentMousePosition > OuterVoid)
             {
-                Debug.Log("Left: " + currentMousePosition);
                 rotationCounter -= (int)((screenCenter - CenterVoid - currentMousePosition) * AccelerationFactor) + RotationIncrement;
                 Vector3 rotate = new Vector3(0, rotationCounter, 0);
                 Quaternion rotationDelta = Quaternion.Euler(rotate);
                 rigidbody.MoveRotation(rotationDelta);
             }
 
-            if (currentMousePosition > screenCenter + CenterVoid)
+            if (currentMousePosition > screenCenter + CenterVoid && currentMousePosition < Screen.width - OuterVoid)
             {
-                Debug.Log("Right: " + currentMousePosition);
                 rotationCounter += (int)(Mathf.Abs((screenCenter + CenterVoid - currentMousePosition)) * AccelerationFactor) + RotationIncrement;
                 Vector3 rotate = new Vector3(0, rotationCounter, 0);
                 Quaternion rotationDelta = Quaternion.Euler(rotate);
