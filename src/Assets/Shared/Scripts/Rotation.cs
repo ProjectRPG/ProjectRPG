@@ -10,9 +10,13 @@ public class Rotation : MonoBehaviour
 
     private readonly int screenCenter = Screen.width / 2;
 
-    public int CenterVoid = 200;
+    public float CenterVoidPercent = 25;
 
-    public int OuterVoid = 400;
+    private float centerVoid;
+
+    public float OuterVoidPercent;
+
+    private float outerVoid;
 
     public double AccelerationFactor = 0.05;
 
@@ -24,9 +28,13 @@ public class Rotation : MonoBehaviour
 
     public Texture2D ArrowRightTexture = null;
 
-    public int ArrowTop = 0;
+    public float ArrowTopPercent = 0;
 
-    public int ArrowLeft = 0;
+    public float ArrowLeftPercent = 0;
+
+    private float arrowTop;
+
+    private float arrowLeft;
 
     public int ArrowWidth = 10;
 
@@ -34,14 +42,19 @@ public class Rotation : MonoBehaviour
 
     public void Start()
     {
+        centerVoid = Screen.width * (CenterVoidPercent / 100f);
+        outerVoid = Screen.width * (OuterVoidPercent / 100f);
+
+        arrowLeft = Screen.width * (ArrowLeftPercent / 100f);
+        arrowTop = Screen.height * (ArrowTopPercent / 100f);
     }
 
     public void OnGUI()
     {
         if (HasArrow)
         {
-            GUI.DrawTexture(new Rect(ArrowLeft, ArrowTop, ArrowWidth, ArrowHeigh), ArrowLeftTexture);
-            GUI.DrawTexture(new Rect(Screen.width - ArrowLeft - ArrowWidth, ArrowTop, ArrowWidth, ArrowHeigh), ArrowRightTexture);
+            GUI.DrawTexture(new Rect(arrowLeft, arrowTop, ArrowWidth, ArrowHeigh), ArrowLeftTexture);
+            GUI.DrawTexture(new Rect(Screen.width - arrowLeft - ArrowWidth, arrowTop, ArrowWidth, ArrowHeigh), ArrowRightTexture);
         }
     }
 
@@ -64,17 +77,17 @@ public class Rotation : MonoBehaviour
 
         if (canMove)
         {
-            if (currentMousePosition < screenCenter - CenterVoid && currentMousePosition > OuterVoid)
+            if (currentMousePosition < screenCenter - centerVoid && currentMousePosition > outerVoid)
             {
-                rotationCounter -= (int)((screenCenter - CenterVoid - currentMousePosition) * AccelerationFactor) + RotationIncrement;
+                rotationCounter -= (int)((screenCenter - centerVoid - currentMousePosition) * AccelerationFactor) + RotationIncrement;
                 Vector3 rotate = new Vector3(0, rotationCounter, 0);
                 Quaternion rotationDelta = Quaternion.Euler(rotate);
                 rigidbody.MoveRotation(rotationDelta);
             }
 
-            if (currentMousePosition > screenCenter + CenterVoid && currentMousePosition < Screen.width - OuterVoid)
+            if (currentMousePosition > screenCenter + centerVoid && currentMousePosition < Screen.width - outerVoid)
             {
-                rotationCounter += (int)(Mathf.Abs((screenCenter + CenterVoid - currentMousePosition)) * AccelerationFactor) + RotationIncrement;
+                rotationCounter += (int)(Mathf.Abs((screenCenter + centerVoid - currentMousePosition)) * AccelerationFactor) + RotationIncrement;
                 Vector3 rotate = new Vector3(0, rotationCounter, 0);
                 Quaternion rotationDelta = Quaternion.Euler(rotate);
                 rigidbody.MoveRotation(rotationDelta);
