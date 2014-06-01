@@ -9,6 +9,3 @@ class AProjectRPGGameMode : public AGameMode
 	GENERATED_UCLASS_BODY()
 
 };
-
-
-
