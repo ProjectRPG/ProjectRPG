@@ -1,0 +1,13 @@
+{
+    "required": true,
+    "minVersion": "0.7",
+    "package": "rpg.project.lib.internal.mixin",
+    "compatibilityLevel": "JAVA_17",
+    "refmap": "projectrpg.refmap.json",
+    "mixins": [],
+    "server": [],
+    "client": [],
+    "injectors": {
+        "defaultRequire": 1
+  }
+}

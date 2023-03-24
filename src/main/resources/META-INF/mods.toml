@@ -3,29 +3,29 @@ loaderVersion="[45,)"
 license="All rights reserved"
 #issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/"
 [[mods]] 
-modId="${modid}" 
+modId="projectrpg" 
 version="${file.jarVersion}" 
 displayName="Example Mod" #
 #updateJSONURL="https://change.me.example.invalid/updates.json" 
 #displayURL="https://change.me.to.your.mods.homepage.example.invalid/" 
-#logoFile="${modid}.png" 
-credits="Thanks for this example mod goes to Java" 
-authors="Love, Cheese and small house plants" 
+#logoFile="projectrpg.png" 
+credits="The Community and Contributors of the Project" 
+authors="Project RPG Team and Contributors" 
 #displayTest="MATCH_VERSION" 
 description='''
-This is a long form description of the mod. You can write whatever you want here
-
-Have some lorem ipsum.
+Project RPG is a hub mod for adding RPG elements to your Minecraft world.
+The mod comes with some default features but is designed to be expanded by
+addons that you choose to shape your RPG experience.
 '''
 
-[[dependencies.${modid}]]
+[[dependencies.projectrpg]]
     modId="forge" 
     mandatory=true 
     versionRange="[45,)" 
     ordering="NONE"
     side="BOTH"
 	
-[[dependencies.${modid}]]
+[[dependencies.projectrpg]]
     modId="minecraft"
     mandatory=true
     versionRange="[1.19.4,1.20)"
