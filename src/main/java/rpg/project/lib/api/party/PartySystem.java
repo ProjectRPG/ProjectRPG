@@ -3,8 +3,8 @@ package rpg.project.lib.api.party;
 import java.util.List;
 import java.util.UUID;
 
-import com.mojang.brigadier.tree.CommandNode;
-
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 
@@ -34,8 +34,8 @@ public interface PartySystem {
 	
 	/**<p>Gets the internal party name of the provided player, if the
 	 * player is in a party, else returns null.</p>
-	 * <p><u>NOTE: the default implementation of this method is highly
-	 * unoptimized.  Overriding is strongly advised.</u></p>  
+	 * <p><i>NOTE: the default implementation of this method is highly
+	 * unoptimized.  Overriding is strongly advised.</i></p>  
 	 * 
 	 * @param player the unique identifier of the player
 	 * @return the party internal name or null if not in a party
@@ -60,12 +60,14 @@ public interface PartySystem {
 	/**@return the display component for all parties currently created*/
 	List<Component> getAllPartyNames();
 	
-	/**This method is called once during server startup to set the party
+	/**<p>This method is called once during server startup to set the party
 	 * commands for the entire ecosystem.  If your implementation works
 	 * with the default command set, you can return null to have this 
-	 * ignored in favor of keeping the defaults.
+	 * ignored in favor of keeping the defaults.</p>
+	 * <p><i>NOTE: your implementation replaces "<code>/rpg party</code>" with
+	 * "<code>/rpg yourLiteralKeyword</code>"</i></p>
 	 * 
 	 * @return a replacement command tree for the party literal
 	 */
-	CommandNode<?> getCommands();
+	LiteralArgumentBuilder<CommandSourceStack> getCommands();
 }

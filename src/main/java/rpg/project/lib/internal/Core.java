@@ -5,6 +5,8 @@ import java.util.function.Function;
 
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.LogicalSide;
+import rpg.project.lib.api.party.PartySystem;
+import rpg.project.lib.internal.setup.CommonSetup;
 import rpg.project.lib.internal.util.Functions;
 
 /**<p>This class bridges the gap between various systems within Project RPG.
@@ -21,11 +23,15 @@ public class Core {
 			LogicalSide.CLIENT, Functions.memoize(Core::new), 
 			LogicalSide.SERVER, Functions.memoize(Core::new));
 	private final LogicalSide side;
+	private final PartySystem party = CommonSetup.partySupplier.get();
 	
 	private Core(LogicalSide side) {
 		this.side = side;
 	}
 	
+	//TODO find a way to prevent these from being called too early.
+	// perhaps a lifecycle state check or some sort of "finished setup"
+	// flag that gets set by prerequisite behavior.
 	public static Core get(final LogicalSide side) {
 	    return INSTANCES.get(side).apply(side);
 	}
@@ -34,4 +40,5 @@ public class Core {
 	}
 	
 	public LogicalSide getSide() {return side;}
+	public PartySystem getParty() {return party;}
 }

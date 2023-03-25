@@ -8,7 +8,7 @@ public class ProgressionUtils {
 	 * 
 	 * @param system an {@link ProgressionSystem} implementation
 	 */
-	public static void registerXpSystem(ProgressionSystem system) {
+	public static void registerXpSystem(ProgressionSystem<?> system) {
 		
 	}
 }

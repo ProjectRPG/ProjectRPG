@@ -3,90 +3,105 @@ package rpg.project.lib.builtins.vanilla;
 import java.util.List;
 import java.util.UUID;
 
-import com.mojang.brigadier.tree.CommandNode;
-
+import com.google.common.collect.HashMultimap;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.ServerScoreboard;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import rpg.project.lib.api.party.PartySystem;
 
 public class VanillaPartySystem implements PartySystem{
+	private final HashMultimap<String, String> partyInvites = HashMultimap.create();
 
 	@Override
 	public boolean createParty(String partyName) {
-		// TODO Auto-generated method stub
-		return false;
+		board().addPlayerTeam(partyName);		
+		return true;
 	}
 
 	@Override
 	public boolean closeParty(String partyName) {
-		// TODO Auto-generated method stub
+		board().removePlayerTeam(board().getPlayerTeam(partyName));
 		return false;
 	}
 
 	@Override
 	public boolean invitePlayer(Player executor, String invitee) {
-		// TODO Auto-generated method stub
+		PlayerTeam team = board().getPlayersTeam(executor.getUUID().toString());
+		if (team != null) {
+			partyInvites.put(team.getName(), invitee);
+			return true;
+		}			
 		return false;
 	}
 
 	@Override
 	public boolean revokeInvite(Player executor, String invitee) {
-		// TODO Auto-generated method stub
+		PlayerTeam team = board().getPlayersTeam(executor.getUUID().toString());
+		if (team != null) 
+			return partyInvites.remove(team.getName(), invitee);
 		return false;
 	}
 
 	@Override
 	public boolean acceptInvite(Player invitee, String partyName) {
-		// TODO Auto-generated method stub
+		if (partyInvites.get(partyName).contains(invitee.getUUID().toString())) {
+			board().addPlayerToTeam(invitee.getUUID().toString(), board().getPlayerTeam(partyName));
+			partyInvites.keySet().forEach(party -> partyInvites.get(party).remove(invitee.getUUID().toString()));
+			return true;
+		}
 		return false;
 	}
 
 	@Override
 	public boolean declineInvite(Player invitee, String partyName) {
-		// TODO Auto-generated method stub
-		return false;
+		return partyInvites.get(partyName).remove(invitee.getUUID().toString());
 	}
 
 	@Override
 	public boolean joinParty(Player executor, String partyName) {
-		// TODO Auto-generated method stub
-		return false;
+		return board().addPlayerToTeam(executor.getUUID().toString(), board().getPlayerTeam(partyName));
 	}
 
 	@Override
 	public boolean leaveParty(Player executor, String partyName) {
-		// TODO Auto-generated method stub
-		return false;
+		return board().removePlayerFromTeam(executor.getUUID().toString());
+	}
+	
+	@Override
+	public String getPlayerParty(UUID player) {
+		return board().getPlayersTeam(player.toString()).getName();
 	}
 
 	@Override
 	public List<UUID> getPartyMembers(String partyName) {
-		// TODO Auto-generated method stub
-		return null;
+		return board().getPlayerTeam(partyName).getPlayers().stream().map(UUID::fromString).toList();
 	}
 
 	@Override
 	public Component getPartyDisplayName(String partyName) {
-		// TODO Auto-generated method stub
-		return null;
+		return board().getPlayerTeam(partyName).getDisplayName();
 	}
 
 	@Override
 	public List<String> getAllParties() {
-		// TODO Auto-generated method stub
-		return null;
+		return board().getPlayerTeams().stream().map(PlayerTeam::getName).toList();
 	}
 
 	@Override
 	public List<Component> getAllPartyNames() {
-		// TODO Auto-generated method stub
-		return null;
+		return board().getPlayerTeams().stream().map(PlayerTeam::getDisplayName).toList();
 	}
 
 	@Override
-	public CommandNode<?> getCommands() {
-		// TODO Auto-generated method stub
-		return null;
+	public LiteralArgumentBuilder<CommandSourceStack> getCommands() {
+		return null; //TODO confirm that default behavior of the default party commands is sufficient for this functionality
 	}
 
+	private MinecraftServer server() {return ServerLifecycleHooks.getCurrentServer();}
+	private ServerScoreboard board() {return server().getScoreboard();}
 }
