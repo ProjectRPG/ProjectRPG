@@ -46,10 +46,29 @@ public class LangProvider extends LanguageProvider{
 	}
 	
 	//Insert Translations between these lines
-	
 	//Example Translation
 	public static final Translation EXAMPLE = Translation.Builder.start("key.key.key")
 			.addLocale(Locale.EN_US, "Translated Text").build();
+	
+	//======PARTY SYSTEM=====
+	public static final Translation PARTY_CREATE_SUCCESS = Translation.Builder.start("projectrpg.cmd.party.create.success")
+		.addLocale(Locale.EN_US, "Created Party: %s").build();
+	public static final Translation PARTY_CREATE_FAILURE = Translation.Builder.start("projectrpg.cmd.party.create.failure")
+			.addLocale(Locale.EN_US, "Party Creation Failed.").build();
+	public static final Translation PARTY_LEAVE_SUCCESS = Translation.Builder.start("projectrpg.cmd.party.leave.success")
+			.addLocale(Locale.EN_US, "You have left %s party").build();
+	public static final Translation PARTY_LEAVE_FAILURE = Translation.Builder.start("projectrpg.cmd.party.leave.failure")
+			.addLocale(Locale.EN_US, "You are not in a party to leave.").build();
+	public static final Translation PARTY_LIST_SUCCESS = Translation.Builder.start("projectrpg.cmd.party.list.success")
+			.addLocale(Locale.EN_US, "Member: %s").build();
+	public static final Translation PARTY_INVITE_SUCCESS = Translation.Builder.start("projectrpg.cmd.party.invite.success")
+			.addLocale(Locale.EN_US, "You have invited %s to the party.").build();
+	public static final Translation PARTY_INVITE_FAILURE = Translation.Builder.start("projectrpg.cmd.party.invite.failure")
+			.addLocale(Locale.EN_US, "You are not in a party to invite players to.").build();
+	public static final Translation PARTY_UNINVITE_SUCCESS = Translation.Builder.start("projectrpg.cmd.party.uninvite.success")
+			.addLocale(Locale.EN_US, "You have uninvited %s to the party.").build();
+	public static final Translation PARTY_UNINVITE_FAILURE = Translation.Builder.start("projectrpg.cmd.party.uninvite.failure")
+			.addLocale(Locale.EN_US, "You are not in a party to invite players to.").build();
 	//End Translations
 	
 	@Override
