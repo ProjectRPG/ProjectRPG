@@ -4,11 +4,17 @@ import java.util.function.Supplier;
 
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.builtins.vanilla.VanillaPartySystem;
+import rpg.project.lib.internal.commands.CmdRoot;
 import rpg.project.lib.internal.setup.datagen.LangProvider;
 import rpg.project.lib.internal.setup.datagen.LangProvider.Locale;
+import rpg.project.lib.internal.util.Reference;
 
+@Mod.EventBusSubscriber(modid=Reference.MODID, bus=Mod.EventBusSubscriber.Bus.FORGE)
 public class CommonSetup {
 	public static Supplier<PartySystem> partySupplier = () -> new VanillaPartySystem();
 
@@ -20,5 +26,10 @@ public class CommonSetup {
 				generator.addProvider(true, new LangProvider(generator.getPackOutput(), locale.str));
 			}
 		}
+	}
+	
+	@SubscribeEvent
+	public static void registerCommands(RegisterCommandsEvent event) {
+		CmdRoot.register(event.getDispatcher());
 	}
 }
