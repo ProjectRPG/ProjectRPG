@@ -5,8 +5,12 @@ import java.util.function.Supplier;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.RegistryManager;
+import rpg.project.lib.api.APIUtils;
+import rpg.project.lib.api.events.EventListenerSpecification;
 import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.builtins.vanilla.VanillaPartySystem;
 import rpg.project.lib.internal.commands.CmdRoot;
@@ -25,6 +29,13 @@ public class CommonSetup {
 			for (Locale locale : LangProvider.Locale.values()) {
 				generator.addProvider(true, new LangProvider(generator.getPackOutput(), locale.str));
 			}
+		}
+	}
+	
+	@SubscribeEvent
+	public static void onServerAboutToStart(ServerAboutToStartEvent event) {
+		for (EventListenerSpecification<?> els : RegistryManager.ACTIVE.getRegistry(APIUtils.GAMEPLAY_EVENTS).getValues()) {
+			els.registerListener();
 		}
 	}
 	
