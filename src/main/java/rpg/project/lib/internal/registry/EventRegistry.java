@@ -1,9 +1,9 @@
 package rpg.project.lib.internal.registry;
 
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.level.BlockEvent.BreakEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -29,9 +29,16 @@ public class EventRegistry {
 	 * @param event the event instance being consumed
 	 * @param contextFactory creates a new {@link EventContext} from the event instance
 	 */
-	public static <T extends Event> void internalEventLogic(ResourceLocation eventSpecID, T event, Function<T, EventContext> contextFactory) {
-		EventContext context = contextFactory.apply(event);
+	public static <T extends Event> void internalEventLogic(T event, EventListenerSpecification<T> spec) {
+		EventContext context = spec.contextFactory().apply(event);
 		//TODO handle things like gates, progression, abilities, and feature hooks
+	}
+	
+	/**This is used to add listeners at the appropriate 
+	 * lifecycle stage.  Calling this in your own mod will create duplication.
+	 */
+	public static <T extends Event> void registerListener(EventListenerSpecification<T> spec) {
+		MinecraftForge.EVENT_BUS.addListener(spec.priority(), true, spec.validEventClass(), event -> internalEventLogic(event, spec));
 	}
 	
 	

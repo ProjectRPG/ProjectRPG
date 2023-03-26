@@ -14,6 +14,7 @@ import rpg.project.lib.api.events.EventListenerSpecification;
 import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.builtins.vanilla.VanillaPartySystem;
 import rpg.project.lib.internal.commands.CmdRoot;
+import rpg.project.lib.internal.registry.EventRegistry;
 import rpg.project.lib.internal.setup.datagen.LangProvider;
 import rpg.project.lib.internal.setup.datagen.LangProvider.Locale;
 import rpg.project.lib.internal.util.Reference;
@@ -35,7 +36,7 @@ public class CommonSetup {
 	@SubscribeEvent
 	public static void onServerAboutToStart(ServerAboutToStartEvent event) {
 		for (EventListenerSpecification<?> els : RegistryManager.ACTIVE.getRegistry(APIUtils.GAMEPLAY_EVENTS).getValues()) {
-			els.registerListener();
+			EventRegistry.registerListener(els);
 		}
 	}
 	
