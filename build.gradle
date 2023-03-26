@@ -73,13 +73,14 @@ minecraft {
         }
 
         data {
-            workingDirectory project.file('run/data')
+            workingDirectory project.file('run/client')
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
             args '--mod', "${modid}", '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
             mods {
                 '${modid}' {
                     source sourceSets.main
+                    forceExit = false
                 }
             }
         }
@@ -88,12 +89,10 @@ minecraft {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
-repositories {
-
-}
+repositories {}
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.4-45.0.22'
+    minecraft 'net.minecraftforge:forge:1.19.4-45.0.25'
     annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
 }
 
