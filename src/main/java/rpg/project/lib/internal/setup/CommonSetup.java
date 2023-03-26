@@ -10,7 +10,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.RegistryManager;
 import rpg.project.lib.api.APIUtils;
-import rpg.project.lib.api.events.EventListenerSpecification;
 import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.builtins.vanilla.VanillaPartySystem;
 import rpg.project.lib.internal.commands.CmdRoot;
@@ -35,9 +34,7 @@ public class CommonSetup {
 	
 	@SubscribeEvent
 	public static void onServerAboutToStart(ServerAboutToStartEvent event) {
-		for (EventListenerSpecification<?> els : RegistryManager.ACTIVE.getRegistry(APIUtils.GAMEPLAY_EVENTS).getValues()) {
-			EventRegistry.registerListener(els);
-		}
+		RegistryManager.ACTIVE.getRegistry(APIUtils.GAMEPLAY_EVENTS).getValues().forEach(els -> EventRegistry.registerListener(els));
 	}
 	
 	@SubscribeEvent
