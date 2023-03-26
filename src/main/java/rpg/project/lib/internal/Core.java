@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.LogicalSide;
+import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.internal.setup.CommonSetup;
 import rpg.project.lib.internal.util.Functions;
@@ -18,7 +19,7 @@ import rpg.project.lib.internal.util.Functions;
  * be invoked in side-sensitive contexts and not violate any cross-side
  * boundaries.</p>
  */
-public class Core {
+public class Core implements Hub{
 	private static final Map<LogicalSide, Function<LogicalSide, Core>> INSTANCES = Map.of(
 			LogicalSide.CLIENT, Functions.memoize(Core::new), 
 			LogicalSide.SERVER, Functions.memoize(Core::new));
@@ -40,5 +41,6 @@ public class Core {
 	}
 	
 	public LogicalSide getSide() {return side;}
+	@Override
 	public PartySystem getParty() {return party;}
 }
