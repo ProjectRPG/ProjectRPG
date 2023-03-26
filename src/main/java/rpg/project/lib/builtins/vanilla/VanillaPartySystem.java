@@ -64,12 +64,12 @@ public class VanillaPartySystem implements PartySystem{
 
 	@Override
 	public boolean joinParty(Player executor, String partyName) {
-		return board().addPlayerToTeam(executor.getUUID().toString(), board().getPlayerTeam(partyName));
+		return board().addPlayerToTeam(executor.getStringUUID(), board().getPlayerTeam(partyName));
 	}
 
 	@Override
 	public boolean leaveParty(Player executor, String partyName) {
-		return board().removePlayerFromTeam(executor.getUUID().toString());
+		return board().removePlayerFromTeam(executor.getStringUUID());
 	}
 	
 	@Override

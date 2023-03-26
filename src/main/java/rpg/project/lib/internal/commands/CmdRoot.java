@@ -37,8 +37,10 @@ public class CmdRoot {
 				.then(Commands.argument(NAME, StringArgumentType.word())
 					.executes(ctx -> {
 						Core core = Core.get(LogicalSide.SERVER); 
-						if (core.getParty().createParty(StringArgumentType.getString(ctx, NAME))) {
-							Component name = core.getParty().getPartyDisplayName(NAME);
+						String partyName = StringArgumentType.getString(ctx, NAME);
+						if (core.getParty().createParty(partyName)) {
+							Component name = core.getParty().getPartyDisplayName(partyName);
+							core.getParty().joinParty(ctx.getSource().getPlayerOrException(), partyName);
 							ctx.getSource().sendSuccess(LangProvider.PARTY_CREATE_SUCCESS.asComponent(name), true);
 							return 0;
 						}
@@ -111,7 +113,21 @@ public class CmdRoot {
 								.append("("+parties.getOrDefault(party, 0)+")"), false);
 					}
 					return 0;
-				}));
+				}))
+			.then(Commands.literal("join")
+				.requires(ctx -> ctx.hasPermission(2))
+				.then(Commands.argument(PLAYER, EntityArgument.players())
+					.then(Commands.argument(NAME, StringArgumentType.word())
+						.executes(ctx -> {
+							Core core = Core.get(LogicalSide.SERVER);
+							String partyName = StringArgumentType.getString(ctx, NAME);
+							Component prettyPartyName = core.getParty().getPartyDisplayName(partyName);
+							EntityArgument.getPlayers(ctx, PLAYER).forEach(player -> {								
+								core.getParty().joinParty(player, partyName);
+								ctx.getSource().sendSuccess(LangProvider.PARTY_JOIN_SUCCESS.asComponent(player.getDisplayName(), prettyPartyName), false);
+							});
+							return 0;
+						}))));
 				
 	}
 }

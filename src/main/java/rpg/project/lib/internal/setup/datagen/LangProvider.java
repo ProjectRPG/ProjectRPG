@@ -69,6 +69,8 @@ public class LangProvider extends LanguageProvider{
 			.addLocale(Locale.EN_US, "You have uninvited %s to the party.").build();
 	public static final Translation PARTY_UNINVITE_FAILURE = Translation.Builder.start("projectrpg.cmd.party.uninvite.failure")
 			.addLocale(Locale.EN_US, "You are not in a party to invite players to.").build();
+	public static final Translation PARTY_JOIN_SUCCESS = Translation.Builder.start("projectrpg.cmd.party.join.success")
+			.addLocale(Locale.EN_US, "You have added %s to the %s party.").build();
 	//End Translations
 	
 	@Override
