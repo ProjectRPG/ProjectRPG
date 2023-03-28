@@ -69,7 +69,10 @@ public class VanillaPartySystem implements PartySystem{
 
 	@Override
 	public boolean leaveParty(Player executor, String partyName) {
-		return board().removePlayerFromTeam(executor.getStringUUID());
+		boolean success =  board().removePlayerFromTeam(executor.getStringUUID());
+		if (getPartyMembers(partyName).isEmpty())
+			closeParty(partyName);
+		return success;
 	}
 	
 	@Override
