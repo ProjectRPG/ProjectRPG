@@ -7,6 +7,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.LogicalSide;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.party.PartySystem;
+import rpg.project.lib.internal.registry.AbilityRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
 import rpg.project.lib.internal.util.Functions;
 
@@ -25,9 +26,11 @@ public class Core implements Hub{
 			LogicalSide.SERVER, Functions.memoize(Core::new));
 	private final LogicalSide side;
 	private final PartySystem party = CommonSetup.partySupplier.get();
+	private final AbilityRegistry abilities;
 	
 	private Core(LogicalSide side) {
 		this.side = side;
+		this.abilities = new AbilityRegistry();
 	}
 	
 	//TODO find a way to prevent these from being called too early.
@@ -43,4 +46,5 @@ public class Core implements Hub{
 	public LogicalSide getSide() {return side;}
 	@Override
 	public PartySystem getParty() {return party;}
+	public AbilityRegistry getAbilityRegistry() { return abilities; }
 }

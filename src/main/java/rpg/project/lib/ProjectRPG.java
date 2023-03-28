@@ -6,6 +6,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import rpg.project.lib.internal.config.AbilitiesConfig;
 import rpg.project.lib.internal.config.Config;
 import rpg.project.lib.internal.registry.EventRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
@@ -17,7 +18,8 @@ public class ProjectRPG {
     	//Configs
     	ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_CONFIG);
     	ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG);
-    	ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SERVER_CONFIG); 
+    	ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SERVER_CONFIG);
+		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, AbilitiesConfig.SERVER_CONFIG, "prpg-abilities.toml");
     	
     	IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
     	EventRegistry.EVENTS.register(modBus);
