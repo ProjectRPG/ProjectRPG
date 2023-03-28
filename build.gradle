@@ -42,7 +42,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', "${modid}"
             mods {
-                '${modid}' {
+                "${modid}" {
                     source sourceSets.main
                 }
             }
@@ -54,7 +54,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', "${modid}"
             mods {
-                '${modid}' {
+                "${modid}" {
                     source sourceSets.main
                 }
             }
@@ -66,7 +66,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', "${modid}"
             mods {
-                '${modid}' {
+                "${modid}" {
                     source sourceSets.main
                 }
             }
@@ -78,7 +78,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
             args '--mod', "${modid}", '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
             mods {
-                '${modid}' {
+                "${modid}" {
                     source sourceSets.main
                     forceExit = false
                 }

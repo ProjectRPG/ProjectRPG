@@ -10,9 +10,7 @@ import net.minecraftforge.common.data.LanguageProvider;
 import rpg.project.lib.internal.util.Reference;
 
 public class LangProvider extends LanguageProvider{
-	private String locale;
-	
-	public static enum Locale {
+	public enum Locale {
 		DE_DE("de_de"),
 		EN_US("en_us"),
 		ES_AR("es_ar"),
@@ -37,12 +35,15 @@ public class LangProvider extends LanguageProvider{
 		ZH_CN("zh_cn"),
 		ZH_TW("zh_tw");
 		
-		public String str;
-		Locale(String locale) {str = locale;}
+		public final String str;
+		Locale(String locale) { str = locale; }
 	}
 
+	private final String locale;
+	
 	public LangProvider(PackOutput output, Locale locale) {
 		super(output, Reference.MODID, locale.str);
+		this.locale = locale.str;
 	}
 	
 	//Insert Translations between these lines
@@ -84,33 +85,39 @@ public class LangProvider extends LanguageProvider{
 	}
 	
 	private void add(Translation translation) {
-		if (translation.localeMap().get(locale) != null)
-			add(translation.key(), translation.localeMap().get(locale));
+		if (translation.localeMap().get(this.locale) != null)
+			add(translation.key(), translation.localeMap().get(this.locale));
 	}
 	
-	public static record Translation(String key, Map<String, String> localeMap) {
+	public record Translation(String key, Map<String, String> localeMap) {
 		public MutableComponent asComponent() {
 			return Component.translatable(key);
 		}
-		public MutableComponent asComponent(Object...obj) {
+		public MutableComponent asComponent(Object... obj) {
 			return Component.translatable(key(), obj);
 		}
+		
 		public static class Builder {
 			private final String key;
-			private Map<String, String> localeMap;
-			private Builder(String key) {this.key = key; localeMap = new HashMap<>();}
+			private final Map<String, String> localeMap;
+			
+			private Builder(String key) {
+				this.key = key;
+				localeMap = new HashMap<>();
+			}
 			
 			public static Builder start(String key) {
 				return new Builder(key);
 			}
+			
 			public Builder addLocale(Locale locale, String translation) {
 				this.localeMap.put(locale.str, translation);
 				return this;
 			}
+			
 			public Translation build() {
 				return new Translation(key, localeMap);
 			}
 		}
 	}
-
 }

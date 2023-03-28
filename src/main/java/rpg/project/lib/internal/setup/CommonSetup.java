@@ -3,6 +3,7 @@ package rpg.project.lib.internal.setup;
 import java.util.function.Supplier;
 
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
@@ -25,9 +26,11 @@ public class CommonSetup {
 	/**Registered to MOD BUS in mod constructor*/
 	public static void gatherData(GatherDataEvent event) {
 		DataGenerator generator = event.getGenerator();
+		PackOutput packOutput = generator.getPackOutput();
+		
 		if (event.includeClient()) {
 			for (Locale locale : LangProvider.Locale.values()) {
-				generator.addProvider(true, new LangProvider(generator.getPackOutput(), locale));
+				generator.addProvider(true, new LangProvider(packOutput, locale));
 			}
 		}
 	}
