@@ -27,7 +27,7 @@ public class CommonSetup {
 		DataGenerator generator = event.getGenerator();
 		if (event.includeClient()) {
 			for (Locale locale : LangProvider.Locale.values()) {
-				generator.addProvider(true, new LangProvider(generator.getPackOutput(), locale.str));
+				generator.addProvider(true, new LangProvider(generator.getPackOutput(), locale));
 			}
 		}
 	}

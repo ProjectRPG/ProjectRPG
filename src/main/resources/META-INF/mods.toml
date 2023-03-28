@@ -5,7 +5,7 @@ license="All rights reserved"
 [[mods]] 
 modId="projectrpg" 
 version="${file.jarVersion}" 
-displayName="Example Mod" #
+displayName="Project RPG"
 #updateJSONURL="https://change.me.example.invalid/updates.json" 
 #displayURL="https://change.me.to.your.mods.homepage.example.invalid/" 
 #logoFile="projectrpg.png" 

@@ -92,7 +92,7 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 repositories {}
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.4-45.0.25'
+    minecraft 'net.minecraftforge:forge:1.19.4-45.0.27'
     annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
 }
 
@@ -123,6 +123,10 @@ publishing {
             url "file://${project.projectDir}/mcmodsrepo"
         }
     }
+}
+
+tasks.withType(Copy).all {
+    duplicatesStrategy 'exclude'
 }
 
 tasks.withType(JavaCompile).configureEach {

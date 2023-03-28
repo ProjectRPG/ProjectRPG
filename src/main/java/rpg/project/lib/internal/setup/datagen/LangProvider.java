@@ -41,8 +41,8 @@ public class LangProvider extends LanguageProvider{
 		Locale(String locale) {str = locale;}
 	}
 
-	public LangProvider(PackOutput output, String locale) {
-		super(output, Reference.MODID, locale);
+	public LangProvider(PackOutput output, Locale locale) {
+		super(output, Reference.MODID, locale.str);
 	}
 	
 	//Insert Translations between these lines
