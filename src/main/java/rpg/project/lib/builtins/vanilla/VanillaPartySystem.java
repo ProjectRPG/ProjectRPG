@@ -69,7 +69,10 @@ public class VanillaPartySystem implements PartySystem{
 
 	@Override
 	public boolean leaveParty(Player executor, String partyName) {
-		return board().removePlayerFromTeam(executor.getStringUUID());
+		boolean success =  board().removePlayerFromTeam(executor.getStringUUID());
+		if (getPartyMembers(partyName).isEmpty())
+			closeParty(partyName);
+		return success;
 	}
 	
 	@Override
@@ -99,7 +102,7 @@ public class VanillaPartySystem implements PartySystem{
 
 	@Override
 	public LiteralArgumentBuilder<CommandSourceStack> getCommands() {
-		return null; //TODO confirm that default behavior of the default party commands is sufficient for this functionality
+		return null;
 	}
 
 	private MinecraftServer server() {return ServerLifecycleHooks.getCurrentServer();}

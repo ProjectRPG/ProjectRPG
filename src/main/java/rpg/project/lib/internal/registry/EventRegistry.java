@@ -14,7 +14,9 @@ import net.minecraftforge.registries.RegistryObject;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.EventListenerSpecification;
+import rpg.project.lib.api.events.EventListenerSpecification.CancellationType;
 import rpg.project.lib.builtins.EventFactories;
+import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.util.Reference;
 
 public class EventRegistry {	
@@ -31,7 +33,27 @@ public class EventRegistry {
 	 */
 	public static <T extends Event> void internalEventLogic(T event, EventListenerSpecification<T> spec) {
 		EventContext context = spec.contextFactory().apply(event);
-		//TODO handle things like gates, progression, abilities, and feature hooks
+		Core core = Core.get(context.level());
+		ResourceLocation eventID = spec.registryID();
+		
+		//Process EVENT gates
+		CancellationType eventCancellationStatus = GateRegistry.isEventPermitted(core, eventID, context);
+		if (eventCancellationStatus != CancellationType.NONE)
+			spec.cancellationCallback().accept(event, eventCancellationStatus);
+		
+		/* These should follow the pattern of this pseudo
+		 * 
+		 * for (Object thing : system.getThings(hub, spec.registryID(), context)) {
+		 * 		if (GateRegistry.isThingPermitted(hub, spec.registryID(), context, thing))
+		 * 			system.executeThing(hub, spec.registryID(), context, thing);
+		 * }
+		 */
+		//TODO Feature Gates
+		
+		//TODO Ability Gates
+		
+		//TODO Progress Gates
+		core.getProgression().applyContextuallyApplicableProgress(core, eventID, context, container -> GateRegistry.isProgressionPermitted(core, eventID, context, container));
 	}
 	
 	/**This is used to add listeners at the appropriate 
@@ -45,7 +67,7 @@ public class EventRegistry {
 	public static final DeferredRegister<EventListenerSpecification<?>> EVENTS = DeferredRegister.create(APIUtils.GAMEPLAY_EVENTS, Reference.MODID);
 	public static final Supplier<IForgeRegistry<EventListenerSpecification<?>>> REGISTRY_SUPPLIER = EVENTS.makeRegistry(RegistryBuilder::new);
 	
-	RegistryObject<EventListenerSpecification<BreakEvent>> BREAK = EVENTS.register("break_block", () -> new EventListenerSpecification<BreakEvent>(rl("break_block"), EventPriority.LOWEST ,BreakEvent.class, EventFactories::breakBlock));
+	RegistryObject<EventListenerSpecification<BreakEvent>> BREAK = EVENTS.register("break_block", () -> new EventListenerSpecification<BreakEvent>(rl("break_block"), EventPriority.LOWEST ,BreakEvent.class, EventFactories::breakBlock, EventFactories::breakCancelCallback));
 	
 	private static ResourceLocation rl(String path) {return new ResourceLocation(Reference.MODID, path);}
 }

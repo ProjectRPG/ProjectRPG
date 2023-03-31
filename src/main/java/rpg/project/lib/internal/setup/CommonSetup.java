@@ -12,7 +12,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.RegistryManager;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.party.PartySystem;
+import rpg.project.lib.api.progression.ProgressionSystem;
 import rpg.project.lib.builtins.vanilla.VanillaPartySystem;
+import rpg.project.lib.builtins.vanilla.VanillaProgressionSystem;
 import rpg.project.lib.internal.commands.CmdRoot;
 import rpg.project.lib.internal.registry.EventRegistry;
 import rpg.project.lib.internal.setup.datagen.LangProvider;
@@ -21,7 +23,9 @@ import rpg.project.lib.internal.util.Reference;
 
 @Mod.EventBusSubscriber(modid=Reference.MODID, bus=Mod.EventBusSubscriber.Bus.FORGE)
 public class CommonSetup {
+	//TODO expose these via API to be overridden
 	public static Supplier<PartySystem> partySupplier = () -> new VanillaPartySystem();
+	public static Supplier<ProgressionSystem<?>> progressionSupplier = () -> new VanillaProgressionSystem();
 
 	/**Registered to MOD BUS in mod constructor*/
 	public static void gatherData(GatherDataEvent event) {
