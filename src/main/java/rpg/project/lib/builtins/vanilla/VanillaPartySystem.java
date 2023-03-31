@@ -102,7 +102,7 @@ public class VanillaPartySystem implements PartySystem{
 
 	@Override
 	public LiteralArgumentBuilder<CommandSourceStack> getCommands() {
-		return null; //TODO confirm that default behavior of the default party commands is sufficient for this functionality
+		return null;
 	}
 
 	private MinecraftServer server() {return ServerLifecycleHooks.getCurrentServer();}
