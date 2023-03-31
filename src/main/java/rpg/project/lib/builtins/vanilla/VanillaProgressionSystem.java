@@ -1,21 +1,27 @@
 package rpg.project.lib.builtins.vanilla;
 
 import java.util.UUID;
+import java.util.function.Predicate;
+
 import org.apache.logging.log4j.LogManager;
 
 import com.mojang.serialization.Codec;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import rpg.project.lib.api.CodecTypes;
+import rpg.project.lib.api.Hub;
+import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.progression.ProgressionSystem;
 
 public class VanillaProgressionSystem implements ProgressionSystem<Integer>{
@@ -48,6 +54,17 @@ public class VanillaProgressionSystem implements ProgressionSystem<Integer>{
 		
 	}
 	
+	@Override
+	public List<String> getContextuallyAffectedContainers(Hub core, ResourceLocation eventID, EventContext context) {
+		//TODO get configuration information
+		return List.of();
+	}
+	
+	@Override
+	public void applyContextuallyApplicableProgress(Hub core, ResourceLocation eventID, EventContext context, Predicate<String> filter) {
+		// TODO Auto-generated method stub
+	}	
+	
 	private static class OfflineProgress extends SavedData {
 		private Map<UUID, Integer> cachedProgress;
 		
@@ -71,7 +88,7 @@ public class VanillaProgressionSystem implements ProgressionSystem<Integer>{
 		public CompoundTag save(CompoundTag pCompoundTag) {
 			pCompoundTag.put(MAP_KEY, (CompoundTag)CODEC.encodeStart(NbtOps.INSTANCE, cachedProgress).resultOrPartial(err -> LogManager.getLogger().error(err)).orElse(new CompoundTag()));
 			return pCompoundTag;
-		}
-		
+		}		
 	}
+
 }
