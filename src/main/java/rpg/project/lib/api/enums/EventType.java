@@ -8,6 +8,9 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Keeping this here just for easy reference, can be removed if needed anytime.
+ */
 public enum EventType implements StringRepresentable, IExtensibleEnum {
     ANVIL_REPAIR(true, false, false, "smithing"),
     BLOCK_BREAK(false, true, false, "mining"),
@@ -79,9 +82,9 @@ public enum EventType implements StringRepresentable, IExtensibleEnum {
     public static final EventType[] BLOCK_APPLICABLE_EVENTS = Arrays.asList(EventType.values()).stream().filter((type) -> type.blockApplicable).toArray(EventType[]::new);
     public static final EventType[] ENTITY_APPLICABLE_EVENTS = Arrays.asList(EventType.values()).stream().filter((type) -> type.entityApplicable).toArray(EventType[]::new);
     public static final EventType[] BLOCKITEM_APPLICABLE_EVENTS = Arrays.asList(EventType.values()).stream().filter((type) -> type.itemApplicable || type.blockApplicable).toArray(EventType[]::new);
-    
     public static final Codec<EventType> CODEC = IExtensibleEnum.createCodecForExtensibleEnum(EventType::values, EventType::byName);
     private static final Map<String, EventType> BY_NAME = Arrays.stream(values()).collect(Collectors.toMap(EventType::getSerializedName, s -> s));
+    
     public static EventType byName(String name) { return BY_NAME.get(name); }
     
     public static EventType create(String name, boolean itemApplicable, boolean blockApplicable, boolean entityApplicable, String autoValueSkillDefault) {

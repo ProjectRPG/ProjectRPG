@@ -19,13 +19,13 @@ import rpg.project.lib.builtins.EventFactories;
 import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.util.Reference;
 
-public class EventRegistry {	
+public class EventRegistry {
 	/**<p>A standardized method used by {@link EventListenerSpecification#registerListener()}
 	 * to register event listeners to the forge event bus.</p>
-	 * <p>Internally this applies the gating, progression, ability, and feature hook logic 
+	 * <p>Internally this applies the gating, progression, ability, and feature hook logic
 	 * for every registered event.  Each system is independently queried for configurations
 	 * related to the eventSpecID for which this consumer is registered.</p>
-	 * 
+	 *
 	 * @param <T> a Forge {@link Event} sub-class
 	 * @param eventSpecID the registry name for the event this should supply to features
 	 * @param event the event instance being consumed
@@ -35,7 +35,6 @@ public class EventRegistry {
 		EventContext context = spec.contextFactory().apply(event);
 		Core core = Core.get(context.level());
 		ResourceLocation eventID = spec.registryID();
-		
 		//Process EVENT gates
 		CancellationType eventCancellationStatus = GateRegistry.isEventPermitted(core, eventID, context);
 		if (eventCancellationStatus != CancellationType.NONE)
@@ -49,25 +48,21 @@ public class EventRegistry {
 		 * }
 		 */
 		//TODO Feature Gates
-		
 		//TODO Ability Gates
-		
 		//TODO Progress Gates
 		core.getProgression().applyContextuallyApplicableProgress(core, eventID, context, container -> GateRegistry.isProgressionPermitted(core, eventID, context, container));
 	}
 	
-	/**This is used to add listeners at the appropriate 
+	/**This is used to add listeners at the appropriate
 	 * lifecycle stage.  Calling this in your own mod will create duplication.
 	 */
 	public static <T extends Event> void registerListener(EventListenerSpecification<T> spec) {
 		MinecraftForge.EVENT_BUS.addListener(spec.priority(), true, spec.validEventClass(), event -> internalEventLogic(event, spec));
 	}
 	
-	
 	public static final DeferredRegister<EventListenerSpecification<?>> EVENTS = DeferredRegister.create(APIUtils.GAMEPLAY_EVENTS, Reference.MODID);
 	public static final Supplier<IForgeRegistry<EventListenerSpecification<?>>> REGISTRY_SUPPLIER = EVENTS.makeRegistry(RegistryBuilder::new);
 	
-	RegistryObject<EventListenerSpecification<BreakEvent>> BREAK = EVENTS.register("break_block", () -> new EventListenerSpecification<BreakEvent>(rl("break_block"), EventPriority.LOWEST ,BreakEvent.class, EventFactories::breakBlock, EventFactories::breakCancelCallback));
-	
-	private static ResourceLocation rl(String path) {return new ResourceLocation(Reference.MODID, path);}
+	public static final RegistryObject<EventListenerSpecification<BreakEvent>> BREAK = EVENTS.register("break_block",
+		() -> new EventListenerSpecification<>(Reference.resource("break_block"), EventPriority.LOWEST, BreakEvent.class, EventFactories::breakBlock, EventFactories::breakCancelCallback));
 }

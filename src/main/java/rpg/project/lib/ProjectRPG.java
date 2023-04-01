@@ -25,6 +25,7 @@ public class ProjectRPG {
     	EventRegistry.EVENTS.register(modBus);
     	
     	//MOD BUS event listeners
+    	modBus.addListener(CommonSetup::init);
     	modBus.addListener(CommonSetup::gatherData);
     }
 }

@@ -10,7 +10,6 @@ import net.minecraftforge.event.TickEvent;
 import org.jetbrains.annotations.NotNull;
 import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.abilities.AbilityUtils;
-import rpg.project.lib.api.enums.EventType;
 import rpg.project.lib.internal.config.AbilitiesConfig;
 import rpg.project.lib.internal.util.MsLoggy;
 import rpg.project.lib.internal.util.MsLoggy.LOG_CODE;
@@ -48,12 +47,12 @@ public class AbilityRegistry {
         return abilities.getOrDefault(id, Ability.empty()).status().apply(player, settings);
     }
     
-    public CompoundTag executeAbility(EventType cause, Player player, @NotNull CompoundTag dataIn) {
+    public CompoundTag executeAbility(ResourceLocation cause, Player player, @NotNull CompoundTag dataIn) {
         if (player == null) { return new CompoundTag(); }
         
         CompoundTag output = new CompoundTag();
         AbilitiesConfig.ABILITY_SETTINGS.get().getOrDefault(cause, new ArrayList<>()).forEach(src -> {
-            ResourceLocation abilityID = new ResourceLocation(src.getString("ability"));
+            ResourceLocation abilityID = new ResourceLocation(src.getString("type"));
             Ability ability = abilities.getOrDefault(abilityID, Ability.empty());
             src = ability.propertyDefaults().merge(src.merge(dataIn));
             // TODO

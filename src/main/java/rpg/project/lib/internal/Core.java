@@ -21,7 +21,7 @@ import rpg.project.lib.internal.util.Functions;
  * be invoked in side-sensitive contexts and not violate any cross-side
  * boundaries.</p>
  */
-public class Core implements Hub{
+public class Core implements Hub {
 	private static final Map<LogicalSide, Function<LogicalSide, Core>> INSTANCES = Map.of(
 			LogicalSide.CLIENT, Functions.memoize(Core::new), 
 			LogicalSide.SERVER, Functions.memoize(Core::new));
