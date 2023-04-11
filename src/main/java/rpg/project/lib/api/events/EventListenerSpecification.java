@@ -46,6 +46,16 @@ public record EventListenerSpecification<T extends Event>(
 		 * block activation is being prevented but not the item activation.*/
 		BLOCK;
 		
+		/**<p>Accepts a set of {@link CancellationType}s and returns the type
+		 * with the highest internal priority. Priority Order:</p><ol>
+		 * <li>{@link CancellationType#EVENT EVENT}</li>
+		 * <li>{@link CancellationType#ITEM ITEM}</li>
+		 * <li>{@link CancellationType#BLOCK BLOCK}</li>
+		 * <li>{@link CancellationType#NONE NONE}</li></ol>
+		 * 
+		 * @param set collection of types to be priority filtered
+		 * @return the highest order priority.
+		 */
 		public static CancellationType resolve(Set<CancellationType> set) {
 			return set.contains(CancellationType.EVENT) ? CancellationType.EVENT
 					: set.contains(CancellationType.ITEM) ? CancellationType.ITEM
