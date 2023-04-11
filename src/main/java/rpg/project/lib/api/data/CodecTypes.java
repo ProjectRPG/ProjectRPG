@@ -1,4 +1,4 @@
-package rpg.project.lib.api;
+package rpg.project.lib.api.data;
 
 import java.util.UUID;
 

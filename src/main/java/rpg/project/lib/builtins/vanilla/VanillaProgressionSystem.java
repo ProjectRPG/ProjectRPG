@@ -19,8 +19,8 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import rpg.project.lib.api.CodecTypes;
 import rpg.project.lib.api.Hub;
+import rpg.project.lib.api.data.CodecTypes;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.progression.ProgressionSystem;
 
