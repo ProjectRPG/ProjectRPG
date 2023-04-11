@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
-import rpg.project.lib.api.abilities.AbilityUtils;
 import rpg.project.lib.internal.config.readers.TomlConfigHelper;
 import rpg.project.lib.internal.config.readers.TomlConfigHelper.ConfigObject;
 import rpg.project.lib.internal.registry.EventRegistry;
