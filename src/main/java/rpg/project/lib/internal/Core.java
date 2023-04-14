@@ -8,6 +8,7 @@ import net.minecraftforge.fml.LogicalSide;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.api.progression.ProgressionSystem;
+import rpg.project.lib.internal.config.readers.DataLoader;
 import rpg.project.lib.internal.registry.AbilityRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
 import rpg.project.lib.internal.util.Functions;
@@ -26,6 +27,7 @@ public class Core implements Hub {
 			LogicalSide.CLIENT, Functions.memoize(Core::new), 
 			LogicalSide.SERVER, Functions.memoize(Core::new));
 	private final LogicalSide side;
+	private final DataLoader loader = new DataLoader();
 	private final PartySystem party = CommonSetup.partySupplier.get();
 	private final ProgressionSystem<?> progress = CommonSetup.progressionSupplier.get();
 	private final AbilityRegistry abilities;
@@ -46,6 +48,7 @@ public class Core implements Hub {
 	}
 	
 	public LogicalSide getSide() {return side;}
+	public DataLoader getLoader() {return loader;}
 	@Override
 	public PartySystem getParty() {return party;}
 	@Override

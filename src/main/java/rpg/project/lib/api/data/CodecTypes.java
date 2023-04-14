@@ -1,11 +1,9 @@
 package rpg.project.lib.api.data;
 
 import java.util.UUID;
-
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.codecs.PrimitiveCodec;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 

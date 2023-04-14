@@ -1,12 +1,17 @@
 package rpg.project.lib.internal.registry;
 
+import java.util.Arrays;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
-import com.ibm.icu.impl.locale.XCldrStub.HashMultimap;
+import com.google.common.collect.HashMultimap;
+import com.mojang.serialization.Codec;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.IExtensibleEnum;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.events.EventContext;
@@ -43,7 +48,7 @@ public class GateRegistry{
 	 * registrations specify their applicable {@link Type} so the 
 	 * internal gating processor can apply them accordingly.  
 	 */
-	public static enum Type{
+	public static enum Type implements StringRepresentable, IExtensibleEnum{
 		/**Specifies gates that cancel or alter events.*/
 		EVENT,
 		/**Specifies gates that police progression advancement.*/
@@ -52,6 +57,13 @@ public class GateRegistry{
 		FEATURE,
 		/**Specifies gates that permit/deny ability usage*/
 		ABILITY;
+		
+		public static final Codec<Type> CODEC = IExtensibleEnum.createCodecForExtensibleEnum(Type::values, Type::create);
+		private static final Map<String, Type> BY_NAME = Arrays.stream(values()).collect(Collectors.toMap(Type::getSerializedName, s -> s));
+		public static Type create(String name) {return BY_NAME.get(name);} 
+		
+		@Override
+		public String getSerializedName() {return this.name();}
 	}
 	private static final HashMultimap<Type, GateSystem<?>> registeredSystems = HashMultimap.create();
 
@@ -67,6 +79,8 @@ public class GateRegistry{
 	 * @return the cancellation result
 	 */
 	public static CancellationType isEventPermitted(Hub core, ResourceLocation event, EventContext context) {
+		if (registeredSystems.get(Type.EVENT).isEmpty())
+			return CancellationType.NONE;
 		return CancellationType.resolve(
 				registeredSystems.get(Type.EVENT).stream()
 				.map(system -> system.getCancellationResult(context, core, event, null))
@@ -86,8 +100,8 @@ public class GateRegistry{
 	 * @return whether progression can be committed or not.
 	 */
 	@SuppressWarnings("unchecked")
-	public static boolean isProgressionPermitted(Hub core, ResourceLocation event, EventContext context, String container) {
-		return registeredSystems.get(Type.PROGRESS).stream()
+	public static boolean isProgressionPermitted(Hub core, ResourceLocation event, EventContext context, String container) {		
+		return registeredSystems.get(Type.PROGRESS).isEmpty() ||registeredSystems.get(Type.PROGRESS).stream()
 				.allMatch(system -> ((GateSystem<String>)system).isActionPermitted(context, core, event, container));
 	}
 
@@ -101,7 +115,7 @@ public class GateRegistry{
 	 */
 	@SuppressWarnings("unchecked")
 	public static boolean isFeaturePermitted(Hub core, ResourceLocation event, EventContext context,	Object featureReferenceWIP) {
-		return registeredSystems.get(Type.FEATURE).stream()
+		return registeredSystems.get(Type.FEATURE).isEmpty() || registeredSystems.get(Type.FEATURE).stream()
 				.allMatch(system -> ((GateSystem<Object>)system).isActionPermitted(context, core, event, featureReferenceWIP));
 	}
 
@@ -116,7 +130,7 @@ public class GateRegistry{
 	 */
 	@SuppressWarnings("unchecked")
 	public static boolean isAbilityPermitted(Player player, Hub core, ResourceLocation event, EventContext context,	Ability ability) {
-		return registeredSystems.get(Type.ABILITY).stream()
+		return registeredSystems.get(Type.ABILITY).isEmpty() || registeredSystems.get(Type.ABILITY).stream()
 				.allMatch(system -> ((GateSystem<Ability>)system).isActionPermitted(context, core, event, ability));
 	}
 }
