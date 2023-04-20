@@ -2,12 +2,9 @@ package rpg.project.lib.internal.network;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
-import rpg.project.lib.internal.Core;
-import rpg.project.lib.internal.config.readers.DataLoader;
 import rpg.project.lib.internal.util.MsLoggy;
 import rpg.project.lib.internal.util.MsLoggy.LOG_CODE;
 import rpg.project.lib.internal.util.Reference;
@@ -21,7 +18,7 @@ public class Networking {
 				s -> true, 
 				s -> true);
 		
-		int ID = 0;
+		//int ID = 0;
 		//CLIENT BOUND PACKETS
 		
 		//SERVER BOUND PACKETS

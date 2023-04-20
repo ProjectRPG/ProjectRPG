@@ -24,12 +24,19 @@ public class CmdRoot {
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(Commands.literal("rpg")
 				.then(getPartyNode())
-				);
+				.then(getProgressNode()));
+	}
+	
+	private static LiteralArgumentBuilder<CommandSourceStack> getProgressNode() {
+		var progressCommand = Core.get(LogicalSide.SERVER).getProgression().getCommands();
+		return progressCommand != null ? progressCommand :
+			Commands.literal("progress")
+				.executes(ctx -> {ctx.getSource().sendSuccess(Component.literal("Unregistered Command"), false); return 0;});
 	}
 	
 	private static final String NAME = "name";
 	private static final String PLAYER = "player";
-	public static LiteralArgumentBuilder<CommandSourceStack> getPartyNode() {
+	private static LiteralArgumentBuilder<CommandSourceStack> getPartyNode() {
 		var partyCommand = Core.get(LogicalSide.SERVER).getParty().getCommands();
 		return partyCommand != null ? partyCommand :
 			Commands.literal("party")

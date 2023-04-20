@@ -1,16 +1,20 @@
 package rpg.project.lib.builtins.vanilla;
 
 import java.util.UUID;
-import java.util.function.Predicate;
-
 import org.apache.logging.log4j.LogManager;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
@@ -50,19 +54,13 @@ public class VanillaProgressionSystem implements ProgressionSystem<Integer>{
 		if (ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID) == null)
 			OfflineProgress.get().cachedProgress.put(playerID, value);
 		else
-			ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID).increaseScore(value);
-		
+			ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID).setScore(value);		
 	}
 	
 	@Override
-	public List<String> getContextuallyAffectedContainers(Hub core, ResourceLocation eventID, EventContext context) {
-		//TODO get configuration information
-		return List.of();
-	}
-	
-	@Override
-	public void applyContextuallyApplicableProgress(Hub core, ResourceLocation eventID, EventContext context, Predicate<String> filter) {
+	public List<Pair<String, Runnable>> getProgressionToBeAwarded(Hub core, ResourceLocation eventID, EventContext context) {
 		// TODO Auto-generated method stub
+		return List.of();
 	}	
 	
 	private static class OfflineProgress extends SavedData {
@@ -89,6 +87,29 @@ public class VanillaProgressionSystem implements ProgressionSystem<Integer>{
 			pCompoundTag.put(MAP_KEY, (CompoundTag)CODEC.encodeStart(NbtOps.INSTANCE, cachedProgress).resultOrPartial(err -> LogManager.getLogger().error(err)).orElse(new CompoundTag()));
 			return pCompoundTag;
 		}		
+	}
+
+	public static final String PLAYERS = "players";
+	public static final String AMOUNT = "amount";
+	@Override
+	public LiteralArgumentBuilder<CommandSourceStack> getCommands() {
+		return Commands.literal("xp")
+				.requires(ctx -> ctx.hasPermission(2))
+				.then(Commands.argument(PLAYERS, EntityArgument.players())
+					.then(Commands.literal("set")
+						.then(Commands.argument(AMOUNT, IntegerArgumentType.integer())
+							.executes(ctx -> {
+								int score = IntegerArgumentType.getInteger(ctx, AMOUNT);
+								EntityArgument.getPlayers(ctx, PLAYERS).forEach(player -> player.setScore(score));
+								return 0;
+							})))
+					.then(Commands.literal("add")
+						.then(Commands.argument(AMOUNT, IntegerArgumentType.integer())
+							.executes(ctx -> {
+								int score = IntegerArgumentType.getInteger(ctx, AMOUNT);
+								EntityArgument.getPlayers(ctx, PLAYERS).forEach(player -> player.increaseScore(score));
+								return 0;
+							}))));
 	}
 
 }

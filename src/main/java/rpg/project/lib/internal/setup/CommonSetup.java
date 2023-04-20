@@ -19,7 +19,6 @@ import rpg.project.lib.api.progression.ProgressionSystem;
 import rpg.project.lib.builtins.vanilla.VanillaPartySystem;
 import rpg.project.lib.builtins.vanilla.VanillaProgressionSystem;
 import rpg.project.lib.internal.Core;
-import rpg.project.lib.internal.abilities.AbilityRegistration;
 import rpg.project.lib.internal.commands.CmdRoot;
 import rpg.project.lib.internal.config.readers.DataLoader;
 import rpg.project.lib.internal.registry.EventRegistry;

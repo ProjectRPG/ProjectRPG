@@ -50,7 +50,10 @@ public class EventRegistry {
 		//TODO Feature Gates
 		//TODO Ability Gates
 		//TODO Progress Gates
-		core.getProgression().applyContextuallyApplicableProgress(core, eventID, context, container -> GateRegistry.isProgressionPermitted(core, eventID, context, container));
+		core.getProgression().getProgressionToBeAwarded(core, eventID, context).forEach(pair -> {
+			if (GateRegistry.isProgressionPermitted(core, eventID, context, pair.getFirst()))
+				pair.getSecond().run();
+		});
 	}
 	
 	/**This is used to add listeners at the appropriate
