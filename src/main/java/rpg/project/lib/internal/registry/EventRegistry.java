@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.level.BlockEvent.BreakEvent;
+import net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.registries.DeferredRegister;
@@ -70,5 +71,8 @@ public class EventRegistry {
 	public static final Supplier<IForgeRegistry<EventListenerSpecification<?>>> REGISTRY_SUPPLIER = EVENTS.makeRegistry(RegistryBuilder::new);
 	
 	public static final RegistryObject<EventListenerSpecification<BreakEvent>> BREAK = EVENTS.register("break_block",
-		() -> new EventListenerSpecification<>(Reference.resource("break_block"), EventPriority.LOWEST, BreakEvent.class, EventFactories::breakBlock, EventFactories::breakCancelCallback));
+		() -> new EventListenerSpecification<>(Reference.resource("break_block"), EventPriority.LOWEST, BreakEvent.class, EventFactories::breakBlock, EventFactories::fullCancel));
+	
+	public static final RegistryObject<EventListenerSpecification<EntityPlaceEvent>> PLACE = EVENTS.register("place_block", 
+		() -> new EventListenerSpecification<>(Reference.resource("break_block"), EventPriority.LOWEST, EntityPlaceEvent.class, EventFactories::placeBlock, EventFactories::fullCancel));
 }
