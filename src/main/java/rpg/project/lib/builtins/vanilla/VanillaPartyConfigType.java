@@ -6,9 +6,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.resources.ResourceLocation;
+import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
-import rpg.project.lib.internal.config.readers.MergeableData;
 
 public record VanillaPartyConfigType() implements SubSystemConfigType{
 	public static final ResourceLocation ID = new ResourceLocation("minecraft:party");

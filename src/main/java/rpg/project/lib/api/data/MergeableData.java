@@ -1,5 +1,13 @@
-package rpg.project.lib.internal.config.readers;
+package rpg.project.lib.api.data;
 
+/**Implemented by the internal master config object and 
+ * {@link SubSystemConfig}, this interface governs behavior
+ * related to data loading which assists with handling 
+ * multiple config files of for the same object via 
+ * {@link #combine(MergeableData)} and eliminating extra
+ * data on load via {@link #isUnconfigured()}.
+ *
+ */
 public interface MergeableData {
 	/**Combines the current instance with the supplied instance and
 	 * returns a new object.  Neither original object are modified

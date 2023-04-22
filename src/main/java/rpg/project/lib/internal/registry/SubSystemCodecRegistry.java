@@ -9,9 +9,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.resources.ResourceLocation;
+import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
-import rpg.project.lib.internal.config.readers.MergeableData;
 import rpg.project.lib.internal.util.Reference;
 
 public class SubSystemCodecRegistry {
