@@ -62,7 +62,6 @@ public class VanillaProgressionSystem implements ProgressionSystem<Integer>{
 	}
 	
 	private void addXp(UUID playerID, int value) {
-		System.out.println("addXP invoked"); //TODO remove sysout
 		if (ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID) == null)
 			OfflineProgress.get().cachedProgress.merge(playerID, value, Integer::sum);
 		else

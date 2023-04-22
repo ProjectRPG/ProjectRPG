@@ -161,10 +161,9 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	 * @param id the object registry ID
 	 * @param data the object containing the specific data
 	 */
-//	@SuppressWarnings("unchecked")
-//	public void registerDefault(ResourceLocation id, DataSource<?> data) {
-//		defaultSettings.merge(id, (ObjectData) data, (currID, currData) -> ((DataSource<?>) currData).combine((ObjectData) data));
-//	}
+	public void registerDefault(ResourceLocation id, MainSystemConfig data) {
+		defaultSettings.merge(id, (MainSystemConfig) data, (currID, currData) -> (MainSystemConfig)currData.combine(data));
+	}
 	
 	/**Adds override data to the loader.  This data is applied on
 	 * top of any other data.  This is a code-based hard overwrite.
@@ -179,10 +178,9 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	 * @param id the object registry ID
 	 * @param data the object containing the specific data
 	 */
-//	@SuppressWarnings("unchecked")
-//	public void registerOverride(ResourceLocation id, DataSource<?> data) {
-//		overrideSettings.merge(id, (ObjectData) data, (currID, currData) -> currData.combine((ObjectData) data));
-//	}
+	public void registerOverride(ResourceLocation id, MainSystemConfig data) {
+		overrideSettings.merge(id, (MainSystemConfig) data, (currID, currData) -> (MainSystemConfig)currData.combine(data));
+	}
 
 	/** Off-thread processing (can include reading files from hard drive) **/
 	@Override
@@ -290,7 +288,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 					tags.add(new ResourceLocation(str));
 			}
 			dataValue.tagValues().clear();
-			tags.forEach(rl -> this.data.merge(rl, (MainSystemConfig)dataValue, (o, n) -> o /*TODO o.combine(n)*/));
+			tags.forEach(rl -> this.data.merge(rl, (MainSystemConfig)dataValue, (o, n) -> (MainSystemConfig)o.combine(n)));
 		}
 		//Execute post-processing behavior (mostly logging at this point).
 		finalizer.accept(this.data);

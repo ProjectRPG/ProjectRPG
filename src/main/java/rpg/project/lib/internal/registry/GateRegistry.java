@@ -19,17 +19,7 @@ import rpg.project.lib.api.events.EventListenerSpecification.CancellationType;
 import rpg.project.lib.api.gating.GateSystem;
 
 /**This class stores and supplies a runtime map of all 
- * {@link GateSystem} implementations.  
- * 
- * TODO determine if this is viable as a static class.
- * It might make more sense as an instance class in Core
- * such that state variables for each system can be 
- * maintianed in a side-safe way.  This may not be necessary
- * but should be considered before removing this comment. 
- * 
- * @author Caltinor
- *
- */
+ * {@link GateSystem} implementations.*/
 public class GateRegistry{
 	/**==INTERNAL USE ONLY==
 	 * This is meant only to be called by API methods in a way that 
@@ -51,7 +41,7 @@ public class GateRegistry{
 	public static enum Type implements StringRepresentable, IExtensibleEnum{
 		/**Specifies gates that cancel or alter events.*/
 		EVENT,
-		/**Specifies gates that police progression advancement.*/
+		/**Specifies gates that permit/deny progression advancement.*/
 		PROGRESS,
 		/**Specifies gates that permit/deny feature usage*/
 		FEATURE,
@@ -75,7 +65,7 @@ public class GateRegistry{
 	 * 
 	 * @param core the {@link Hub} instance to be used by consumers
 	 * @param event the event ID used to get the correct callbacks
-	 * @param context event information provded to the gate system for evaluation
+	 * @param context event information provided to the gate system for evaluation
 	 * @return the cancellation result
 	 */
 	public static CancellationType isEventPermitted(Hub core, ResourceLocation event, EventContext context) {
@@ -94,7 +84,7 @@ public class GateRegistry{
 	 * 
 	 * @param core the {@link Hub} instance to be used by consumers
 	 * @param event the event ID used to get the correct callbacks
-	 * @param context event information provded to the gate system for evaluation
+	 * @param context event information provided to the gate system for evaluation
 	 * @param container the progression container id this event is expected to 
 	 * apply progression to.  
 	 * @return whether progression can be committed or not.
@@ -105,28 +95,32 @@ public class GateRegistry{
 				.allMatch(system -> ((GateSystem<String>)system).isActionPermitted(context, core, event, container));
 	}
 
-	/**TODO finish docs
+	/**Returns whether the event is valid for activating a feature.
+	 * If this returns falls, the feature system will not be notified
+	 * the event occurred and the feature will not execute.
 	 * 
-	 * @param core
-	 * @param event
-	 * @param context
+	 * @param corethe {@link Hub} instance to be used by consumers
+	 * @param event the event ID used to get the correct callbacks
+	 * @param context event information provided to the gate system for evaluation
 	 * @param featureReferenceWIP
-	 * @return
+	 * @return whether a feature is allowed to perform its function
 	 */
 	@SuppressWarnings("unchecked")
-	public static boolean isFeaturePermitted(Hub core, ResourceLocation event, EventContext context,	Object featureReferenceWIP) {
+	public static boolean isFeaturePermitted(Hub core, ResourceLocation event, EventContext context, Object featureReferenceWIP) {
 		return registeredSystems.get(Type.FEATURE).isEmpty() || registeredSystems.get(Type.FEATURE).stream()
 				.allMatch(system -> ((GateSystem<Object>)system).isActionPermitted(context, core, event, featureReferenceWIP));
 	}
 
-	/**TODO finish docs
+	/**Returns whether the event is valid for activating an ability.
+	 * If this returns falls, the ability system will not be notified
+	 * the event occurred and the ability will not activate.
 	 * 
-	 * @param player
-	 * @param core
-	 * @param event
-	 * @param context
-	 * @param ability
-	 * @return
+	 * @param player the player using the ability
+	 * @param corethe {@link Hub} instance to be used by consumers
+	 * @param event the event ID used to get the correct callbacks
+	 * @param context event information provided to the gate system for evaluation
+	 * @param ability the ability instance being activated
+	 * @return whether an ability is allowed to perform its function
 	 */
 	@SuppressWarnings("unchecked")
 	public static boolean isAbilityPermitted(Player player, Hub core, ResourceLocation event, EventContext context,	Ability ability) {
