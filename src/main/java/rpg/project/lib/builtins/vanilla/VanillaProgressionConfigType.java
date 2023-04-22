@@ -1,13 +1,14 @@
 package rpg.project.lib.builtins.vanilla;
 
+import java.util.HashMap;
 import java.util.Map;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.resources.ResourceLocation;
+import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
-import rpg.project.lib.internal.config.readers.MergeableData;
 
 public record VanillaProgressionConfigType() implements SubSystemConfigType{
 	public static final ResourceLocation ID = new ResourceLocation("minecraft:progression");
@@ -26,12 +27,15 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 
 		@Override
 		public MergeableData combine(MergeableData two) {
-			return this;
+			VanillaProgressionConfig t = (VanillaProgressionConfig) two;
+			var map = new HashMap<>(this.eventToXp());
+			t.eventToXp().entrySet().forEach(entry -> map.merge(entry.getKey(), entry.getValue(), Integer::max));
+			return new VanillaProgressionConfig(map);
 		}
 
 		@Override
 		public boolean isUnconfigured() {
-			return false;
+			return this.eventToXp().isEmpty();
 		}
 
 		@Override
