@@ -1,15 +1,23 @@
 package rpg.project.lib.internal;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.LogicalSide;
 import rpg.project.lib.api.Hub;
+import rpg.project.lib.api.data.ObjectType;
+import rpg.project.lib.api.data.SubSystemConfig;
+import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.api.progression.ProgressionSystem;
 import rpg.project.lib.internal.config.readers.DataLoader;
+import rpg.project.lib.internal.config.readers.MergeableCodecDataManager;
 import rpg.project.lib.internal.registry.AbilityRegistry;
+import rpg.project.lib.internal.registry.GateRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
 import rpg.project.lib.internal.util.Functions;
 
@@ -54,4 +62,28 @@ public class Core implements Hub {
 	@Override
 	public ProgressionSystem<?> getProgression() {return progress;}
 	public AbilityRegistry getAbilityRegistry() { return abilities; }
+
+	@Override
+	public Optional<SubSystemConfig> getProgressionData(SubSystemConfigType systemType, ObjectType type, ResourceLocation objectID) {
+		MergeableCodecDataManager<?> loader = getLoader().getLoader(type);
+		return loader.getData(objectID).progression().stream().filter(config -> config.getType().equals(systemType)).findFirst();
+	}
+
+	@Override
+	public Optional<SubSystemConfig> getGateData(SubSystemConfigType systemType, ObjectType type, GateRegistry.Type gateType, ResourceLocation objectID) {
+		MergeableCodecDataManager<?> loader = getLoader().getLoader(type);
+		return loader.getData(objectID).gates().getOrDefault(gateType, List.of()).stream().filter(config -> config.getType().equals(systemType)).findFirst();
+	}
+
+	@Override
+	public Optional<SubSystemConfig> getAbilityData(SubSystemConfigType systemType, ObjectType type, ResourceLocation objectID) {
+		MergeableCodecDataManager<?> loader = getLoader().getLoader(type);
+		return loader.getData(objectID).abilities().stream().filter(config -> config.getType().equals(systemType)).findFirst();
+	}
+
+	@Override
+	public Optional<SubSystemConfig> getFeatureData(SubSystemConfigType systemType, ObjectType type, ResourceLocation objectID) {
+		MergeableCodecDataManager<?> loader = getLoader().getLoader(type);
+		return loader.getData(objectID).features().stream().filter(config -> config.getType().equals(systemType)).findFirst();
+	}
 }

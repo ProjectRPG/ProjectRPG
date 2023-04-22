@@ -25,10 +25,13 @@ import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.data.CodecTypes;
+import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.progression.ProgressionSystem;
+import rpg.project.lib.builtins.vanilla.VanillaProgressionConfigType.VanillaProgressionConfig;
 
 public class VanillaProgressionSystem implements ProgressionSystem<Integer>{
+	private static final String container = "exp";
 	
 	public VanillaProgressionSystem() {
 		MinecraftForge.EVENT_BUS.addListener(VanillaProgressionSystem::updateScoreFromOfflineProgress);
@@ -52,15 +55,31 @@ public class VanillaProgressionSystem implements ProgressionSystem<Integer>{
 	@Override
 	public void setProgress(UUID playerID, String container, Integer value) {
 		if (ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID) == null)
-			OfflineProgress.get().cachedProgress.put(playerID, value);
+			//TODO make this a hard override for when they log in otherwise this will just add to the amount
+			OfflineProgress.get().cachedProgress.merge(playerID, value, Integer::sum);
 		else
-			ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID).setScore(value);		
+			ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID).setExperiencePoints(value);		
+	}
+	
+	private void addXp(UUID playerID, int value) {
+		System.out.println("addXP invoked"); //TODO remove sysout
+		if (ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID) == null)
+			OfflineProgress.get().cachedProgress.merge(playerID, value, Integer::sum);
+		else
+			ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID).giveExperiencePoints(value);
 	}
 	
 	@Override
 	public List<Pair<String, Runnable>> getProgressionToBeAwarded(Hub core, ResourceLocation eventID, EventContext context) {
-		// TODO Auto-generated method stub
-		return List.of();
+		ResourceLocation objectID = context.subjectObject().getSecond();
+		ObjectType type = context.subjectObject().getFirst();
+		return core.getProgressionData(VanillaProgressionConfigType.IMPL, type, objectID)
+				.map(config -> {
+					int xpToAward = ((VanillaProgressionConfig)config).eventToXp().getOrDefault(eventID, 0);
+					List<Pair<String, Runnable>> output = List.of(Pair.of(container, () -> this.addXp(context.actor().getUUID(), xpToAward)));
+					return output; 
+				}
+			).orElse(List.of());
 	}	
 	
 	private static class OfflineProgress extends SavedData {
@@ -100,14 +119,14 @@ public class VanillaProgressionSystem implements ProgressionSystem<Integer>{
 						.then(Commands.argument(AMOUNT, IntegerArgumentType.integer())
 							.executes(ctx -> {
 								int score = IntegerArgumentType.getInteger(ctx, AMOUNT);
-								EntityArgument.getPlayers(ctx, PLAYERS).forEach(player -> player.setScore(score));
+								EntityArgument.getPlayers(ctx, PLAYERS).forEach(player -> player.setExperiencePoints(score));
 								return 0;
 							})))
 					.then(Commands.literal("add")
 						.then(Commands.argument(AMOUNT, IntegerArgumentType.integer())
 							.executes(ctx -> {
 								int score = IntegerArgumentType.getInteger(ctx, AMOUNT);
-								EntityArgument.getPlayers(ctx, PLAYERS).forEach(player -> player.increaseScore(score));
+								EntityArgument.getPlayers(ctx, PLAYERS).forEach(player -> player.giveExperiencePoints(score));
 								return 0;
 							}))));
 	}

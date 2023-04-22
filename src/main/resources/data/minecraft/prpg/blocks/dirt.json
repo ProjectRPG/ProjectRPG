@@ -1,0 +1,12 @@
+{"replaced":false,
+ "copyTo":[],
+ "progression": [
+    {"type":"minecraft:progression",
+     "events": {
+       "projectrpg:break_block":100,
+       "prpg:place_block":50,
+       "prpg:craft":10,
+       "some_addon:transmute":1337
+    }}
+ ]
+}

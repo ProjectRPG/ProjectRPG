@@ -6,9 +6,13 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.mojang.datafixers.util.Pair;
+
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import rpg.project.lib.api.data.ObjectType;
 
 /** TODO: <p>populate this with things we need for processing gates,
  * progression, abilities, and feature hooks.  The idea is that
@@ -29,6 +33,11 @@ import net.minecraft.world.level.Level;
  * of values, but that implementation is up for debate.
  */
 public record EventContext(
+		/**The object type and id for the subject of this event.  Note 
+		 * that other objects can be passed in context, however this 
+		 * pair specifically refers to the subject of this event and 
+		 * is used by sub systems to isolate relevant parameters */
+		Pair<ObjectType, ResourceLocation> subjectObject,
 		/**The player responsible for triggering the event and for whom
 		 * any progress should be applied to.*/
 		Player actor,
@@ -39,16 +48,18 @@ public record EventContext(
 		/**An applicable location for the event.*/
 		@Nullable List<BlockPos> pos) {
 	
-	public static Builder build(Player player) {
-		return new Builder(player);
+	public static Builder build(ObjectType subjectType, ResourceLocation subjectID, Player player) {
+		return new Builder(subjectType, subjectID, player);
 	}
 	
 	public static class Builder {
+		private Pair<ObjectType, ResourceLocation> subject;
 		private Player actor;
 		private Level level;
 		private List<BlockPos> posList = new ArrayList<>();
 		
-		protected Builder(Player actor) {
+		protected Builder(ObjectType subjectType, ResourceLocation subjectID, Player actor) {
+			subject = Pair.of(subjectType, subjectID);
 			this.actor = actor;
 			this.level = actor.getLevel();
 		}
@@ -86,7 +97,7 @@ public record EventContext(
 		/**@return a fully formed {@link EventContext} with the 
 		 * constructed values */
 		public EventContext build() {
-			return new EventContext(actor, level, posList);
+			return new EventContext(subject, actor, level, posList);
 		}
 	}
 }

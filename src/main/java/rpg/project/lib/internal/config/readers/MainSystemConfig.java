@@ -38,13 +38,13 @@ public record MainSystemConfig(
 					StringRepresentable.keys(GateRegistry.Type.values())).codec()
 				)
 				.forGetter(msc -> Optional.of(msc.gates())),
-			SubSystemCodecRegistry.CODEC.dispatch("type", SubSystemConfig::getType, SubSystemConfigType::getCodec).listOf()
+			Codec.list(SubSystemCodecRegistry.CODEC.dispatch("type", SubSystemConfig::getType, SubSystemConfigType::getCodec))
 				.optionalFieldOf("progression")
 				.forGetter(msc -> Optional.of(msc.progression())),
-			SubSystemCodecRegistry.CODEC.dispatch("type", SubSystemConfig::getType, SubSystemConfigType::getCodec).listOf()
+				Codec.list(SubSystemCodecRegistry.CODEC.dispatch("type", SubSystemConfig::getType, SubSystemConfigType::getCodec))
 				.optionalFieldOf("abilities")
 				.forGetter(msc -> Optional.of(msc.abilities())),
-			SubSystemCodecRegistry.CODEC.dispatch("type", SubSystemConfig::getType, SubSystemConfigType::getCodec).listOf()
+			Codec.list(SubSystemCodecRegistry.CODEC.dispatch("type", SubSystemConfig::getType, SubSystemConfigType::getCodec))
 				.optionalFieldOf("features")
 				.forGetter(msc -> Optional.of(msc.features()))
 			).apply(instance, (o, t, g, p, a, f) -> new MainSystemConfig(
