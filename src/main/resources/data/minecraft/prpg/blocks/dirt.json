@@ -7,6 +7,7 @@
        "prpg:place_block":50,
        "prpg:craft":10,
        "some_addon:transmute":1337
-    }}
+    }},
+    {"type":"other:other"}
  ]
 }
