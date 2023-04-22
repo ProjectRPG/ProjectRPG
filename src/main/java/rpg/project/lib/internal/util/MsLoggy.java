@@ -40,15 +40,13 @@ public enum MsLoggy {
 	 */
 	public enum LOG_CODE {
 		API("api"),
-		AUTO_VALUES("autovalues"),
-		CHUNK("chunk"),
 		DATA("data"),
 		EVENT("event"),
 		FEATURE("feature"),
 		GUI("gui"),
 		LOADING("loading"),
 		NETWORK("network"),
-		XP("xp"),
+		PROGRESSION("progress"),
 		// unused default
 		NONE("none");
 		

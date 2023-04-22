@@ -65,7 +65,7 @@ public class Config {
 		DEBUG_LOGGING = builder
 			.comment("Which MsLoggy debug logging should be enabled?  This will flood your log with data, but provides essential details",
 				" when trying to find bugs. DEVELOPER SETTING (mostly).  ")
-			.defineList("Debug Logging", new ArrayList<>(List.of(LOG_CODE.AUTO_VALUES.code)), s -> s instanceof String);
+			.defineList("Debug Logging", new ArrayList<>(List.of(LOG_CODE.API.code)), s -> s instanceof String);
 		WARN_LOGGING = builder
 			.comment("Which MsLoggy warn logging should be enabled?  This log type is helpful for catching important but non-fatal issues")
 			.defineList("Warn Logging", new ArrayList<>(List.of(LOG_CODE.API.code)), s -> s instanceof String);

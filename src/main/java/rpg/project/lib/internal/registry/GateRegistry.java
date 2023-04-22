@@ -101,7 +101,7 @@ public class GateRegistry{
 	 */
 	@SuppressWarnings("unchecked")
 	public static boolean isProgressionPermitted(Hub core, ResourceLocation event, EventContext context, String container) {		
-		return registeredSystems.get(Type.PROGRESS).isEmpty() ||registeredSystems.get(Type.PROGRESS).stream()
+		return registeredSystems.get(Type.PROGRESS).isEmpty() || registeredSystems.get(Type.PROGRESS).stream()
 				.allMatch(system -> ((GateSystem<String>)system).isActionPermitted(context, core, event, container));
 	}
 

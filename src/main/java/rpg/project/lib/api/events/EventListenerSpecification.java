@@ -33,16 +33,16 @@ public record EventListenerSpecification<T extends Event>(
 		BiConsumer<T, CancellationType> cancellationCallback) {
 	
 	public static enum CancellationType {
-		/**Passed to indicate no cancelation should apply.*/
+		/**Passed to indicate no cancellation should apply.*/
 		NONE,
 		/**Cancels the entire event.*/
 		EVENT,
 		/**Cancels any item-specific behavior but not the entire event.
-		 * An exmaple of this would be a right-click action where the
+		 * An example of this would be a right-click action where the
 		 * item activation is being prevented but not the block activation.*/
 		ITEM,
 		/**Cancels any block-specific behavior but not the entire event.
-		 * An exmaple of this woudl be a right-click action where the 
+		 * An example of this would be a right-click action where the 
 		 * block activation is being prevented but not the item activation.*/
 		BLOCK;
 		

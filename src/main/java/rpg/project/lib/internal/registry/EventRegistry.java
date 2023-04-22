@@ -17,7 +17,9 @@ import rpg.project.lib.api.events.EventListenerSpecification;
 import rpg.project.lib.api.events.EventListenerSpecification.CancellationType;
 import rpg.project.lib.builtins.EventFactories;
 import rpg.project.lib.internal.Core;
+import rpg.project.lib.internal.util.MsLoggy;
 import rpg.project.lib.internal.util.Reference;
+import rpg.project.lib.internal.util.MsLoggy.LOG_CODE;
 
 public class EventRegistry {
 	/**<p>A standardized method used by {@link EventListenerSpecification#registerListener()}
@@ -35,6 +37,7 @@ public class EventRegistry {
 		EventContext context = spec.contextFactory().apply(event);
 		Core core = Core.get(context.level());
 		ResourceLocation eventID = spec.registryID();
+		MsLoggy.DEBUG.log(LOG_CODE.EVENT, "Firing Event: {} with Context: {}", eventID, context);
 		//Process EVENT gates
 		CancellationType eventCancellationStatus = GateRegistry.isEventPermitted(core, eventID, context);
 		if (eventCancellationStatus != CancellationType.NONE)
