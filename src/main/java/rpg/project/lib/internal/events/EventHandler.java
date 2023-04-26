@@ -14,6 +14,9 @@ import rpg.project.lib.internal.util.Reference;
 
 @Mod.EventBusSubscriber(modid = Reference.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class EventHandler {
+	//TODO we might want to move this specifically to the Ability package.
+	//However, if the content is going to be minimal, we might just move it
+	//to the setup package.
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void tickPerks(TickEvent.LevelTickEvent event) {
         Core.get(event.level).getAbilityRegistry().executeAbilityTicks(event);

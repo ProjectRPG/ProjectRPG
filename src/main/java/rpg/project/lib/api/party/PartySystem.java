@@ -8,6 +8,15 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 
+/**<p>A party is a group of players who share features in
+ * some way.  The benefits they receive are determined
+ * by the feature itself and are not the responsibility
+ * of this system.</p>  
+ * <p>An implementation of the party system may have more
+ * complex inner workings than what is exposed by these 
+ * methods. However, the other PRPG systems will only expect
+ * to have access to these methods.</p>
+ */
 public interface PartySystem {
 	boolean createParty(String partyName);
 	boolean closeParty(String partyName);

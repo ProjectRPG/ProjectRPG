@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+//TODO as is, this is probably moving to the builtin package.
 public class AbilityRegistration {
     public static void init() {
         AbilityUtils.registerAbility(Reference.resource("break_speed"),
