@@ -2,10 +2,14 @@ package rpg.project.lib.builtins.vanilla;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.registries.RegistryManager;
+import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
@@ -47,6 +51,11 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 		public Codec<SubSystemConfig> getCodec() {
 			return CODEC;
 		}
-		
+
+		@Override
+		public SubSystemConfig getDefault() {
+			return new VanillaProgressionConfig(RegistryManager.ACTIVE.getRegistry(APIUtils.GAMEPLAY_EVENTS)
+					.getKeys().stream().collect(Collectors.toMap(rl -> rl, rl -> 0)));
+		}		
 	}
 }

@@ -49,7 +49,11 @@ public class SubSystemCodecRegistry {
 
 			@Override
 			public Codec<SubSystemConfig> getCodec() {return CODEC;}
-			
+
+			@Override
+			public SubSystemConfig getDefault() {
+				return new DefaultConfig();
+			}			
 		}
 	}
 }
