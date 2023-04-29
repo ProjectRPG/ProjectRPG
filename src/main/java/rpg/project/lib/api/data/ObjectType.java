@@ -17,6 +17,7 @@ public enum ObjectType implements StringRepresentable, IExtensibleEnum{
 	BIOME,
 	ENCHANTMENT,
 	EFFECT,
+	EVENT,
 	PLAYER;
 	
 	public static final Codec<ObjectType> CODEC = IExtensibleEnum.createCodecForExtensibleEnum(ObjectType::values, ObjectType::byName);

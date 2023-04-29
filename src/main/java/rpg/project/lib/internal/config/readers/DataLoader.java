@@ -21,7 +21,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryManager;
+import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.data.ObjectType;
+import rpg.project.lib.api.events.EventListenerSpecification;
 import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.util.MsLoggy;
 import rpg.project.lib.internal.util.MsLoggy.LOG_CODE;
@@ -51,6 +54,7 @@ public class DataLoader {
 		case PLAYER -> PLAYER_LOADER.data.putAll(data);
 		case ENCHANTMENT -> ENCHANTMENT_LOADER.data.putAll(data);
 		case EFFECT -> EFFECT_LOADER.data.putAll(data);
+		case EVENT -> EVENT_LOADER.data.putAll(data);
 		default -> {}}
 		printData((Map<ResourceLocation, ? extends Record>) data);
 	}
@@ -64,6 +68,7 @@ public class DataLoader {
 		case DIMENSION -> DIMENSION_LOADER;
 		case ENCHANTMENT -> ENCHANTMENT_LOADER;
 		case EFFECT -> EFFECT_LOADER;
+		case EVENT -> EVENT_LOADER;
 		case PLAYER -> PLAYER_LOADER;
 		default -> null;};
 	}
@@ -81,9 +86,10 @@ public class DataLoader {
 		PLAYER_LOADER.clearData();
 		ENCHANTMENT_LOADER.clearData();
 		EFFECT_LOADER.clearData();
+		EVENT_LOADER.clearData();
 	}
 	
-	public final MergeableCodecDataManager<Item> ITEM_LOADER = new MergeableCodecDataManager<Item>(
+	public final MergeableCodecDataManager<Item> ITEM_LOADER = new MergeableCodecDataManager<>(
 			"prpg/items", DATA_LOGGER, this::mergeLoaderData, this::printData, ForgeRegistries.ITEMS);
 	public final MergeableCodecDataManager<Block> BLOCK_LOADER = new MergeableCodecDataManager<>(
 			"prpg/blocks", DATA_LOGGER, this::mergeLoaderData, this::printData, ForgeRegistries.BLOCKS);
@@ -99,6 +105,8 @@ public class DataLoader {
 			"prpg/enchantments", DATA_LOGGER, this::mergeLoaderData, this::printData, ForgeRegistries.ENCHANTMENTS);
 	public final MergeableCodecDataManager<MobEffect> EFFECT_LOADER = new MergeableCodecDataManager<>(
 			"prpg/effects", DATA_LOGGER, this::mergeLoaderData, this::printData, ForgeRegistries.MOB_EFFECTS);
+	public final MergeableCodecDataManager<EventListenerSpecification<?>> EVENT_LOADER = new MergeableCodecDataManager<>(
+			"prpg/events", DATA_LOGGER, this::mergeLoaderData, this::printData, RegistryManager.ACTIVE.getRegistry(APIUtils.GAMEPLAY_EVENTS));
 	
 	
 	private MainSystemConfig mergeLoaderData(final List<MainSystemConfig> raws) {
