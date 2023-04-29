@@ -7,7 +7,10 @@ import com.mojang.serialization.codecs.PrimitiveCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 
+/**Various common codecs used within Project RPG.*/
 public class CodecTypes {
+	/**In contrast to {@link net.minecraft.core.UUIDUtil#CODEC}, this
+	 * codec type can be used as a map key.*/
 	public static final PrimitiveCodec<UUID> UUID_CODEC = new PrimitiveCodec<>() {
 		@Override
 		public <T> DataResult<UUID> read(DynamicOps<T> ops, T input) {
@@ -21,6 +24,8 @@ public class CodecTypes {
 		public String toString() { return "uuid";}
 	};
 	
+	/**In constrast to {@link BlockPos#CODEC}, this
+	 * codec type can be used as a map key.*/
 	public static final PrimitiveCodec<BlockPos> BLOCKPOS_CODEC = new PrimitiveCodec<>() {
 		@Override
 		public <T> DataResult<BlockPos> read(DynamicOps<T> ops, T input) {
@@ -34,6 +39,8 @@ public class CodecTypes {
 		public String toString() { return "blockpos";}
 	};
 	
+	/**Used to serialize a {@link ChunkPos}.  This cannot be used as
+	 * a map key.*/
 	public static final PrimitiveCodec<ChunkPos> CHUNKPOS_CODEC = new PrimitiveCodec<>() {
 		@Override
 		public <T> DataResult<ChunkPos> read(DynamicOps<T> ops, T input) {
