@@ -1,6 +1,5 @@
 package rpg.project.lib.internal.registry;
 
-import java.util.List;
 import java.util.function.Supplier;
 
 import net.minecraft.nbt.CompoundTag;
@@ -14,12 +13,12 @@ import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 import net.minecraftforge.registries.RegistryObject;
 import rpg.project.lib.api.APIUtils;
+import rpg.project.lib.api.abilities.AbilityUtils;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.EventListenerSpecification;
 import rpg.project.lib.api.events.EventListenerSpecification.CancellationType;
 import rpg.project.lib.builtins.EventFactories;
 import rpg.project.lib.internal.Core;
-import rpg.project.lib.internal.config.AbilitiesConfig;
 import rpg.project.lib.internal.util.MsLoggy;
 import rpg.project.lib.internal.util.Reference;
 import rpg.project.lib.internal.util.MsLoggy.LOG_CODE;
@@ -49,21 +48,19 @@ public class EventRegistry {
 		if (eventCancellationStatus != CancellationType.NONE)
 			spec.cancellationCallback().accept(event, eventCancellationStatus);
 		
-		/* These should follow the pattern of this pseudo
-		 * 
+		/*TODO Feature Gates
 		 * for (Object thing : system.getThings(hub, spec.registryID(), context)) {
 		 * 		if (GateRegistry.isThingPermitted(hub, spec.registryID(), context, thing))
 		 * 			system.executeThing(hub, spec.registryID(), context, thing);
 		 * }
 		 */
-		//TODO Feature Gates
 				
 		//Activate event-specific abilities
-		for (CompoundTag config : AbilitiesConfig.ABILITY_SETTINGS.get().getOrDefault(eventID, List.of())) {
-			ResourceLocation abilityID = new ResourceLocation(config.getString(AbilitiesConfig.TYPE));
+		for (CompoundTag config : core.getAbility().getAbilitiesForContext(core, eventID, context)) {
+			ResourceLocation abilityID = new ResourceLocation(config.getString(AbilityUtils.TYPE));
 			if (GateRegistry.isAbilityPermitted(context.actor(), core, eventID, context, abilityID)) {
 				CompoundTag consolidatedInputData = config.copy().merge(context.dynamicVariables());
-				core.getAbilityRegistry().executeAbility(eventID, context.actor(), consolidatedInputData);
+				core.getAbilities().executeAbility(eventID, context.actor(), consolidatedInputData);
 			}
 		}
 		

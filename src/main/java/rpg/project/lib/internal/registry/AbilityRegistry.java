@@ -10,7 +10,6 @@ import net.minecraftforge.event.TickEvent;
 import org.jetbrains.annotations.NotNull;
 import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.abilities.AbilityUtils;
-import rpg.project.lib.internal.config.AbilitiesConfig;
 import rpg.project.lib.internal.util.MsLoggy;
 import rpg.project.lib.internal.util.MsLoggy.LOG_CODE;
 import rpg.project.lib.internal.util.TagUtils;
@@ -47,26 +46,20 @@ public class AbilityRegistry {
         return abilities.getOrDefault(id, Ability.empty()).status().apply(player, settings);
     }
     
-    public CompoundTag executeAbility(ResourceLocation cause, Player player, @NotNull CompoundTag dataIn) {
+    public CompoundTag executeAbility(ResourceLocation abilityID, Player player, @NotNull CompoundTag dataIn) {
         if (player == null) { return new CompoundTag(); }
         
         CompoundTag output = new CompoundTag();
-        AbilitiesConfig.ABILITY_SETTINGS.get().getOrDefault(cause, new ArrayList<>()).forEach(src -> {
-            ResourceLocation abilityID = new ResourceLocation(src.getString("type"));
-            Ability ability = abilities.getOrDefault(abilityID, Ability.empty());
-            src = ability.propertyDefaults().merge(src.merge(dataIn));
-            // TODO
-            // src.putInt(APIUtils.SKILL_LEVEL, src.contains(APIUtils.SKILLNAME) ? Core.get(player.level).getData().getPlayerSkillLevel(src.getString(APIUtils.SKILLNAME), player.getUUID()) : 0);
-            
-            CompoundTag executionOutput = ability.start(player, src);
-            tickTracker.add(new TickSchedule(ability, player, src, new AtomicInteger(0)));
-            
-            if (src.contains(AbilityUtils.COOLDOWN)) {
-                coolTracker.add(new AbilityCooldown(abilityID, player, src, player.level.getGameTime()));
-            }
-            
-            output.merge(TagUtils.mergeTags(output, executionOutput));
-        });
+        Ability ability = abilities.getOrDefault(abilityID, Ability.empty());
+        CompoundTag config = ability.propertyDefaults().merge(dataIn);
+        CompoundTag executionOutput = ability.start(player, config);
+        tickTracker.add(new TickSchedule(ability, player, config, new AtomicInteger(0)));
+        
+        if (config.contains(AbilityUtils.COOLDOWN)) {
+            coolTracker.add(new AbilityCooldown(abilityID, player, config, player.level.getGameTime()));
+        }
+        
+        output.merge(TagUtils.mergeTags(output, executionOutput));
         return output;
     }
     

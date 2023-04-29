@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.LogicalSide;
 import rpg.project.lib.api.Hub;
+import rpg.project.lib.api.abilities.AbilitySystem;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
@@ -38,6 +39,7 @@ public class Core implements Hub {
 	private final DataLoader loader = new DataLoader();
 	private final PartySystem party = CommonSetup.partySupplier.get();
 	private final ProgressionSystem<?> progress = CommonSetup.progressionSupplier.get();
+	private final AbilitySystem abilitySys = CommonSetup.abilitySupplier.get();
 	private final AbilityRegistry abilities;
 	
 	private Core(LogicalSide side) {
@@ -61,7 +63,10 @@ public class Core implements Hub {
 	public PartySystem getParty() {return party;}
 	@Override
 	public ProgressionSystem<?> getProgression() {return progress;}
-	public AbilityRegistry getAbilityRegistry() { return abilities; }
+	@Override
+	public AbilitySystem getAbility() {return abilitySys;}
+	@Override
+	public AbilityRegistry getAbilities() { return abilities; }
 
 	@Override
 	public Optional<SubSystemConfig> getProgressionData(SubSystemConfigType systemType, ObjectType type, ResourceLocation objectID) {

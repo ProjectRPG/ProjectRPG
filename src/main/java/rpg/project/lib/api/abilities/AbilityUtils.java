@@ -2,11 +2,23 @@ package rpg.project.lib.api.abilities;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.LogicalSide;
+
+import java.util.function.Supplier;
+
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.api.enums.AbilitySide;
 import rpg.project.lib.internal.Core;
+import rpg.project.lib.internal.registry.SubSystemCodecRegistry;
+import rpg.project.lib.internal.setup.CommonSetup;
 
 public class AbilityUtils {
+	/**The key to specify which ability this config applies to.
+	 * Values associated with this key must reflect the ID used
+	 * when the ability was registered.*/
+	public static final String TYPE = "type";
+	
     public static final String PER_LEVEL = "per_level";
     public static final String MAX_BOOST = "max_boost";
     public static final String RATIO = "ratio";
@@ -17,6 +29,7 @@ public class AbilityUtils {
     public static final String MODULUS = "per_x_level";
     public static final String CHANCE = "chance";
     public static final String COOLDOWN = "cooldown";
+    /**Sets how long this ability should tick for before stopping*/
     public static final String DURATION = "duration";
     
     public static final String BLOCK_POS = "block_pos";
@@ -62,14 +75,27 @@ public class AbilityUtils {
     public static void registerAbility(@NonNull ResourceLocation abilityID, @NonNull Ability ability, @NonNull AbilitySide side) {
         switch (side) {
             case SERVER -> {
-                Core.get(LogicalSide.SERVER).getAbilityRegistry().registerAbility(abilityID, ability);
-                Core.get(LogicalSide.CLIENT).getAbilityRegistry().registerClientClone(abilityID, ability);
+                Core.get(LogicalSide.SERVER).getAbilities().registerAbility(abilityID, ability);
+                Core.get(LogicalSide.CLIENT).getAbilities().registerClientClone(abilityID, ability);
             }
-            case CLIENT -> Core.get(LogicalSide.CLIENT).getAbilityRegistry().registerAbility(abilityID, ability);
+            case CLIENT -> Core.get(LogicalSide.CLIENT).getAbilities().registerAbility(abilityID, ability);
             case BOTH -> {
-                Core.get(LogicalSide.SERVER).getAbilityRegistry().registerAbility(abilityID, ability);
-                Core.get(LogicalSide.CLIENT).getAbilityRegistry().registerAbility(abilityID, ability);
+                Core.get(LogicalSide.SERVER).getAbilities().registerAbility(abilityID, ability);
+                Core.get(LogicalSide.CLIENT).getAbilities().registerAbility(abilityID, ability);
             }
         }
+    }
+    
+    /**Sets the ability system for the ecosystem.  Only one system can be active.
+     * 
+     * @param id the system configuration ID used to specify the format of configuration settings
+     * @param config the configuration specification used by this system.
+     * @param system supplies a new instance of the AbilitySystem to be registered.
+     */
+    public static void registerAbilitySystem(ResourceLocation id, SubSystemConfigType config, Supplier<AbilitySystem> system) {
+    	CommonSetup.abilitySupplier = () ->{
+    		SubSystemCodecRegistry.registerSubSystem(id, config);
+    		return system.get();
+    	};    	
     }
 }

@@ -3,11 +3,13 @@ package rpg.project.lib.api;
 import java.util.Optional;
 
 import net.minecraft.resources.ResourceLocation;
+import rpg.project.lib.api.abilities.AbilitySystem;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.api.progression.ProgressionSystem;
+import rpg.project.lib.internal.registry.AbilityRegistry;
 import rpg.project.lib.internal.registry.GateRegistry;
 
 /**Implementations of this provide access to shared
@@ -21,7 +23,7 @@ public interface Hub {
 	 * the configuration object associated with the in-game object
 	 * specified and for the configuration type.</p>
 	 * <p>Note: if no configuration for the supplied type is present
-	 * in the user's configuration files, this will return and empty
+	 * in the user's configuration files, this will return an empty
 	 * optional.</p>  
 	 * 
 	 * @param systemType the config object type being requested
@@ -35,7 +37,7 @@ public interface Hub {
 	 * the configuration object associated with the in-game object
 	 * specified and for the configuration type.</p>
 	 * <p>Note: if no configuration for the supplied type is present
-	 * in the user's configuration files, this will return and empty
+	 * in the user's configuration files, this will return an empty
 	 * optional.</p>  
 	 * 
 	 * @param systemType the config object type being requested
@@ -49,7 +51,7 @@ public interface Hub {
 	 * the configuration object associated with the in-game object
 	 * specified and for the configuration type.</p>
 	 * <p>Note: if no configuration for the supplied type is present
-	 * in the user's configuration files, this will return and empty
+	 * in the user's configuration files, this will return an empty
 	 * optional.</p>  
 	 * 
 	 * @param systemType the config object type being requested
@@ -63,7 +65,7 @@ public interface Hub {
 	 * the configuration object associated with the in-game object
 	 * specified and for the configuration type.</p>
 	 * <p>Note: if no configuration for the supplied type is present
-	 * in the user's configuration files, this will return and empty
+	 * in the user's configuration files, this will return an empty
 	 * optional.</p>  
 	 * 
 	 * @param systemType the config object type being requested
@@ -79,4 +81,10 @@ public interface Hub {
 	/**@return the active {@link ProgressionSystem} implementation for this instance
 	 */
 	ProgressionSystem<?> getProgression();
+	/**@return the active {@link AbilitySystem} implementation for this instance
+	 */
+	AbilitySystem getAbility();
+	/**@return the registry containing {@link Ability} types from all addons
+	 */
+	AbilityRegistry getAbilities();
 }

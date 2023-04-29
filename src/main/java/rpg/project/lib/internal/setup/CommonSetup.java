@@ -7,16 +7,21 @@ import net.minecraft.data.PackOutput;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.RegistryManager;
 import rpg.project.lib.api.APIUtils;
+import rpg.project.lib.api.abilities.AbilitySystem;
 import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.api.progression.ProgressionSystem;
 import rpg.project.lib.builtins.Abilities;
+import rpg.project.lib.builtins.vanilla.VanillaAbilityConfigType;
+import rpg.project.lib.builtins.vanilla.VanillaAbilitySystem;
 import rpg.project.lib.builtins.vanilla.VanillaPartyConfigType;
 import rpg.project.lib.builtins.vanilla.VanillaPartySystem;
 import rpg.project.lib.builtins.vanilla.VanillaProgressionConfigType;
@@ -32,7 +37,6 @@ import rpg.project.lib.internal.util.Reference;
 
 @Mod.EventBusSubscriber(modid=Reference.MODID, bus=Mod.EventBusSubscriber.Bus.FORGE)
 public class CommonSetup {
-	//TODO expose these via API to be overridden
 	public static Supplier<PartySystem> partySupplier = () -> {
 		SubSystemCodecRegistry.registerSubSystem(VanillaPartyConfigType.ID, VanillaPartyConfigType.IMPL);
 		return new VanillaPartySystem();
@@ -40,6 +44,10 @@ public class CommonSetup {
 	public static Supplier<ProgressionSystem<?>> progressionSupplier = () -> {
 		SubSystemCodecRegistry.registerSubSystem(VanillaProgressionConfigType.ID, VanillaProgressionConfigType.IMPL);
 		return new VanillaProgressionSystem();
+	};
+	public static Supplier<AbilitySystem> abilitySupplier = () -> {
+		SubSystemCodecRegistry.registerSubSystem(VanillaAbilityConfigType.ID, VanillaAbilityConfigType.IMPL);
+		return new VanillaAbilitySystem();
 	};
 
 	/**Registered to MOD BUS in mod constructor*/
@@ -57,6 +65,11 @@ public class CommonSetup {
 	public static void init(final FMLCommonSetupEvent event) {
 		Abilities.init();
 	}
+	
+	@SubscribeEvent(priority = EventPriority.HIGH)
+    public static void tickPerks(TickEvent.LevelTickEvent event) {
+        Core.get(event.level).getAbilities().executeAbilityTicks(event);
+    }
 	
 	@SubscribeEvent
 	public static void onServerAboutToStart(ServerAboutToStartEvent event) {
