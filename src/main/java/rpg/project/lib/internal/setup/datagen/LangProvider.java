@@ -3,6 +3,7 @@ package rpg.project.lib.internal.setup.datagen;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -72,6 +73,16 @@ public class LangProvider extends LanguageProvider{
 			.addLocale(Locale.EN_US, "You are not in a party to invite players to.").build();
 	public static final Translation PARTY_JOIN_SUCCESS = Translation.Builder.start("projectrpg.cmd.party.join.success")
 			.addLocale(Locale.EN_US, "You have added %s to the %s party.").build();
+	
+	//=======ABILITIES=======
+	public static final Translation PERK_EFFECT = Translation.Builder.start("perk.pmmo.effect")
+			.addLocale(Locale.EN_US, "Status Effect").build();
+	public static final Translation PERK_EFFECT_DESC = Translation.Builder.start("perk.pmmo.effect.description")
+			.addLocale(Locale.EN_US, "Grants the player an effect. If the player already has the effect, it pauses the cooldown").build();
+	public static final Translation PERK_EFFECT_STATUS_1 = Translation.Builder.start("perk.pmmo.effect.status1")
+			.addLocale(Locale.EN_US, "Effect: %s").build();
+	public static final Translation PERK_EFFECT_STATUS_2 = Translation.Builder.start("perk.pmmo.effect.status2")
+			.addLocale(Locale.EN_US, "Lvl:%s for %ss").build();
 	//End Translations
 	
 	@Override

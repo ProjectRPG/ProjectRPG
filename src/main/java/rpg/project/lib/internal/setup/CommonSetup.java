@@ -16,6 +16,7 @@ import net.minecraftforge.registries.RegistryManager;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.api.progression.ProgressionSystem;
+import rpg.project.lib.builtins.Abilities;
 import rpg.project.lib.builtins.vanilla.VanillaPartyConfigType;
 import rpg.project.lib.builtins.vanilla.VanillaPartySystem;
 import rpg.project.lib.builtins.vanilla.VanillaProgressionConfigType;
@@ -54,8 +55,7 @@ public class CommonSetup {
 	}
 	
 	public static void init(final FMLCommonSetupEvent event) {
-		//TODO this crashed on load.  
-//		AbilityRegistration.init();
+		Abilities.init();
 	}
 	
 	@SubscribeEvent

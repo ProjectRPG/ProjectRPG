@@ -4,33 +4,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import rpg.project.lib.api.data.ObjectType;
 
-/** TODO: <p>populate this with things we need for processing gates,
- * progression, abilities, and feature hooks.  The idea is that
- * an {@link rpg.project.lib.api.events.EventListenerSpecification} 
- * translates a specific event into the attributes we need.</p>  
- * <p>For example: suppose Event A uses <code>event.getPlayer()</code>
- * to obtain the relevant player who performed the action but Event B
- * is entity generic and so uses <code>event.getEntityLiving()</code>.
- * <br>We only care that we get a player instance in the end that we 
- * can check permissions for and award progression.</p>
- * <p>In addition to standard context variables, we also have properties
- * of events that are unique to the event but might be relevant to a 
- * feature.  For example, in PMMO the damage events send the damage 
- * value for Perks to use.  Only these events have this value and any 
- * perk dependent on this value has to account for the fact it might
- * not receive this value if the user configures the perk for an event
- * that does not supply it.  PMMO uses a CompoundTag to get a "dictionary"
- * of values, but that implementation is up for debate.
+/**<p>This translates a specific event into the attributes needed by all
+ * consuming systems.</p>  
  */
 public record EventContext(
 		/**The object type and id for the subject of this event.  Note 
@@ -45,18 +31,49 @@ public record EventContext(
 		 * this to the level held by the player instance.  Events may 
 		 * specify another level if different in the context of the event.*/
 		Level level,
-		/**An applicable location for the event.*/
-		@Nullable List<BlockPos> pos) {
+		/**Applicable locations for the event.*/
+		List<BlockPos> pos,
+		/**Applicable entities for the event*/
+		List<Entity> entities,
+		/**Applicable Itemstacks for the event*/
+		List<ItemStack> items,
+		/**<p>An object containing otherwise unspecified values.  This allows
+		 * events to provide data to context consumers that is irrelevant
+		 * or otherwise too niche to be declared as a standard EventContext
+		 * attribute.</p>
+		 * <p>It is the burden of consumers to test for the presence of 
+		 * properties in this tag if needed.  Additionally, if the consumer
+		 * is inserting properties into this map, they should convey this
+		 * intent to users of the consumer feature.</p>*/
+		CompoundTag dynamicVariables) {
 	
+	/**@see #dynamicVariables*/
+	public CompoundTag dynamicVariables() {
+		return dynamicVariables.copy();
+	}
+	
+	/**Creates a new builder instance for easily creating an 
+	 * {@link EventContext}.  The builder provides default values
+	 * for most parameters to prevent null cases.
+	 * 
+	 * @param subjectType the object type this event is centered on
+	 * @param subjectID the id of the subject object
+	 * @param player the player relevant to this event
+	 * @return a new {@link Builder}
+	 */
 	public static Builder build(ObjectType subjectType, ResourceLocation subjectID, Player player) {
 		return new Builder(subjectType, subjectID, player);
 	}
 	
+	/**A helper class for creating an {@link EventContext}*/
 	public static class Builder {
 		private Pair<ObjectType, ResourceLocation> subject;
 		private Player actor;
 		private Level level;
 		private List<BlockPos> posList = new ArrayList<>();
+		private List<Entity> entityList = new ArrayList<>();
+		private List<ItemStack> stackList = new ArrayList<>();
+		private CompoundTag dynamicVars = new CompoundTag();
 		
 		protected Builder(ObjectType subjectType, ResourceLocation subjectID, Player actor) {
 			subject = Pair.of(subjectType, subjectID);
@@ -83,6 +100,29 @@ public record EventContext(
 			this.posList.addAll(pos);
 			return this;
 		}
+		/**Includes multiple entity instances in this context.
+		 * This should be used to provide the actual entity 
+		 * instance associated with the subject object ID.
+		 * 
+		 * @param entity a collection of entities
+		 * @return the builder instance
+		 */
+		public Builder withEntity(Collection<Entity> entity) {
+			this.entityList.addAll(entity);
+			return this;
+		}
+		/**Includes multiple item stack instances in this
+		 * context.  This should be used to provide actual
+		 * stack instances associated with the subject object
+		 * ID.
+		 * 
+		 * @param stack a collection of {@link ItemStack}s
+		 * @return the builder instance
+		 */
+		public Builder withStacks(Collection<ItemStack> stack) {
+			this.stackList.addAll(stack);
+			return this;
+		}
 		/**The level is obtained from the player object by
 		 * default.  If this is invoked another level instance
 		 * can be used instead.  
@@ -94,10 +134,19 @@ public record EventContext(
 			this.level = level;
 			return this;
 		}
+		/**Sets the dynamic variables provided by this event.
+		 * 
+		 * @param nbt the object containing the dynamic values
+		 * @return the builder instance
+		 */
+		public Builder withDynamicVariables(CompoundTag nbt) {
+			this.dynamicVars.merge(nbt);
+			return this;
+		}
 		/**@return a fully formed {@link EventContext} with the 
 		 * constructed values */
 		public EventContext build() {
-			return new EventContext(subject, actor, level, posList);
+			return new EventContext(subject, actor, level, posList, entityList, stackList, dynamicVars);
 		}
 	}
 }

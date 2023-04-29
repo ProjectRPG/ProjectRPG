@@ -93,19 +93,14 @@ public record Ability(
     }
     
     public static final BiPredicate<Player, CompoundTag> VALID_CONTEXT = (player, src) -> {
-        if (src.contains(AbilityUtils.COOLDOWN) && !Core.get(player.level).getAbilityRegistry().isAbilityCooledDown(player, src)) {
+        if (src.contains(AbilityUtils.COOLDOWN) && !Core.get(player.getLevel()).getAbilityRegistry().isAbilityCooledDown(player, src)) {
             return false;
         }
-        if (src.contains(AbilityUtils.CHANCE) && src.getDouble(AbilityUtils.CHANCE) < player.level.random.nextDouble()) {
+        if (src.contains(AbilityUtils.CHANCE) && src.getDouble(AbilityUtils.CHANCE) < player.getLevel().random.nextDouble()) {
             return false;
         }
-        if (src.contains(AbilityUtils.SKILLNAME)) {
-            // TODO
-            // if (src.contains(FireworkHandler.FIREWORK_SKILL) && !src.getString(AbilityUtils.SKILLNAME).equals(src.getString(FireworkHandler.FIREWORK_SKILL))) {
-            //     return false;
-            // }
-            
-            int skillLevel = src.getInt(AbilityUtils.SKILL_LEVEL);
+        if (src.contains(AbilityUtils.CONTAINER_NAME)) {            
+            int skillLevel = src.getInt(AbilityUtils.PROGRESS_LEVEL);
             if (src.contains(AbilityUtils.MAX_LEVEL) && skillLevel > src.getInt(AbilityUtils.MAX_LEVEL)) {
                 return false;
             }

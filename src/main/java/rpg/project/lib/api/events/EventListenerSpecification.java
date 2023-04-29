@@ -3,7 +3,9 @@ package rpg.project.lib.api.events;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -20,6 +22,11 @@ public record EventListenerSpecification<T extends Event>(
 		EventPriority priority,
 		/**The event class this applies to.*/
 		Class<T> validEventClass,
+		/**Fired first when an event is invoked, this predicate determines
+		 * if ProjectRPG should internally consider this event as having fired.
+		 * This discrimination allows two ProjectRPG events which listen to the
+		 * same Forge event to execute RPG logic under different circumstances.*/
+		Predicate<T> validEventContext,
 		/**This consumes the valid event and returns the necessary context 
 		 * values needed to perform standard behavior within the gameplay
 		 * event system*/
@@ -30,7 +37,12 @@ public record EventListenerSpecification<T extends Event>(
 		 * <p>NOTE: the event will always be provided by the event registry in
 		 * a safe manner and never by the sub-system.  Type checking of the
 		 * event in your consumer will be redundant.*/
-		BiConsumer<T, CancellationType> cancellationCallback) {
+		BiConsumer<T, CancellationType> cancellationCallback,
+		/**<p>After other systems have executed their event-specific behavior,
+		 * there may be information about the event which features expect to
+		 * modify. The original values should be supplied by the contextFactory
+		 * at the event's firing and are subsequently consumed here.</p>*/
+		BiConsumer<T, CompoundTag> dynamicVariableConsumer) {
 	
 	public static enum CancellationType {
 		/**Passed to indicate no cancellation should apply.*/

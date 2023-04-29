@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 public class AbilitiesConfig {
+	public static final String TYPE = "type";
+	
     public static ForgeConfigSpec SERVER_CONFIG;
     private static final Codec<Map<ResourceLocation, List<CompoundTag>>> CODEC = Codec.unboundedMap(ResourceLocation.CODEC, CompoundTag.CODEC.listOf());
     
@@ -41,12 +43,12 @@ public class AbilitiesConfig {
         List<CompoundTag> bodyList = new ArrayList<>();
     
         //====================BREAK SPEED DEFAULTS========================
-        bodyList.add(TagBuilder.start().withString("type", "projectrpg:break_speed").withDouble("pickaxe_dig", 0.005).build());
-        bodyList.add(TagBuilder.start().withString("type", "projectrpg:break_speed").withDouble("shovel_dig", 0.005).build());
-        bodyList.add(TagBuilder.start().withString("type", "projectrpg:break_speed").withDouble("axe_dig", 0.005).build());
-        bodyList.add(TagBuilder.start().withString("type", "projectrpg:break_speed").withDouble("hoe_dig", 0.005).build());
-        bodyList.add(TagBuilder.start().withString("type", "projectrpg:break_speed").withDouble("shears_dig", 0.005).build());
-        bodyList.add(TagBuilder.start().withString("type", "projectrpg:break_speed").withDouble("sword_dig", 0.005).build());
+        bodyList.add(TagBuilder.start().withString(TYPE, "projectrpg:break_speed").withDouble("pickaxe_dig", 0.005).build());
+        bodyList.add(TagBuilder.start().withString(TYPE, "projectrpg:break_speed").withDouble("shovel_dig", 0.005).build());
+        bodyList.add(TagBuilder.start().withString(TYPE, "projectrpg:break_speed").withDouble("axe_dig", 0.005).build());
+        bodyList.add(TagBuilder.start().withString(TYPE, "projectrpg:break_speed").withDouble("hoe_dig", 0.005).build());
+        bodyList.add(TagBuilder.start().withString(TYPE, "projectrpg:break_speed").withDouble("shears_dig", 0.005).build());
+        bodyList.add(TagBuilder.start().withString(TYPE, "projectrpg:break_speed").withDouble("sword_dig", 0.005).build());
         defaultSettings.put(EventRegistry.BREAK.getId(), new ArrayList<>(bodyList));
         bodyList.clear();
         

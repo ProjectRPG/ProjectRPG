@@ -1,13 +1,14 @@
 package rpg.project.lib.internal.registry;
 
+import java.util.List;
 import java.util.function.Supplier;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.level.BlockEvent.BreakEvent;
 import net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent;
 import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
@@ -18,6 +19,7 @@ import rpg.project.lib.api.events.EventListenerSpecification;
 import rpg.project.lib.api.events.EventListenerSpecification.CancellationType;
 import rpg.project.lib.builtins.EventFactories;
 import rpg.project.lib.internal.Core;
+import rpg.project.lib.internal.config.AbilitiesConfig;
 import rpg.project.lib.internal.util.MsLoggy;
 import rpg.project.lib.internal.util.Reference;
 import rpg.project.lib.internal.util.MsLoggy.LOG_CODE;
@@ -35,6 +37,9 @@ public class EventRegistry {
 	 * @param contextFactory creates a new {@link EventContext} from the event instance
 	 */
 	public static <T extends Event> void internalEventLogic(T event, EventListenerSpecification<T> spec) {
+		//exit if this event is not situationally applicable for the eventID and specification.
+		if (!spec.validEventContext().test(event))
+			return;
 		EventContext context = spec.contextFactory().apply(event);
 		Core core = Core.get(context.level());
 		ResourceLocation eventID = spec.registryID();
@@ -52,16 +57,27 @@ public class EventRegistry {
 		 * }
 		 */
 		//TODO Feature Gates
-		//TODO Ability Gates
+				
+		//Activate event-specific abilities
+		for (CompoundTag config : AbilitiesConfig.ABILITY_SETTINGS.get().getOrDefault(eventID, List.of())) {
+			ResourceLocation abilityID = new ResourceLocation(config.getString(AbilitiesConfig.TYPE));
+			if (GateRegistry.isAbilityPermitted(context.actor(), core, eventID, context, abilityID)) {
+				CompoundTag consolidatedInputData = config.copy().merge(context.dynamicVariables());
+				core.getAbilityRegistry().executeAbility(eventID, context.actor(), consolidatedInputData);
+			}
+		}
+		
+		//Execute progression awards
 		core.getProgression().getProgressionToBeAwarded(core, eventID, context).forEach(pair -> {
 			if (GateRegistry.isProgressionPermitted(core, eventID, context, pair.getFirst()))
 				pair.getSecond().run();
 		});
+		
+		//Process any event modificaiton from features, abilities, or progress
+		spec.dynamicVariableConsumer().accept(event, context.dynamicVariables());
 	}
 	
-	/**This is used to add listeners at the appropriate
-	 * lifecycle stage.  Calling this in your own mod will create duplication.
-	 */
+	/**This is used to add listeners at the appropriate lifecycle stage.*/
 	public static <T extends Event> void registerListener(EventListenerSpecification<T> spec) {
 		MinecraftForge.EVENT_BUS.addListener(spec.priority(), true, spec.validEventClass(), event -> internalEventLogic(event, spec));
 	}
@@ -69,9 +85,6 @@ public class EventRegistry {
 	public static final DeferredRegister<EventListenerSpecification<?>> EVENTS = DeferredRegister.create(APIUtils.GAMEPLAY_EVENTS, Reference.MODID);
 	public static final Supplier<IForgeRegistry<EventListenerSpecification<?>>> REGISTRY_SUPPLIER = EVENTS.makeRegistry(RegistryBuilder::new);
 	
-	public static final RegistryObject<EventListenerSpecification<BreakEvent>> BREAK = EVENTS.register("break_block",
-		() -> new EventListenerSpecification<>(Reference.resource("break_block"), EventPriority.LOWEST, BreakEvent.class, EventFactories::breakBlock, EventFactories::fullCancel));
-	
-	public static final RegistryObject<EventListenerSpecification<EntityPlaceEvent>> PLACE = EVENTS.register("place_block", 
-		() -> new EventListenerSpecification<>(Reference.resource("break_block"), EventPriority.LOWEST, EntityPlaceEvent.class, EventFactories::placeBlock, EventFactories::fullCancel));
+	public static final RegistryObject<EventListenerSpecification<BreakEvent>> BREAK = EVENTS.register("break_block", () -> EventFactories.BLOCK_BREAK);	
+	public static final RegistryObject<EventListenerSpecification<EntityPlaceEvent>> PLACE = EVENTS.register("place_block",	() -> EventFactories.BLOCK_PLACE);
 }

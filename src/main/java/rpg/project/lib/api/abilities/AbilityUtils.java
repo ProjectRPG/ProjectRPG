@@ -20,8 +20,8 @@ public class AbilityUtils {
     public static final String DURATION = "duration";
     
     public static final String BLOCK_POS = "block_pos";
-    public static final String SKILLNAME = "skill";
-    public static final String SKILL_LEVEL = "level";
+    public static final String CONTAINER_NAME = "progress_type";
+    public static final String PROGRESS_LEVEL = "progress";
     
     public static final String BREAK_SPEED_INPUT_VALUE = "speedIn";
     public static final String BREAK_SPEED_OUTPUT_VALUE = "speed";
