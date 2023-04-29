@@ -13,7 +13,6 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.IExtensibleEnum;
 import rpg.project.lib.api.Hub;
-import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.EventListenerSpecification.CancellationType;
 import rpg.project.lib.api.gating.GateSystem;
@@ -29,7 +28,7 @@ public class GateRegistry{
 	 * @param system a GateSystem implementation
 	 * @param type the applicable gating type for the system.
 	 */
-	public static void register(GateSystem<?> system, Type type) {
+	public static void register(GateSystem system, Type type) {
 		Preconditions.checkNotNull(system);
 		registeredSystems.put(type, system);
 	}
@@ -55,7 +54,7 @@ public class GateRegistry{
 		@Override
 		public String getSerializedName() {return this.name();}
 	}
-	private static final HashMultimap<Type, GateSystem<?>> registeredSystems = HashMultimap.create();
+	private static final HashMultimap<Type, GateSystem> registeredSystems = HashMultimap.create();
 
 	/**Returns an event-specific result for this event.  This is used
 	 * by {@link EventRegistry} to inform event systems whether to 
@@ -89,10 +88,9 @@ public class GateRegistry{
 	 * apply progression to.  
 	 * @return whether progression can be committed or not.
 	 */
-	@SuppressWarnings("unchecked")
 	public static boolean isProgressionPermitted(Hub core, ResourceLocation event, EventContext context, String container) {		
 		return registeredSystems.get(Type.PROGRESS).isEmpty() || registeredSystems.get(Type.PROGRESS).stream()
-				.allMatch(system -> ((GateSystem<String>)system).isActionPermitted(context, core, event, container));
+				.allMatch(system -> system.isActionPermitted(context, core, event, container));
 	}
 
 	/**Returns whether the event is valid for activating a feature.
@@ -105,10 +103,9 @@ public class GateRegistry{
 	 * @param featureReferenceWIP
 	 * @return whether a feature is allowed to perform its function
 	 */
-	@SuppressWarnings("unchecked")
-	public static boolean isFeaturePermitted(Hub core, ResourceLocation event, EventContext context, Object featureReferenceWIP) {
+	public static boolean isFeaturePermitted(Hub core, ResourceLocation event, EventContext context, String featureReference) {
 		return registeredSystems.get(Type.FEATURE).isEmpty() || registeredSystems.get(Type.FEATURE).stream()
-				.allMatch(system -> ((GateSystem<Object>)system).isActionPermitted(context, core, event, featureReferenceWIP));
+				.allMatch(system -> system.isActionPermitted(context, core, event, featureReference));
 	}
 
 	/**Returns whether the event is valid for activating an ability.
@@ -122,9 +119,8 @@ public class GateRegistry{
 	 * @param ability the ability instance being activated
 	 * @return whether an ability is allowed to perform its function
 	 */
-	@SuppressWarnings("unchecked")
-	public static boolean isAbilityPermitted(Player player, Hub core, ResourceLocation event, EventContext context,	Ability ability) {
+	public static boolean isAbilityPermitted(Player player, Hub core, ResourceLocation event, EventContext context,	ResourceLocation ability) {
 		return registeredSystems.get(Type.ABILITY).isEmpty() || registeredSystems.get(Type.ABILITY).stream()
-				.allMatch(system -> ((GateSystem<Ability>)system).isActionPermitted(context, core, event, ability));
+				.allMatch(system -> system.isActionPermitted(context, core, event, ability.toString()));
 	}
 }

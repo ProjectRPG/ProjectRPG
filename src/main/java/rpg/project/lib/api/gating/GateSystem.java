@@ -23,7 +23,7 @@ import rpg.project.lib.api.events.EventListenerSpecification.CancellationType;
  *
  * @param <T> gate object type
  */
-public interface GateSystem<T> {
+public interface GateSystem {
 	/**<p>Consumes the provided contextual variables to evaluate if
 	 * that context is permissible for the player provided.</p>
 	 * 
@@ -34,7 +34,7 @@ public interface GateSystem<T> {
 	 * @param reference an instance of the applicable object being gated
 	 * @return false if the action should be prevented.
 	 */
-	boolean isActionPermitted(EventContext context, Hub core, ResourceLocation event, T reference);
+	boolean isActionPermitted(EventContext context, Hub core, ResourceLocation event, String reference);
 	
 	/**<p>Used specifically by the EVENT gating type, this method
 	 * tells the event listener spec which type of cancellation
@@ -49,7 +49,7 @@ public interface GateSystem<T> {
 	 * @param reference an instance of the applicable object being gated
 	 * @return the type of cancellation behavior
 	 */
-	default CancellationType getCancellationResult(EventContext context, Hub core, ResourceLocation event, T reference) {
+	default CancellationType getCancellationResult(EventContext context, Hub core, ResourceLocation event, String reference) {
 		return isActionPermitted(context, core, event, reference) 
 				? CancellationType.NONE
 				: CancellationType.EVENT;
