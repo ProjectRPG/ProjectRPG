@@ -1,6 +1,8 @@
 package rpg.project.lib.builtins.vanilla;
 
 import java.util.UUID;
+import java.util.function.Consumer;
+
 import org.apache.logging.log4j.LogManager;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -26,11 +28,13 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.data.CodecTypes;
 import rpg.project.lib.api.data.ObjectType;
+import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.progression.ProgressionSystem;
 import rpg.project.lib.builtins.vanilla.VanillaProgressionConfigType.VanillaProgressionConfig;
+import rpg.project.lib.builtins.vanilla.VanillaProgressionDataType.VanillaProgressionData;
 
-public class VanillaProgressionSystem implements ProgressionSystem<Integer>{
+public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgressionData>{
 	private static final String container = "exp";
 	
 	public VanillaProgressionSystem() {
@@ -38,53 +42,53 @@ public class VanillaProgressionSystem implements ProgressionSystem<Integer>{
 	}
 	
 	public static void updateScoreFromOfflineProgress(PlayerLoggedInEvent event) {
-		int cache = OfflineProgress.get().cachedProgress.getOrDefault(event.getEntity().getUUID(), 0);
-		event.getEntity().increaseScore(cache);
+		VanillaProgressionData cache = OfflineProgress.get().cachedProgress.getOrDefault(event.getEntity().getUUID(), new VanillaProgressionData(0));
+		event.getEntity().increaseScore(cache.exp());
 	}
 
 	@Override
-	public Integer getProgress(UUID playerID, String container) {
+	public VanillaProgressionData getProgress(UUID playerID, String container) {
 		if (ServerLifecycleHooks.getCurrentServer() == null)
-			return 0;
+			return new VanillaProgressionData(0);
 		ServerPlayer player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID);
 		if (player == null)
-			return 0;
-		return player.getScore();
+			return new VanillaProgressionData(0);
+		return new VanillaProgressionData(player.getScore());
 	}
 
 	@Override
-	public void setProgress(UUID playerID, String container, Integer value) {
+	public void setProgress(UUID playerID, String container, VanillaProgressionData value) {
 		if (ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID) == null)
 			//TODO make this a hard override for when they log in otherwise this will just add to the amount
-			OfflineProgress.get().cachedProgress.merge(playerID, value, Integer::sum);
+			OfflineProgress.get().cachedProgress.merge(playerID, value, (og, ng) -> new VanillaProgressionData(og.exp() + ng.exp()));
 		else
-			ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID).setExperiencePoints(value);		
+			ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID).setExperiencePoints(value.exp());		
 	}
 	
-	private void addXp(UUID playerID, int value) {
+	private void addXp(UUID playerID, VanillaProgressionData value) {
 		if (ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID) == null)
-			OfflineProgress.get().cachedProgress.merge(playerID, value, Integer::sum);
+			OfflineProgress.get().cachedProgress.merge(playerID, value, (og, ng) -> new VanillaProgressionData(og.exp() + ng.exp()));
 		else
-			ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID).giveExperiencePoints(value);
+			ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID).giveExperiencePoints(value.exp());
 	}
 	
 	@Override
-	public List<Pair<String, Runnable>> getProgressionToBeAwarded(Hub core, ResourceLocation eventID, EventContext context) {
+	public List<Pair<String, Consumer<Float>>> getProgressionToBeAwarded(Hub core, ResourceLocation eventID, EventContext context) {
 		ResourceLocation objectID = context.subjectObject().getSecond();
 		ObjectType type = context.subjectObject().getFirst();
 		return core.getProgressionData(VanillaProgressionConfigType.IMPL, type, objectID)
 				.map(config -> {
 					int xpToAward = ((VanillaProgressionConfig)config).eventToXp().getOrDefault(eventID, 0);
-					List<Pair<String, Runnable>> output = List.of(Pair.of(container, () -> this.addXp(context.actor().getUUID(), xpToAward)));
+					List<Pair<String, Consumer<Float>>> output = List.of(Pair.of(container, gate -> this.addXp(context.actor().getUUID(), new VanillaProgressionData((int)((float)xpToAward * gate)))));
 					return output; 
 				}
 			).orElse(List.of());
 	}	
 	
 	private static class OfflineProgress extends SavedData {
-		private Map<UUID, Integer> cachedProgress;
+		private Map<UUID, VanillaProgressionData> cachedProgress;
 		
-		private static final Codec<Map<UUID, Integer>> CODEC = Codec.unboundedMap(CodecTypes.UUID_CODEC, Codec.INT);
+		private static final Codec<Map<UUID, VanillaProgressionData>> CODEC = Codec.unboundedMap(CodecTypes.UUID_CODEC, VanillaProgressionData.CODEC.xmap(s -> (VanillaProgressionData)s, s -> s));
 		
 		private static final String MAP_KEY = "data";
 		
@@ -130,4 +134,8 @@ public class VanillaProgressionSystem implements ProgressionSystem<Integer>{
 							}))));
 	}
 
+	@Override
+	public SubSystemConfigType dataType() {
+		return VanillaProgressionDataType.IMPL;
+	}
 }

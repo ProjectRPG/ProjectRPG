@@ -25,6 +25,7 @@ import rpg.project.lib.builtins.vanilla.VanillaAbilitySystem;
 import rpg.project.lib.builtins.vanilla.VanillaPartyConfigType;
 import rpg.project.lib.builtins.vanilla.VanillaPartySystem;
 import rpg.project.lib.builtins.vanilla.VanillaProgressionConfigType;
+import rpg.project.lib.builtins.vanilla.VanillaProgressionDataType;
 import rpg.project.lib.builtins.vanilla.VanillaProgressionSystem;
 import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.commands.CmdRoot;
@@ -43,6 +44,7 @@ public class CommonSetup {
 	};
 	public static Supplier<ProgressionSystem<?>> progressionSupplier = () -> {
 		SubSystemCodecRegistry.registerSubSystem(VanillaProgressionConfigType.ID, VanillaProgressionConfigType.IMPL);
+		SubSystemCodecRegistry.registerSubSystem(VanillaProgressionDataType.ID, VanillaProgressionDataType.IMPL);
 		return new VanillaProgressionSystem();
 	};
 	public static Supplier<AbilitySystem> abilitySupplier = () -> {

@@ -13,17 +13,23 @@ public class ProgressionUtils {
 	 * If this is invoked more than once, the latter
 	 * invocation will set the ultimate xp system.</p>
 	 * 
-	 * @param id an identifier used in object configs as the
+	 * @param systemConfigId an identifier used in object configs as the
 	 * "type" for the configuration. This "type" specifies that
 	 * the internal config reader should use your config when
 	 * parsing the user-defined configurations
-	 * @param config the config type used to obtain a codec to
+	 * @param systemConfig the config type used to obtain a codec to
 	 * parse user-defined configurations.
 	 * @param system an {@link ProgressionSystem} implementation
 	 */
-	public static void registerXpSystem(ResourceLocation id, SubSystemConfigType config, Supplier<ProgressionSystem<?>> system) {
+	public static void registerXpSystem(
+			ResourceLocation systemConfigId, 
+			SubSystemConfigType systemConfig, 
+			ResourceLocation systemDataTypeId,
+			SubSystemConfigType systemDataType,
+			Supplier<ProgressionSystem<?>> system) {
 		CommonSetup.progressionSupplier = () -> {
-			SubSystemCodecRegistry.registerSubSystem(id, config);
+			SubSystemCodecRegistry.registerSubSystem(systemConfigId, systemConfig);
+			SubSystemCodecRegistry.registerSubSystem(systemDataTypeId, systemDataType);
 			return system.get();
 		};
 	}
