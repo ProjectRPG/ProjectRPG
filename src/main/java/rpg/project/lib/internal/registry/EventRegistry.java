@@ -58,17 +58,17 @@ public class EventRegistry {
 		//Activate event-specific abilities
 		for (CompoundTag config : core.getAbility().getAbilitiesForContext(core, eventID, context)) {
 			ResourceLocation abilityID = new ResourceLocation(config.getString(AbilityUtils.TYPE));
-			if (GateRegistry.isAbilityPermitted(context.actor(), core, eventID, context, abilityID)) {
+			float gating = GateRegistry.isAbilityPermitted(context.actor(), core, eventID, context, abilityID);
+			if (gating != GateRegistry.HARD_FAIL) {
 				CompoundTag consolidatedInputData = config.copy().merge(context.dynamicVariables());
+				consolidatedInputData.putFloat(AbilityUtils.REDUCTION, gating);
 				core.getAbilities().executeAbility(eventID, context.actor(), consolidatedInputData);
 			}
 		}
 		
 		//Execute progression awards
-		core.getProgression().getProgressionToBeAwarded(core, eventID, context).forEach(pair -> {
-			if (GateRegistry.isProgressionPermitted(core, eventID, context, pair.getFirst()))
-				pair.getSecond().run();
-		});
+		core.getProgression().getProgressionToBeAwarded(core, eventID, context).forEach(
+				pair -> pair.getSecond().accept(GateRegistry.isProgressionPermitted(core, eventID, context, pair.getFirst())));
 		
 		//Process any event modificaiton from features, abilities, or progress
 		spec.dynamicVariableConsumer().accept(event, context.dynamicVariables());

@@ -31,6 +31,7 @@ public class AbilityUtils {
     public static final String COOLDOWN = "cooldown";
     /**Sets how long this ability should tick for before stopping*/
     public static final String DURATION = "duration";
+    public static final String REDUCTION = "reduce";
     
     public static final String BLOCK_POS = "block_pos";
     public static final String CONTAINER_NAME = "progress_type";

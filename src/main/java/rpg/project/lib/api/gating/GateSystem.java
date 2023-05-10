@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.EventListenerSpecification.CancellationType;
+import rpg.project.lib.internal.registry.GateRegistry;
 
 /**<p>A gate system controls whether specific content is
  * accessible to the player.</p>
@@ -32,9 +33,10 @@ public interface GateSystem {
 	 * @param core reference to the internal system logic
 	 * @param event event ID which triggered this check
 	 * @param reference an instance of the applicable object being gated
-	 * @return false if the action should be prevented.
+	 * @return a percentage of success.  0 == no success. 1 == max success.
+	 * some systems may accept larger or smaller numbers.  
 	 */
-	boolean isActionPermitted(EventContext context, Hub core, ResourceLocation event, String reference);
+	float isActionPermitted(EventContext context, Hub core, ResourceLocation event, String reference);
 	
 	/**<p>Used specifically by the EVENT gating type, this method
 	 * tells the event listener spec which type of cancellation
@@ -50,7 +52,7 @@ public interface GateSystem {
 	 * @return the type of cancellation behavior
 	 */
 	default CancellationType getCancellationResult(EventContext context, Hub core, ResourceLocation event, String reference) {
-		return isActionPermitted(context, core, event, reference) 
+		return isActionPermitted(context, core, event, reference) == GateRegistry.HARD_PASS
 				? CancellationType.NONE
 				: CancellationType.EVENT;
 	}

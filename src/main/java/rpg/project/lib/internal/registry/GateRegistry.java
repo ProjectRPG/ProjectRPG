@@ -1,6 +1,7 @@
 package rpg.project.lib.internal.registry;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -20,6 +21,8 @@ import rpg.project.lib.api.gating.GateSystem;
 /**This class stores and supplies a runtime map of all 
  * {@link GateSystem} implementations.*/
 public class GateRegistry{
+	public static final float HARD_PASS = 1f;
+	public static final float HARD_FAIL = 0f;
 	/**==INTERNAL USE ONLY==
 	 * This is meant only to be called by API methods in a way that 
 	 * checks the type safety of the {@link GateSystem} sub-type 
@@ -88,9 +91,13 @@ public class GateRegistry{
 	 * apply progression to.  
 	 * @return whether progression can be committed or not.
 	 */
-	public static boolean isProgressionPermitted(Hub core, ResourceLocation event, EventContext context, String container) {		
-		return registeredSystems.get(Type.PROGRESS).isEmpty() || registeredSystems.get(Type.PROGRESS).stream()
-				.allMatch(system -> system.isActionPermitted(context, core, event, container));
+	public static float isProgressionPermitted(Hub core, ResourceLocation event, EventContext context, String container) {
+		if (registeredSystems.get(Type.PROGRESS).isEmpty())
+			return HARD_PASS;
+		return registeredSystems.get(Type.PROGRESS).stream()
+				.map(system -> system.isActionPermitted(context, core, event, container))
+				.min(Comparator.naturalOrder())
+				.orElse(HARD_PASS);
 	}
 
 	/**Returns whether the event is valid for activating a feature.
@@ -103,9 +110,13 @@ public class GateRegistry{
 	 * @param featureReferenceWIP
 	 * @return whether a feature is allowed to perform its function
 	 */
-	public static boolean isFeaturePermitted(Hub core, ResourceLocation event, EventContext context, String featureReference) {
-		return registeredSystems.get(Type.FEATURE).isEmpty() || registeredSystems.get(Type.FEATURE).stream()
-				.allMatch(system -> system.isActionPermitted(context, core, event, featureReference));
+	public static float isFeaturePermitted(Hub core, ResourceLocation event, EventContext context, String featureReference) {
+		if (registeredSystems.get(Type.FEATURE).isEmpty())
+			return HARD_PASS;
+		return registeredSystems.get(Type.FEATURE).stream()
+				.map(system -> system.isActionPermitted(context, core, event, featureReference))
+				.min(Comparator.naturalOrder())
+				.orElse(HARD_PASS);
 	}
 
 	/**Returns whether the event is valid for activating an ability.
@@ -119,8 +130,12 @@ public class GateRegistry{
 	 * @param ability the ability instance being activated
 	 * @return whether an ability is allowed to perform its function
 	 */
-	public static boolean isAbilityPermitted(Player player, Hub core, ResourceLocation event, EventContext context,	ResourceLocation ability) {
-		return registeredSystems.get(Type.ABILITY).isEmpty() || registeredSystems.get(Type.ABILITY).stream()
-				.allMatch(system -> system.isActionPermitted(context, core, event, ability.toString()));
+	public static float isAbilityPermitted(Player player, Hub core, ResourceLocation event, EventContext context,	ResourceLocation ability) {
+		if (registeredSystems.get(Type.ABILITY).isEmpty())
+			return HARD_PASS;
+		return registeredSystems.get(Type.ABILITY).stream()
+				.map(system -> system.isActionPermitted(context, core, event, ability.toString()))
+				.min(Comparator.naturalOrder())
+				.orElse(HARD_PASS);
 	}
 }
