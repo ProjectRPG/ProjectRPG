@@ -1,22 +1,17 @@
 package rpg.project.lib.internal.registry;
 
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
-import com.mojang.serialization.Codec;
-
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.IExtensibleEnum;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.EventListenerSpecification.CancellationType;
 import rpg.project.lib.api.gating.GateSystem;
+import rpg.project.lib.api.gating.GateUtils.Type;
 
 /**This class stores and supplies a runtime map of all 
  * {@link GateSystem} implementations.*/
@@ -36,27 +31,6 @@ public class GateRegistry{
 		registeredSystems.put(type, system);
 	}
 	
-	/**Gameplay gating is divided into four types.  {@link GateSystem}
-	 * registrations specify their applicable {@link Type} so the 
-	 * internal gating processor can apply them accordingly.  
-	 */
-	public static enum Type implements StringRepresentable, IExtensibleEnum{
-		/**Specifies gates that cancel or alter events.*/
-		EVENT,
-		/**Specifies gates that permit/deny progression advancement.*/
-		PROGRESS,
-		/**Specifies gates that permit/deny feature usage*/
-		FEATURE,
-		/**Specifies gates that permit/deny ability usage*/
-		ABILITY;
-		
-		public static final Codec<Type> CODEC = IExtensibleEnum.createCodecForExtensibleEnum(Type::values, Type::create);
-		private static final Map<String, Type> BY_NAME = Arrays.stream(values()).collect(Collectors.toMap(Type::getSerializedName, s -> s));
-		public static Type create(String name) {return BY_NAME.get(name);} 
-		
-		@Override
-		public String getSerializedName() {return this.name();}
-	}
 	private static final HashMultimap<Type, GateSystem> registeredSystems = HashMultimap.create();
 
 	/**Returns an event-specific result for this event.  This is used

@@ -7,10 +7,10 @@ import rpg.project.lib.api.abilities.AbilitySystem;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
+import rpg.project.lib.api.gating.GateUtils.Type;
 import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.api.progression.ProgressionSystem;
 import rpg.project.lib.internal.registry.AbilityRegistry;
-import rpg.project.lib.internal.registry.GateRegistry;
 
 /**Implementations of this provide access to shared
  * features of the library.  Project RPG provides an
@@ -46,7 +46,7 @@ public interface Hub {
 	 * @param objectID the id of the object
 	 * @return an optional containing the configuration, if present
 	 */
-	Optional<SubSystemConfig> getGateData(SubSystemConfigType systemType, ObjectType type, GateRegistry.Type gateType, ResourceLocation objectID);
+	Optional<SubSystemConfig> getGateData(SubSystemConfigType systemType, ObjectType type, Type gateType, ResourceLocation objectID);
 	/**<p>Accesses the Hub's internal configuration data and returns 
 	 * the configuration object associated with the in-game object
 	 * specified and for the configuration type.</p>
