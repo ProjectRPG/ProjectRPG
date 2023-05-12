@@ -13,12 +13,12 @@ import rpg.project.lib.api.abilities.AbilitySystem;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
+import rpg.project.lib.api.gating.GateUtils.Type;
 import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.api.progression.ProgressionSystem;
 import rpg.project.lib.internal.config.readers.DataLoader;
 import rpg.project.lib.internal.config.readers.MergeableCodecDataManager;
 import rpg.project.lib.internal.registry.AbilityRegistry;
-import rpg.project.lib.internal.registry.GateRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
 import rpg.project.lib.internal.util.Functions;
 
@@ -75,7 +75,7 @@ public class Core implements Hub {
 	}
 
 	@Override
-	public Optional<SubSystemConfig> getGateData(SubSystemConfigType systemType, ObjectType type, GateRegistry.Type gateType, ResourceLocation objectID) {
+	public Optional<SubSystemConfig> getGateData(SubSystemConfigType systemType, ObjectType type, Type gateType, ResourceLocation objectID) {
 		MergeableCodecDataManager<?> loader = getLoader().getLoader(type);
 		return loader.getData(objectID).gates().getOrDefault(gateType, List.of()).stream().filter(config -> config.getType().equals(systemType)).findFirst();
 	}

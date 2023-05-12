@@ -15,14 +15,14 @@ import net.minecraft.util.StringRepresentable;
 import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
-import rpg.project.lib.internal.registry.GateRegistry;
+import rpg.project.lib.api.gating.GateUtils.Type;
 import rpg.project.lib.internal.registry.SubSystemCodecRegistry;
 import rpg.project.lib.internal.util.Functions;
 
 public record MainSystemConfig(
 		boolean override, 
 		List<String> tagValues,
-		Map<GateRegistry.Type, List<SubSystemConfig>> gates,
+		Map<Type, List<SubSystemConfig>> gates,
 		List<SubSystemConfig> progression,
 		List<SubSystemConfig> abilities,
 		List<SubSystemConfig> features
@@ -34,9 +34,9 @@ public record MainSystemConfig(
 			Codec.BOOL.optionalFieldOf("replace").forGetter(msc -> Optional.of(msc.override())),
 			Codec.STRING.listOf().optionalFieldOf("copyTo").forGetter(msc -> Optional.of(msc.tagValues())),
 			Codec.optionalField("gates",  Codec.simpleMap(
-					GateRegistry.Type.CODEC, 
+					Type.CODEC, 
 					Codec.list(SubSystemCodecRegistry.CODEC.dispatch("type", SubSystemConfig::getType, SubSystemConfigType::getCodec)), 
-					StringRepresentable.keys(GateRegistry.Type.values())).codec()
+					StringRepresentable.keys(Type.values())).codec()
 				)
 				.forGetter(msc -> Optional.of(msc.gates())),
 			Codec.list(SubSystemCodecRegistry.CODEC.dispatch("type", SubSystemConfig::getType, SubSystemConfigType::getCodec))
@@ -63,7 +63,7 @@ public record MainSystemConfig(
 		if (!(two instanceof MainSystemConfig second))
 			return this;
 		List<String> tagValues = new ArrayList<>();
-		Map<GateRegistry.Type, List<SubSystemConfig>> gates = new HashMap<>();
+		Map<Type, List<SubSystemConfig>> gates = new HashMap<>();
 		List<SubSystemConfig> progression = new ArrayList<>();
 		List<SubSystemConfig> abilities = new ArrayList<>();
 		List<SubSystemConfig> features = new ArrayList<>();
