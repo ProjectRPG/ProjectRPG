@@ -93,9 +93,10 @@ public class GateRegistry{
 				.orElse(HARD_PASS);
 	}
 
-	/**Returns whether the event is valid for activating an ability.
-	 * If this returns falls, the ability system will not be notified
-	 * the event occurred and the ability will not activate.
+	/**Returns whether the event and context is valid for activating 
+	 * an ability.  This occurs after the ability system has decided
+	 * which abilities are applicable and evaluates each ability from
+	 * that collection independently.
 	 * 
 	 * @param player the player using the ability
 	 * @param corethe {@link Hub} instance to be used by consumers
@@ -104,7 +105,7 @@ public class GateRegistry{
 	 * @param ability the ability instance being activated
 	 * @return whether an ability is allowed to perform its function
 	 */
-	public static float isAbilityPermitted(Player player, Hub core, ResourceLocation event, EventContext context,	ResourceLocation ability) {
+	public static float isAbilityPermitted(Player player, Hub core, ResourceLocation event, EventContext context, ResourceLocation ability) {
 		if (registeredSystems.get(Type.ABILITY).isEmpty())
 			return HARD_PASS;
 		return registeredSystems.get(Type.ABILITY).stream()

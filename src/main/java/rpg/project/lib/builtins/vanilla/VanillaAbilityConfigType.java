@@ -14,7 +14,7 @@ import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
 
 public record VanillaAbilityConfigType() implements SubSystemConfigType {
-	public static final ResourceLocation ID = new ResourceLocation("minecraft:abilities");
+	public static final ResourceLocation ID = new ResourceLocation("abilities");
 	public static final VanillaAbilityConfigType IMPL = new VanillaAbilityConfigType();
 
 	@Override

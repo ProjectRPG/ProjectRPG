@@ -42,7 +42,7 @@ public record MainSystemConfig(
 			Codec.list(SubSystemCodecRegistry.CODEC.dispatch("type", SubSystemConfig::getType, SubSystemConfigType::getCodec))
 				.optionalFieldOf("progression")
 				.forGetter(msc -> Optional.of(msc.progression())),
-				Codec.list(SubSystemCodecRegistry.CODEC.dispatch("type", SubSystemConfig::getType, SubSystemConfigType::getCodec))
+			Codec.list(SubSystemCodecRegistry.CODEC.dispatch("type", SubSystemConfig::getType, SubSystemConfigType::getCodec))
 				.optionalFieldOf("abilities")
 				.forGetter(msc -> Optional.of(msc.abilities())),
 			Codec.list(SubSystemCodecRegistry.CODEC.dispatch("type", SubSystemConfig::getType, SubSystemConfigType::getCodec))
