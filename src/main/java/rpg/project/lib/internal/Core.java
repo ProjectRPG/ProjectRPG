@@ -15,10 +15,12 @@ import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.api.gating.GateUtils.Type;
 import rpg.project.lib.api.party.PartySystem;
+import rpg.project.lib.api.progression.ProgressionAddon;
 import rpg.project.lib.api.progression.ProgressionSystem;
 import rpg.project.lib.internal.config.readers.DataLoader;
 import rpg.project.lib.internal.config.readers.MergeableCodecDataManager;
 import rpg.project.lib.internal.registry.AbilityRegistry;
+import rpg.project.lib.internal.registry.ProgressionAddonRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
 import rpg.project.lib.internal.util.Functions;
 
@@ -63,6 +65,10 @@ public class Core implements Hub {
 	public PartySystem getParty() {return party;}
 	@Override
 	public ProgressionSystem<?> getProgression() {return progress;}
+	@Override
+	public List<ProgressionAddon> getProgressionAddons() {
+		return ProgressionAddonRegistry.getAddons();
+	}
 	@Override
 	public AbilitySystem getAbility() {return abilitySys;}
 	@Override

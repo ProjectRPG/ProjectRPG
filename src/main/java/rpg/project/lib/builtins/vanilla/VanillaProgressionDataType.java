@@ -59,5 +59,17 @@ public record VanillaProgressionDataType() implements SubSystemConfigType{
 			case LESS_THAN_OR_EQUAL -> this.exp() <= ((VanillaProgressionData)with).exp() ? 1f : 0f;
 			default -> 0f;};
 		}
+
+		@Override
+		public ProgressionDataType modify(Modification operator, ProgressionDataType with) {
+			return switch (operator) {
+			case INCREASE -> new VanillaProgressionData(this.exp() + ((VanillaProgressionData)with).exp());
+			case DECREASE -> new VanillaProgressionData(this.exp() - ((VanillaProgressionData)with).exp());
+			case MULTIPLY -> new VanillaProgressionData(this.exp() * ((VanillaProgressionData)with).exp());
+			case DIVIDE -> new VanillaProgressionData(this.exp() / ((VanillaProgressionData)with).exp() != 0 
+					? ((VanillaProgressionData)with).exp() : 1);
+			case REPLACE -> with;
+			default -> this;};
+		}
 	}
 }

@@ -1,5 +1,6 @@
 package rpg.project.lib.api;
 
+import java.util.List;
 import java.util.Optional;
 
 import net.minecraft.resources.ResourceLocation;
@@ -9,6 +10,7 @@ import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.api.gating.GateUtils.Type;
 import rpg.project.lib.api.party.PartySystem;
+import rpg.project.lib.api.progression.ProgressionAddon;
 import rpg.project.lib.api.progression.ProgressionSystem;
 import rpg.project.lib.internal.registry.AbilityRegistry;
 
@@ -81,6 +83,9 @@ public interface Hub {
 	/**@return the active {@link ProgressionSystem} implementation for this instance
 	 */
 	ProgressionSystem<?> getProgression();
+	/**@return all active {@link ProgressionAddon}s for this instance
+	 */
+	List<ProgressionAddon> getProgressionAddons();
 	/**@return the active {@link AbilitySystem} implementation for this instance
 	 */
 	AbilitySystem getAbility();

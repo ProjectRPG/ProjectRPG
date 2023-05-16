@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import net.minecraft.resources.ResourceLocation;
 import rpg.project.lib.api.data.SubSystemConfigType;
+import rpg.project.lib.internal.registry.ProgressionAddonRegistry;
 import rpg.project.lib.internal.registry.SubSystemCodecRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
 
@@ -32,5 +33,19 @@ public class ProgressionUtils {
 			SubSystemCodecRegistry.registerSubSystem(systemDataTypeId, systemDataType);
 			return system.get();
 		};
+	}
+	
+	/**Registers an addon to customize behavior of the 
+	 * xp system.  Multiple addons can be registered.
+	 * 
+	 * @param configID the configuration key for this addon
+	 * @param configType the cofiguration implementation reference
+	 * @param addon the addon instance being registered
+	 */
+	public static void registerAddon(
+			ResourceLocation configID,
+			SubSystemConfigType configType,
+			ProgressionAddon addon) {
+		ProgressionAddonRegistry.registerAddon(configID, configType, addon);
 	}
 }

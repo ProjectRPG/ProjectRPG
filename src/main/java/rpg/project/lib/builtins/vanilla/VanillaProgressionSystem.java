@@ -1,6 +1,7 @@
 package rpg.project.lib.builtins.vanilla;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
@@ -78,8 +79,11 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 		ObjectType type = context.subjectObject().getFirst();
 		return core.getProgressionData(VanillaProgressionConfigType.IMPL, type, objectID)
 				.map(config -> {
-					int xpToAward = ((VanillaProgressionConfig)config).eventToXp().getOrDefault(eventID, 0);
-					List<Pair<String, Consumer<Float>>> output = List.of(Pair.of(container, gate -> this.addXp(context.actor().getUUID(), new VanillaProgressionData((int)((float)xpToAward * gate)))));
+					AtomicInteger xpToAward = new AtomicInteger(((VanillaProgressionConfig)config).eventToXp().getOrDefault(eventID, 0));
+					core.getProgressionAddons().forEach(addon -> {
+						xpToAward.getAndSet(((VanillaProgressionData)addon.modifyProgression(new VanillaProgressionData(xpToAward.get()))).exp());						
+					});
+					List<Pair<String, Consumer<Float>>> output = List.of(Pair.of(container, gate -> this.addXp(context.actor().getUUID(), new VanillaProgressionData((int)((float)xpToAward.get() * gate)))));
 					return output; 
 				}
 			).orElse(List.of());
