@@ -78,7 +78,7 @@ public record EventContext(
 		protected Builder(ObjectType subjectType, ResourceLocation subjectID, Player actor) {
 			subject = Pair.of(subjectType, subjectID);
 			this.actor = actor;
-			this.level = actor.getLevel();
+			this.level = actor.level();
 		}
 		/**Includes a position value for this context.
 		 * 

@@ -184,10 +184,10 @@ public record Ability(
     /**Common conditions for all abilities.  Whether specified or not, users can provide
      * values to these settings to have any ability tested against them.*/
     public static final BiPredicate<Player, CompoundTag> VALID_CONTEXT = (player, src) -> {
-        if (src.contains(AbilityUtils.COOLDOWN) && !Core.get(player.getLevel()).getAbilities().isAbilityCooledDown(player, src)) {
+        if (src.contains(AbilityUtils.COOLDOWN) && !Core.get(player.level()).getAbilities().isAbilityCooledDown(player, src)) {
             return false;
         }
-        if (src.contains(AbilityUtils.CHANCE) && src.getDouble(AbilityUtils.CHANCE) < player.getLevel().random.nextDouble()) {
+        if (src.contains(AbilityUtils.CHANCE) && src.getDouble(AbilityUtils.CHANCE) < player.level().random.nextDouble()) {
             return false;
         }
         if (src.contains(AbilityUtils.CONTAINER_NAME)) {            

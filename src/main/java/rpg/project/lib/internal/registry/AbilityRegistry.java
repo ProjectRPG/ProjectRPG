@@ -56,7 +56,7 @@ public class AbilityRegistry {
         tickTracker.add(new TickSchedule(ability, player, config, new AtomicInteger(0)));
         
         if (config.contains(AbilityUtils.COOLDOWN)) {
-            coolTracker.add(new AbilityCooldown(abilityID, player, config, player.level.getGameTime()));
+            coolTracker.add(new AbilityCooldown(abilityID, player, config, player.level().getGameTime()));
         }
         
         output.merge(TagUtils.mergeTags(output, executionOutput));

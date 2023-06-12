@@ -31,7 +31,7 @@ public class CmdRoot {
 		var progressCommand = Core.get(LogicalSide.SERVER).getProgression().getCommands();
 		return progressCommand != null ? progressCommand :
 			Commands.literal("progress")
-				.executes(ctx -> {ctx.getSource().sendSuccess(Component.literal("Unregistered Command"), false); return 0;});
+				.executes(ctx -> {ctx.getSource().sendSuccess(() -> Component.literal("Unregistered Command"), false); return 0;});
 	}
 	
 	private static final String NAME = "name";
@@ -48,7 +48,7 @@ public class CmdRoot {
 						if (core.getParty().createParty(partyName)) {
 							Component name = core.getParty().getPartyDisplayName(partyName);
 							core.getParty().joinParty(ctx.getSource().getPlayerOrException(), partyName);
-							ctx.getSource().sendSuccess(LangProvider.PARTY_CREATE_SUCCESS.asComponent(name), true);
+							ctx.getSource().sendSuccess(() -> LangProvider.PARTY_CREATE_SUCCESS.asComponent(name), true);
 							return 0;
 						}
 						ctx.getSource().sendFailure(LangProvider.PARTY_CREATE_FAILURE.asComponent());
@@ -61,7 +61,7 @@ public class CmdRoot {
 					String party = core.getParty().getPlayerParty(player.getUUID());
 					if (core.getParty().leaveParty(player, party)) {
 						Component name = core.getParty().getPartyDisplayName(party);
-						ctx.getSource().sendSuccess(LangProvider.PARTY_LEAVE_SUCCESS.asComponent(name), false);
+						ctx.getSource().sendSuccess(() -> LangProvider.PARTY_LEAVE_SUCCESS.asComponent(name), false);
 						return 0;
 					}
 					ctx.getSource().sendFailure(LangProvider.PARTY_LEAVE_FAILURE.asComponent());
@@ -81,7 +81,7 @@ public class CmdRoot {
 							if (core.getParty().invitePlayer(executor, player.getStringUUID()))
 								invitedPlayers.add(player);
 						}
-						ctx.getSource().sendSuccess(LangProvider.PARTY_INVITE_SUCCESS.asComponent(invitedPlayers), false);
+						ctx.getSource().sendSuccess(() -> LangProvider.PARTY_INVITE_SUCCESS.asComponent(invitedPlayers), false);
 						return 0;
 					})))
 			.then(Commands.literal("uninvite")
@@ -98,7 +98,7 @@ public class CmdRoot {
 							if (core.getParty().revokeInvite(executor, player.getStringUUID()))
 								uninvitedPlayers.add(player);
 						}
-						ctx.getSource().sendSuccess(LangProvider.PARTY_UNINVITE_SUCCESS.asComponent(uninvitedPlayers), false);
+						ctx.getSource().sendSuccess(() -> LangProvider.PARTY_UNINVITE_SUCCESS.asComponent(uninvitedPlayers), false);
 						return 0;
 					})))
 			.then(Commands.literal("listMembers")
@@ -106,7 +106,7 @@ public class CmdRoot {
 					.executes(ctx -> {
 						for (UUID playerID : Core.get(LogicalSide.SERVER).getParty().getPartyMembers(StringArgumentType.getString(ctx, NAME))) {
 							String name = ctx.getSource().getServer().getProfileCache().get(playerID).get().getName();
-							ctx.getSource().sendSuccess(LangProvider.PARTY_LIST_SUCCESS.asComponent(name), false);
+							ctx.getSource().sendSuccess(() -> LangProvider.PARTY_LIST_SUCCESS.asComponent(name), false);
 						}
 						return 0;
 					})))
@@ -116,7 +116,7 @@ public class CmdRoot {
 					Map<String, Integer> parties = core.getParty().getAllParties().stream()
 							.collect(Collectors.toMap(name -> name, name -> core.getParty().getPartyMembers(name).size()));
 					for (String party : core.getParty().getAllParties()) {
-						ctx.getSource().sendSuccess(core.getParty().getPartyDisplayName(party).copy()
+						ctx.getSource().sendSuccess(() -> core.getParty().getPartyDisplayName(party).copy()
 								.append("("+parties.getOrDefault(party, 0)+")"), false);
 					}
 					return 0;
@@ -131,7 +131,7 @@ public class CmdRoot {
 							Component prettyPartyName = core.getParty().getPartyDisplayName(partyName);
 							EntityArgument.getPlayers(ctx, PLAYER).forEach(player -> {								
 								core.getParty().joinParty(player, partyName);
-								ctx.getSource().sendSuccess(LangProvider.PARTY_JOIN_SUCCESS.asComponent(player.getDisplayName(), prettyPartyName), false);
+								ctx.getSource().sendSuccess(() -> LangProvider.PARTY_JOIN_SUCCESS.asComponent(player.getDisplayName(), prettyPartyName), false);
 							});
 							return 0;
 						}))));
