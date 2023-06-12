@@ -49,9 +49,6 @@ public class Core implements Hub {
 		this.abilities = new AbilityRegistry();
 	}
 	
-	//TODO find a way to prevent these from being called too early.
-	// perhaps a lifecycle state check or some sort of "finished setup"
-	// flag that gets set by prerequisite behavior.
 	public static Core get(final LogicalSide side) {
 	    return INSTANCES.get(side).apply(side);
 	}

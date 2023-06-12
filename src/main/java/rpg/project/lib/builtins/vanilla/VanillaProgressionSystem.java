@@ -43,8 +43,9 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 	}
 	
 	public static void updateScoreFromOfflineProgress(PlayerLoggedInEvent event) {
-		VanillaProgressionData cache = OfflineProgress.get().cachedProgress.getOrDefault(event.getEntity().getUUID(), new VanillaProgressionData(0));
-		event.getEntity().increaseScore(cache.exp());
+		VanillaProgressionData cache = OfflineProgress.get().cachedProgress.remove(event.getEntity().getUUID());
+		if (cache != null)
+			event.getEntity().increaseScore(cache.exp());
 	}
 
 	@Override
@@ -60,8 +61,7 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 	@Override
 	public void setProgress(UUID playerID, String container, VanillaProgressionData value) {
 		if (ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID) == null)
-			//TODO make this a hard override for when they log in otherwise this will just add to the amount
-			OfflineProgress.get().cachedProgress.merge(playerID, value, (og, ng) -> new VanillaProgressionData(og.exp() + ng.exp()));
+			OfflineProgress.get().cachedProgress.put(playerID, value);
 		else
 			ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID).setExperiencePoints(value.exp());		
 	}
@@ -81,7 +81,7 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 				.map(config -> {
 					AtomicInteger xpToAward = new AtomicInteger(((VanillaProgressionConfig)config).eventToXp().getOrDefault(eventID, 0));
 					core.getProgressionAddons().forEach(addon -> {
-						xpToAward.getAndSet(((VanillaProgressionData)addon.modifyProgression(new VanillaProgressionData(xpToAward.get()))).exp());						
+						xpToAward.getAndSet(((VanillaProgressionData)addon.modifyProgression(core, context, new VanillaProgressionData(xpToAward.get()))).exp());						
 					});
 					List<Pair<String, Consumer<Float>>> output = List.of(Pair.of(container, gate -> this.addXp(context.actor().getUUID(), new VanillaProgressionData((int)((float)xpToAward.get() * gate)))));
 					return output; 

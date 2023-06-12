@@ -1,5 +1,8 @@
 package rpg.project.lib.api.progression;
 
+import rpg.project.lib.api.Hub;
+import rpg.project.lib.api.events.EventContext;
+
 /**<p>Progression addons provide third-party input into
  * the progression system.  Addons do not care about
  * the underlying implementation.  The purpose of a
@@ -27,8 +30,10 @@ public interface ProgressionAddon {
 	 * the configuration for this addon should factor into
 	 * the configuration</p>
 	 * 
+	 * @param core gives access to shared resources
+	 * @param context information about the circumstances of this progression
 	 * @param dataIn the data value being modified
 	 * @return a new modified value
 	 */
-	public ProgressionDataType modifyProgression(ProgressionDataType dataIn);
+	public ProgressionDataType modifyProgression(Hub core, EventContext context, ProgressionDataType dataIn);
 }
