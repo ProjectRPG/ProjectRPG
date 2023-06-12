@@ -36,19 +36,57 @@ public class GateUtils {
 		public String getSerializedName() {return this.name();}
 	}
 	
-	//TODO JavaDocs
+	/**<p>Registers a gating system specifically for gating events.</p>
+	 * <p>Note the same config and config ID can be used for multiple
+	 * systems of different types.  Uniqueness is not required</p>
+	 * 
+	 * @param id the "type" id for the config type
+	 * @param config a config type for this system
+	 * @param system the system instance itself
+	 */
 	public static void registerEventGate(ResourceLocation id, SubSystemConfigType config, GateSystem system) {
 		SubSystemCodecRegistry.registerSubSystem(id, config);
 		GateRegistry.register(system, Type.EVENT);
 	}
+	
+	/**<p>Registers a gating system specifically for gating progress.</p>
+	 * <p>Note the same config and config ID can be used for multiple
+	 * systems of different types.  Uniqueness is not required</p>
+	 * 
+	 * @param id the "type" id for the config type
+	 * @param config a config type for this system
+	 * @param system the system instance itself
+	 */
 	public static void registerProgressGate(ResourceLocation id, SubSystemConfigType config, GateSystem system) {
 		SubSystemCodecRegistry.registerSubSystem(id, config);
 		GateRegistry.register(system, Type.PROGRESS);
 	}
+
+	/**<p>Registers a gating system specifically for gating features.</p>
+	 * <p>Note the same config and config ID can be used for multiple
+	 * systems of different types.  Uniqueness is not required</p>
+	 * 
+	 * @param id the "type" id for the config type
+	 * @param config a config type for this system
+	 * @param system the system instance itself
+	 */
 	public static void registerFeatureGate(ResourceLocation id, SubSystemConfigType config, GateSystem system) {
 		SubSystemCodecRegistry.registerSubSystem(id, config);
 		GateRegistry.register(system, Type.FEATURE);
 	}
+
+
+	/**<p>Registers a gating system specifically for gating abilities.
+	 * This can be redundant to unlocks of ability systems, so be aware
+	 * your system might be better suited as an ability system depending
+	 * on its function.</p>
+	 * <p>Note the same config and config ID can be used for multiple
+	 * systems of different types.  Uniqueness is not required</p>
+	 * 
+	 * @param id the "type" id for the config type
+	 * @param config a config type for this system
+	 * @param system the system instance itself
+	 */
 	public static void registerAbilityGate(ResourceLocation id, SubSystemConfigType config, GateSystem system) {
 		SubSystemCodecRegistry.registerSubSystem(id, config);
 		GateRegistry.register(system, Type.ABILITY);
