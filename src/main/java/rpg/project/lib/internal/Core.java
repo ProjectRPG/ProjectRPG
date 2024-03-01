@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.LogicalSide;
+import net.neoforged.fml.LogicalSide;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.abilities.AbilitySystem;
 import rpg.project.lib.api.data.ObjectType;

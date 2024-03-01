@@ -1,17 +1,13 @@
 package rpg.project.lib.internal.registry;
 
-import java.util.function.Supplier;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.level.BlockEvent.BreakEvent;
-import net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryBuilder;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.Event;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import org.apache.http.config.RegistryBuilder;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.abilities.AbilityUtils;
 import rpg.project.lib.api.events.EventContext;
@@ -76,12 +72,12 @@ public class EventRegistry {
 	
 	/**This is used to add listeners at the appropriate lifecycle stage.*/
 	public static <T extends Event> void registerListener(EventListenerSpecification<T> spec) {
-		MinecraftForge.EVENT_BUS.addListener(spec.priority(), true, spec.validEventClass(), event -> internalEventLogic(event, spec));
+		NeoForge.EVENT_BUS.addListener(spec.priority(), true, spec.validEventClass(), event -> internalEventLogic(event, spec));
 	}
 	
 	public static final DeferredRegister<EventListenerSpecification<?>> EVENTS = DeferredRegister.create(APIUtils.GAMEPLAY_EVENTS, Reference.MODID);
-	public static final Supplier<IForgeRegistry<EventListenerSpecification<?>>> REGISTRY_SUPPLIER = EVENTS.makeRegistry(RegistryBuilder::new);
+	//public static final Supplier<IForgeRegistry<EventListenerSpecification<?>>> REGISTRY_SUPPLIER = EVENTS.makeRegistry(RegistryBuilder::create);
 	
-	public static final RegistryObject<EventListenerSpecification<BreakEvent>> BREAK = EVENTS.register("break_block", () -> EventFactories.BLOCK_BREAK);	
-	public static final RegistryObject<EventListenerSpecification<EntityPlaceEvent>> PLACE = EVENTS.register("place_block",	() -> EventFactories.BLOCK_PLACE);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<BlockEvent.BreakEvent>> BREAK = EVENTS.register("break_block", () -> EventFactories.BLOCK_BREAK);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<BlockEvent.EntityPlaceEvent>> PLACE = EVENTS.register("place_block",	() -> EventFactories.BLOCK_PLACE);
 }

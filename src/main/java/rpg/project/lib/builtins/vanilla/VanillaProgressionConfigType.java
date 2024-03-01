@@ -8,11 +8,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.RegistryManager;
-import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
+import rpg.project.lib.internal.registry.EventRegistry;
 
 public record VanillaProgressionConfigType() implements SubSystemConfigType{
 	public static final ResourceLocation ID = new ResourceLocation("minecraft:progression");
@@ -33,7 +32,7 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 		public MergeableData combine(MergeableData two) {
 			VanillaProgressionConfig t = (VanillaProgressionConfig) two;
 			var map = new HashMap<>(this.eventToXp());
-			t.eventToXp().entrySet().forEach(entry -> map.merge(entry.getKey(), entry.getValue(), Integer::max));
+			t.eventToXp().forEach((key, value) -> map.merge(key, value, Integer::max));
 			return new VanillaProgressionConfig(map);
 		}
 
@@ -54,8 +53,8 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 
 		@Override
 		public SubSystemConfig getDefault() {
-			return new VanillaProgressionConfig(RegistryManager.ACTIVE.getRegistry(APIUtils.GAMEPLAY_EVENTS)
-					.getKeys().stream().collect(Collectors.toMap(rl -> rl, rl -> 0)));
+			return new VanillaProgressionConfig(EventRegistry.EVENTS.getRegistry().get()
+					.keySet().stream().collect(Collectors.toMap(rl -> rl, rl -> 0)));
 		}		
 	}
 }

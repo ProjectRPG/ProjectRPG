@@ -38,6 +38,11 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 
+import net.minecraft.core.Registry;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.OnDatapackSyncEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
@@ -54,12 +59,6 @@ import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.OnDatapackSyncEvent;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.PacketDistributor.PacketTarget;
-import net.minecraftforge.network.simple.SimpleChannel;
-import net.minecraftforge.registries.IForgeRegistry;
 import rpg.project.lib.internal.util.MsLoggy;
 import rpg.project.lib.internal.util.MsLoggy.LOG_CODE;
 
@@ -87,7 +86,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	private final Consumer<Map<ResourceLocation, MainSystemConfig>> finalizer;
 	private final Gson gson;
 	private final Supplier<MainSystemConfig> defaultImpl = MainSystemConfig::new;
-	private final IForgeRegistry<V> registry;
+	private final Registry<V> registry;
 	private Map<ResourceLocation, MainSystemConfig> defaultSettings = new HashMap<>();
 	private Map<ResourceLocation, MainSystemConfig> overrideSettings = new HashMap<>();
 	
@@ -106,7 +105,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	 * and then all tag jsons defined with the same ID are merged additively into a single set of items, etc
 	 */
 	public MergeableCodecDataManager(final String folderName, final Logger logger, final Function<List<MainSystemConfig>, MainSystemConfig> merger
-			, final Consumer<Map<ResourceLocation, MainSystemConfig>> finalizer, IForgeRegistry<V> registry)
+			, final Consumer<Map<ResourceLocation, MainSystemConfig>> finalizer, Registry<V> registry)
 	{
 		this(folderName, logger, merger, finalizer, STANDARD_GSON, registry);
 	}
@@ -129,7 +128,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	 * raw json to a JsonElement, which the Codec then parses into a proper java object.
 	 */
 	public MergeableCodecDataManager(final String folderName, final Logger logger, final Function<List<MainSystemConfig>, MainSystemConfig> merger
-			, final Consumer<Map<ResourceLocation, MainSystemConfig>> finalizer, final Gson gson, IForgeRegistry<V> registry)
+			, final Consumer<Map<ResourceLocation, MainSystemConfig>> finalizer, final Gson gson, Registry<V> registry)
 	{
 		this.folderName = folderName;
 		this.logger = logger;
@@ -272,14 +271,14 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 			for (String str : dataValue.tagValues()) {
 				MsLoggy.INFO.log(LOG_CODE.DATA, "Applying Setting to Tag: {}", str);
 				if (str.startsWith("#")) {
-					tags.addAll(registry.tags()
-							.getTag(TagKey.create(registry.getRegistryKey(), new ResourceLocation(str.substring(1))))
+					tags.addAll(registry
+							.getTag(TagKey.create(registry.key(), new ResourceLocation(str.substring(1))))
 							.stream()
-							.map(item -> registry.getKey(item))
+							.map(item -> item.key().location())
 							.toList());
 				}
 				else if (str.endsWith(":*")) {
-					tags.addAll(registry.getKeys()
+					tags.addAll(registry.keySet()
 							.stream()
 							.filter(key -> key.getNamespace().equals(str.replace(":*", "")))
 							.toList());
@@ -298,34 +297,32 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	 * This should be called at most once, during construction of your mod (static init of your main mod class is fine)
 	 * (FMLCommonSetupEvent *may* work as well)
 	 * Calling this method automatically subscribes a packet-sender to {@link OnDatapackSyncEvent}.
-	 * @param <PACKET> the packet type that will be sent on the given channel
-	 * @param channel The networking channel of your mod
 	 * @param packetFactory  A packet constructor or factory method that converts the given map to a packet object to send on the given channel
 	 * @return this manager object
 	 */
-	public <PACKET> MergeableCodecDataManager<V> subscribeAsSyncable(final SimpleChannel channel,
-		final Function<Map<ResourceLocation, MainSystemConfig>, PACKET> packetFactory)
+	public MergeableCodecDataManager<V> subscribeAsSyncable(
+		final Function<Map<ResourceLocation, MainSystemConfig>, CustomPacketPayload> packetFactory)
 	{
-		MinecraftForge.EVENT_BUS.addListener(this.getDatapackSyncListener(channel, packetFactory));
+		NeoForge.EVENT_BUS.addListener(this.getDatapackSyncListener(packetFactory));
 		return this;
 	}
 	
 	/** Generate an event listener function for the on-datapack-sync event **/
-	private <PACKET> Consumer<OnDatapackSyncEvent> getDatapackSyncListener(final SimpleChannel channel,
-		final Function<Map<ResourceLocation, MainSystemConfig>, PACKET> packetFactory)
+	private Consumer<OnDatapackSyncEvent> getDatapackSyncListener(
+		final Function<Map<ResourceLocation, MainSystemConfig>, CustomPacketPayload> packetFactory)
 	{
 		return event -> {
 			ServerPlayer player = event.getPlayer();
-			List<PACKET> packets = new ArrayList<>();
+			List<CustomPacketPayload> packets = new ArrayList<>();
 			for (Map.Entry<ResourceLocation, MainSystemConfig> entry : new HashMap<>(this.data).entrySet()) {
 				if (entry.getKey() == null) continue;
 				packets.add(packetFactory.apply(Map.of(entry.getKey(), entry.getValue())));
 			}
 
-			PacketTarget target = player == null
+			PacketDistributor.PacketTarget target = player == null
 				? PacketDistributor.ALL.noArg()
-				: PacketDistributor.PLAYER.with(() -> player);
-			packets.forEach(packet -> channel.send(target, packet));
+				: PacketDistributor.PLAYER.with(player);
+			packets.forEach(target::send);
 		};
 	}
 }

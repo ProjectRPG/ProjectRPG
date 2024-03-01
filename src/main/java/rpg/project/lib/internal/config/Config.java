@@ -1,21 +1,20 @@
 package rpg.project.lib.internal.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import rpg.project.lib.internal.util.MsLoggy.LOG_CODE;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Config {
-	public static ForgeConfigSpec CLIENT_CONFIG;
-	public static ForgeConfigSpec COMMON_CONFIG;
-	public static ForgeConfigSpec SERVER_CONFIG;
+	public static ModConfigSpec CLIENT_CONFIG;
+	public static ModConfigSpec COMMON_CONFIG;
+	public static ModConfigSpec SERVER_CONFIG;
 	
 	static {
-		ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
-		ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
-		ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
+		ModConfigSpec.Builder CLIENT_BUILDER = new ModConfigSpec.Builder();
+		ModConfigSpec.Builder COMMON_BUILDER = new ModConfigSpec.Builder();
+		ModConfigSpec.Builder SERVER_BUILDER = new ModConfigSpec.Builder();
 		
 		setupClient(CLIENT_BUILDER);
 		setupCommon(COMMON_BUILDER);
@@ -28,13 +27,13 @@ public class Config {
 	
 	//====================CLIENT SETTINGS===============================
 	
-	private static void setupClient(ForgeConfigSpec.Builder builder) {
+	private static void setupClient(ModConfigSpec.Builder builder) {
 		
 	}
 
 	//====================COMMON SETTINGS===============================
 	
-	private static void setupCommon(ForgeConfigSpec.Builder builder) {
+	private static void setupCommon(ModConfigSpec.Builder builder) {
 		builder.push("Common");
 		
 		buildMsLoggy(builder);
@@ -42,13 +41,13 @@ public class Config {
 		builder.pop(); //Common Blocks
 	}
 	
-	public static ConfigValue<List<? extends String>> INFO_LOGGING;
-	public static ConfigValue<List<? extends String>> DEBUG_LOGGING;
-	public static ConfigValue<List<? extends String>> WARN_LOGGING;
-	public static ConfigValue<List<? extends String>> ERROR_LOGGING;
-	public static ConfigValue<List<? extends String>> FATAL_LOGGING;
+	public static ModConfigSpec.ConfigValue<List<? extends String>> INFO_LOGGING;
+	public static ModConfigSpec.ConfigValue<List<? extends String>> DEBUG_LOGGING;
+	public static ModConfigSpec.ConfigValue<List<? extends String>> WARN_LOGGING;
+	public static ModConfigSpec.ConfigValue<List<? extends String>> ERROR_LOGGING;
+	public static ModConfigSpec.ConfigValue<List<? extends String>> FATAL_LOGGING;
 	
-	private static void buildMsLoggy(ForgeConfigSpec.Builder builder) {
+	private static void buildMsLoggy(ModConfigSpec.Builder builder) {
 		builder.comment("PRPG Error Logging Configuration","",
 			"===================================================",
 			"To enable Logging with MsLoggy, enter a logging",
@@ -82,7 +81,7 @@ public class Config {
 	
 	//====================SERVER SETTINGS===============================
 	
-	private static void setupServer(ForgeConfigSpec.Builder builder) {
+	private static void setupServer(ModConfigSpec.Builder builder) {
 		
 	}
 }

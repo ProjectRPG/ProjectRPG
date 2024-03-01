@@ -7,10 +7,10 @@ import java.util.Map;
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraftforge.common.data.LanguageProvider;
+import net.neoforged.neoforge.common.data.LanguageProvider;
 import rpg.project.lib.internal.util.Reference;
 
-public class LangProvider extends LanguageProvider{
+public class LangProvider extends LanguageProvider {
 	public enum Locale {
 		DE_DE("de_de"),
 		EN_US("en_us"),

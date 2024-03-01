@@ -7,8 +7,8 @@ import java.util.function.Predicate;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.eventbus.api.EventPriority;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.EventPriority;
 
 /**Used by the gameplay event system to register event listeners for various
  * events watched by the library.  

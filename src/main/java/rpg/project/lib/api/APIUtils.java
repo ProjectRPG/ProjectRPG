@@ -10,7 +10,7 @@ import rpg.project.lib.internal.registry.SubSystemCodecRegistry;
 import rpg.project.lib.internal.util.Reference;
 
 public class APIUtils {
-	/**{@link ResourceKey} for use with a {@link net.minecraftforge.registries.DeferredRegister DeferredRegister}
+	/**{@link ResourceKey} for use with a {@link net.neoforged.neoforge.registries.DeferredRegister DeferredRegister}
 	 * to register custom events.  Custom events can be referenced by other addons' configurations to apply their
 	 * system implementation behavior to your event specification.*/
 	public static final ResourceKey<Registry<EventListenerSpecification<?>>> GAMEPLAY_EVENTS = ResourceKey.createRegistryKey(Reference.resource("gameplay_events"));

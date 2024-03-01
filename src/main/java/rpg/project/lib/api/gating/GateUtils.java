@@ -8,7 +8,7 @@ import com.mojang.serialization.Codec;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
-import net.minecraftforge.common.IExtensibleEnum;
+import net.neoforged.neoforge.common.IExtensibleEnum;
 import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.internal.registry.GateRegistry;
 import rpg.project.lib.internal.registry.SubSystemCodecRegistry;
@@ -18,7 +18,7 @@ public class GateUtils {
 	 * registrations specify their applicable {@link Type} so the 
 	 * internal gating processor can apply them accordingly.  
 	 */
-	public static enum Type implements StringRepresentable, IExtensibleEnum{
+	public static enum Type implements StringRepresentable, IExtensibleEnum {
 		/**Specifies gates that cancel or alter events.*/
 		EVENT,
 		/**Specifies gates that permit/deny progression advancement.*/

@@ -2,7 +2,7 @@ package rpg.project.lib.api.enums;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.util.StringRepresentable;
-import net.minecraftforge.common.IExtensibleEnum;
+import net.neoforged.neoforge.common.IExtensibleEnum;
 
 import java.util.Arrays;
 import java.util.Map;

@@ -2,19 +2,20 @@ package rpg.project.lib.internal.setup;
 
 import java.util.function.Supplier;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.registries.RegistryManager;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.LogicalSide;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.TickEvent;
+import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
+import net.neoforged.neoforge.registries.RegistryManager;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.abilities.AbilitySystem;
 import rpg.project.lib.api.party.PartySystem;
@@ -75,7 +76,7 @@ public class CommonSetup {
 	
 	@SubscribeEvent
 	public static void onServerAboutToStart(ServerAboutToStartEvent event) {
-		RegistryManager.ACTIVE.getRegistry(APIUtils.GAMEPLAY_EVENTS).getValues().forEach(els -> EventRegistry.registerListener(els));
+		EventRegistry.EVENTS.getRegistry().get().stream().forEach(EventRegistry::registerListener);
 	}
 	
 	@SubscribeEvent

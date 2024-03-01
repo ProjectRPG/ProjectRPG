@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -14,9 +15,8 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.ToolAction;
-import net.minecraftforge.common.ToolActions;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.ToolAction;
+import net.neoforged.neoforge.common.ToolActions;
 import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.abilities.AbilityUtils;
 import rpg.project.lib.api.enums.AbilitySide;
@@ -76,7 +76,7 @@ public class Abilities {
 	
 	public static BiFunction<Player, CompoundTag, CompoundTag> EFFECT_SETTER = (player, nbt) -> {
 		MobEffect effect;
-		if ((effect = ForgeRegistries.MOB_EFFECTS.getValue(new ResourceLocation(nbt.getString("effect")))) != null) {
+		if ((effect = BuiltInRegistries.MOB_EFFECT.get(new ResourceLocation(nbt.getString("effect")))) != null) {
 			int configDuration = nbt.getInt(AbilityUtils.DURATION);
 			int duration = player.hasEffect(effect) && player.getEffect(effect).getDuration() > configDuration 
 					? player.getEffect(effect).getDuration() 
@@ -101,7 +101,7 @@ public class Abilities {
 			.setTick((player, nbt, ticks) -> EFFECT_SETTER.apply(player, nbt))
 			.setDescription(LangProvider.PERK_EFFECT_DESC.asComponent())
 			.setStatus((player, nbt) -> List.of(
-					LangProvider.PERK_EFFECT_STATUS_1.asComponent(Component.translatable(ForgeRegistries.MOB_EFFECTS.getValue(new ResourceLocation(nbt.getString("effect"))).getDescriptionId())),
+					LangProvider.PERK_EFFECT_STATUS_1.asComponent(Component.translatable(BuiltInRegistries.MOB_EFFECT.get(new ResourceLocation(nbt.getString("effect"))).getDescriptionId())),
 					LangProvider.PERK_EFFECT_STATUS_2.asComponent(nbt.getInt(AbilityUtils.MODIFIER), nbt.getInt(AbilityUtils.DURATION))))
 			.build();
 }

@@ -1,10 +1,10 @@
 package rpg.project.lib.api.abilities;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.fml.LogicalSide;
 
 import java.util.function.Supplier;
 
+import net.neoforged.fml.LogicalSide;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import rpg.project.lib.api.data.SubSystemConfigType;
@@ -64,13 +64,6 @@ public class AbilityUtils {
      * reasonable triggers, and sidedness.
      *
      * @param abilityID a custom id for your ability that can be used in abilities.json to reference this ability
-     * @param propertyDefaults keys used by your abilities and default values to supply if omitted
-     * @param customConditions a predicate for checks outside the standard built in checks
-     * @param onStart the function executing the behavior of this ability when triggered
-     * @param onTick the function to execute each tick for the duration configured
-     * @param onStop the function executing the behavior of this ability when expected to end
-     * @param description summarizes what the function does for the glossary
-     * @param status provides a multiline description of the status of the ability for the supplied player
      * @param side the logical sides this ability should execute on.  Your implementation should factor in sidedness to avoid crashes.
      */
     public static void registerAbility(@NonNull ResourceLocation abilityID, @NonNull Ability ability, @NonNull AbilitySide side) {

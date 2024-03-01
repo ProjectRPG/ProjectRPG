@@ -4,6 +4,9 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.LogManager;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -23,9 +26,6 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.data.CodecTypes;
 import rpg.project.lib.api.data.ObjectType;
@@ -39,10 +39,10 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 	private static final String container = "exp";
 	
 	public VanillaProgressionSystem() {
-		MinecraftForge.EVENT_BUS.addListener(VanillaProgressionSystem::updateScoreFromOfflineProgress);
+		NeoForge.EVENT_BUS.addListener(VanillaProgressionSystem::updateScoreFromOfflineProgress);
 	}
 	
-	public static void updateScoreFromOfflineProgress(PlayerLoggedInEvent event) {
+	public static void updateScoreFromOfflineProgress(PlayerEvent.PlayerLoggedInEvent event) {
 		VanillaProgressionData cache = OfflineProgress.get().cachedProgress.remove(event.getEntity().getUUID());
 		if (cache != null)
 			event.getEntity().increaseScore(cache.exp());
@@ -84,7 +84,7 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 						xpToAward.getAndSet(((VanillaProgressionData)addon.modifyProgression(core, context, new VanillaProgressionData(xpToAward.get()))).exp());						
 					});
 					List<Pair<String, Consumer<Float>>> output = List.of(Pair.of(container, gate -> this.addXp(context.actor().getUUID(), new VanillaProgressionData((int)((float)xpToAward.get() * gate)))));
-					return output; 
+					return output;
 				}
 			).orElse(List.of());
 	}	
@@ -95,10 +95,13 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 		private static final Codec<Map<UUID, VanillaProgressionData>> CODEC = Codec.unboundedMap(CodecTypes.UUID_CODEC, VanillaProgressionData.CODEC.xmap(s -> (VanillaProgressionData)s, s -> s));
 		
 		private static final String MAP_KEY = "data";
-		
+
+		public static Factory<OfflineProgress> dataFactory() {
+			return new Factory<>(OfflineProgress::new, OfflineProgress::new, null);
+		}
 		public static OfflineProgress get() {			
 			return ServerLifecycleHooks.getCurrentServer() == null ? new OfflineProgress()
-					: ServerLifecycleHooks.getCurrentServer().overworld().getDataStorage().computeIfAbsent(OfflineProgress::new, OfflineProgress::new, "prpg_vanilla_progress_data");
+					: ServerLifecycleHooks.getCurrentServer().overworld().getDataStorage().computeIfAbsent(dataFactory(), "prpg_vanilla_progress_data");
 		}
 		
 		private OfflineProgress() {
