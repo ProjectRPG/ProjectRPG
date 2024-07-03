@@ -4,6 +4,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
+import net.minecraft.core.HolderLookup;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
@@ -92,7 +93,7 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 	private static class OfflineProgress extends SavedData {
 		private Map<UUID, VanillaProgressionData> cachedProgress;
 		
-		private static final Codec<Map<UUID, VanillaProgressionData>> CODEC = Codec.unboundedMap(CodecTypes.UUID_CODEC, VanillaProgressionData.CODEC.xmap(s -> (VanillaProgressionData)s, s -> s));
+		private static final Codec<Map<UUID, VanillaProgressionData>> CODEC = Codec.unboundedMap(CodecTypes.UUID_CODEC, VanillaProgressionData.CODEC.xmap(s -> (VanillaProgressionData)s, s -> s).codec());
 		
 		private static final String MAP_KEY = "data";
 
@@ -107,13 +108,13 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 		private OfflineProgress() {
 			cachedProgress = new HashMap<>();
 		}
-		private OfflineProgress(CompoundTag nbt) {
+		private OfflineProgress(CompoundTag nbt, HolderLookup.Provider provider) {
 			cachedProgress = new HashMap<>(CODEC.parse(NbtOps.INSTANCE, nbt.getCompound(MAP_KEY)).resultOrPartial(err -> LogManager.getLogger().error(err)).orElse(new HashMap<>()));
 		}
 
 		@Override
-		public CompoundTag save(CompoundTag pCompoundTag) {
-			pCompoundTag.put(MAP_KEY, (CompoundTag)CODEC.encodeStart(NbtOps.INSTANCE, cachedProgress).resultOrPartial(err -> LogManager.getLogger().error(err)).orElse(new CompoundTag()));
+		public CompoundTag save(CompoundTag pCompoundTag, HolderLookup.Provider provider) {
+			pCompoundTag.put(MAP_KEY, CODEC.encodeStart(NbtOps.INSTANCE, cachedProgress).resultOrPartial(err -> LogManager.getLogger().error(err)).orElse(new CompoundTag()));
 			return pCompoundTag;
 		}		
 	}

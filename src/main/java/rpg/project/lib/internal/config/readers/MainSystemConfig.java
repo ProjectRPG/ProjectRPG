@@ -30,14 +30,14 @@ public record MainSystemConfig(
 	
 	public MainSystemConfig() {this(false, List.of(), Map.of(), List.of(), List.of(), List.of());}
 	
-	public static final Codec<MainSystemConfig> CODEC = ExtraCodecs.lazyInitializedCodec(() -> RecordCodecBuilder.create(instance -> instance.group(
+	public static final Codec<MainSystemConfig> CODEC = Codec.lazyInitialized(() -> RecordCodecBuilder.create(instance -> instance.group(
 			Codec.BOOL.optionalFieldOf("replace").forGetter(msc -> Optional.of(msc.override())),
 			Codec.STRING.listOf().optionalFieldOf("copyTo").forGetter(msc -> Optional.of(msc.tagValues())),
 			Codec.optionalField("gates",  Codec.simpleMap(
-					Type.CODEC, 
-					Codec.list(SubSystemCodecRegistry.CODEC.dispatch("type", SubSystemConfig::getType, SubSystemConfigType::getCodec)), 
+					Type.CODEC,
+					Codec.list(SubSystemCodecRegistry.CODEC.dispatch("type", SubSystemConfig::getType, SubSystemConfigType::getCodec)),
 					StringRepresentable.keys(Type.values())).codec()
-				)
+				, true)
 				.forGetter(msc -> Optional.of(msc.gates())),
 			Codec.list(SubSystemCodecRegistry.CODEC.dispatch("type", SubSystemConfig::getType, SubSystemConfigType::getCodec))
 				.optionalFieldOf("progression")

@@ -20,21 +20,27 @@ import rpg.project.lib.internal.util.Reference;
 import rpg.project.lib.internal.util.MsLoggy.LOG_CODE;
 
 public class EventRegistry {
-	/**<p>A standardized method used by {@link EventListenerSpecification#registerListener()}
+	/**<p>A standardized method used by {@link EventRegistry#registerListener(EventListenerSpecification) registerListener}
 	 * to register event listeners to the forge event bus.</p>
 	 * <p>Internally this applies the gating, progression, ability, and feature hook logic
 	 * for every registered event.  Each system is independently queried for configurations
 	 * related to the eventSpecID for which this consumer is registered.</p>
 	 *
-	 * @param <T> a Forge {@link Event} sub-class
-	 * @param eventSpecID the registry name for the event this should supply to features
+	 * @param <T> a NeoForge {@link Event} sub-class
 	 * @param event the event instance being consumed
-	 * @param contextFactory creates a new {@link EventContext} from the event instance
 	 */
 	public static <T extends Event> void internalEventLogic(T event, EventListenerSpecification<T> spec) {
 		//exit if this event is not situationally applicable for the eventID and specification.
 		if (!spec.validEventContext().test(event))
 			return;
+		//TODO replace this with a context registry.
+		/* The context registry stores functions for getting specific data from an event
+		 * which should be read/exposed for use in other functionality.  This design is
+		 * not yet defined, but conceptually works to only gather contextual data needed
+		 * by downstream event consumers.  This would also mean that events with no listeners
+		 * or underlying logic would effectively execute no context or listeners and thus
+		 * be more performant.
+		 */
 		EventContext context = spec.contextFactory().apply(event);
 		Core core = Core.get(context.level());
 		ResourceLocation eventID = spec.registryID();
@@ -53,7 +59,7 @@ public class EventRegistry {
 				
 		//Activate event-specific abilities
 		for (CompoundTag config : core.getAbility().getAbilitiesForContext(core, eventID, context)) {
-			ResourceLocation abilityID = new ResourceLocation(config.getString(AbilityUtils.TYPE));
+			ResourceLocation abilityID = ResourceLocation.parse(config.getString(AbilityUtils.TYPE));
 			float gating = GateRegistry.isAbilityPermitted(context.actor(), core, eventID, context, abilityID);
 			if (gating != GateRegistry.HARD_FAIL) {
 				CompoundTag consolidatedInputData = config.copy().merge(context.dynamicVariables());

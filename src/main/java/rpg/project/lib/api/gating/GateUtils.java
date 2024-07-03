@@ -8,7 +8,6 @@ import com.mojang.serialization.Codec;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
-import net.neoforged.neoforge.common.IExtensibleEnum;
 import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.internal.registry.GateRegistry;
 import rpg.project.lib.internal.registry.SubSystemCodecRegistry;
@@ -18,7 +17,7 @@ public class GateUtils {
 	 * registrations specify their applicable {@link Type} so the 
 	 * internal gating processor can apply them accordingly.  
 	 */
-	public static enum Type implements StringRepresentable, IExtensibleEnum {
+	public static enum Type implements StringRepresentable {
 		/**Specifies gates that cancel or alter events.*/
 		EVENT,
 		/**Specifies gates that permit/deny progression advancement.*/
@@ -28,7 +27,7 @@ public class GateUtils {
 		/**Specifies gates that permit/deny ability usage*/
 		ABILITY;
 		
-		public static final Codec<Type> CODEC = IExtensibleEnum.createCodecForExtensibleEnum(Type::values, Type::create);
+		public static final Codec<Type> CODEC = StringRepresentable.fromEnum(Type::values);
 		private static final Map<String, Type> BY_NAME = Arrays.stream(values()).collect(Collectors.toMap(Type::getSerializedName, s -> s));
 		public static Type create(String name) {return BY_NAME.get(name);} 
 		

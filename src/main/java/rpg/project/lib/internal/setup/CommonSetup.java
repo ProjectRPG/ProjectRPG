@@ -2,20 +2,20 @@ package rpg.project.lib.internal.setup;
 
 import java.util.function.Supplier;
 
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.LogicalSide;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.TickEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
-import net.neoforged.neoforge.registries.RegistryManager;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.abilities.AbilitySystem;
 import rpg.project.lib.api.party.PartySystem;
@@ -37,7 +37,7 @@ import rpg.project.lib.internal.setup.datagen.LangProvider;
 import rpg.project.lib.internal.setup.datagen.LangProvider.Locale;
 import rpg.project.lib.internal.util.Reference;
 
-@Mod.EventBusSubscriber(modid=Reference.MODID, bus=Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid=Reference.MODID, bus= EventBusSubscriber.Bus.GAME)
 public class CommonSetup {
 	public static Supplier<PartySystem> partySupplier = () -> {
 		SubSystemCodecRegistry.registerSubSystem(VanillaPartyConfigType.ID, VanillaPartyConfigType.IMPL);
@@ -70,13 +70,13 @@ public class CommonSetup {
 	}
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
-    public static void tickPerks(TickEvent.LevelTickEvent event) {
-        Core.get(event.level).getAbilities().executeAbilityTicks(event);
+    public static void tickPerks(LevelTickEvent.Pre event) {
+        Core.get(event.getLevel()).getAbilities().executeAbilityTicks(event);
     }
 	
 	@SubscribeEvent
-	public static void onServerAboutToStart(ServerAboutToStartEvent event) {
-		EventRegistry.EVENTS.getRegistry().get().stream().forEach(EventRegistry::registerListener);
+	public static void onServerAboutToStart(ServerStartedEvent event) {
+		event.getServer().registryAccess().registryOrThrow(EventRegistry.EVENTS.getRegistryKey()).stream().forEach(EventRegistry::registerListener);
 	}
 	
 	@SubscribeEvent

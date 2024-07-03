@@ -6,6 +6,6 @@ public class Reference {
 	public static final String MODID = "projectrpg";
 	
 	public static ResourceLocation resource(String path) {
-		return new ResourceLocation(MODID, path);
+		return ResourceLocation.fromNamespaceAndPath(MODID, path);
 	}
 }

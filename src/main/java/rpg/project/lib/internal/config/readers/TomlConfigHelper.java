@@ -28,8 +28,8 @@ import com.electronwill.nightconfig.toml.TomlFormat;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import com.mojang.serialization.DataResult.PartialResult;
 import com.mojang.serialization.DynamicOps;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -88,7 +88,7 @@ public record TomlConfigHelper(ModConfigSpec.Builder builder) {
      * @return An instance of your config class
      */
     public static <T> T register(final ModConfig.Type configType, final Function<ModConfigSpec.Builder, T> configFactory, final @Nullable String configName) {
-        final ModLoadingContext modContext = ModLoadingContext.get();
+        final ModContainer modContext = ModLoadingContext.get().getActiveContainer();
         final org.apache.commons.lang3.tuple.Pair<T, ModConfigSpec> entry = new ModConfigSpec.Builder().configure(configFactory);
         final T config = entry.getLeft();
         final ModConfigSpec spec = entry.getRight();
@@ -116,7 +116,7 @@ public record TomlConfigHelper(ModConfigSpec.Builder builder) {
      */
     public static <T> ConfigObject<T> defineObject(ModConfigSpec.Builder builder, String name, Codec<T> codec, T defaultObject) {
         DataResult<Object> encodeResult = codec.encodeStart(TomlConfigOps.INSTANCE, defaultObject);
-        Object encodedObject = encodeResult.getOrThrow(false, s -> LOGGER.error("Unable to encode default value: {}", s));
+        Object encodedObject = encodeResult.getOrThrow();
         ModConfigSpec.ConfigValue<Object> value = builder.define(name, encodedObject);
 		
         return new ConfigObject<>(value, codec, defaultObject, encodedObject);
@@ -153,10 +153,9 @@ public record TomlConfigHelper(ModConfigSpec.Builder builder) {
         
         private T getReparsedObject(Object obj) {
             DataResult<T> parseResult = this.codec.parse(TomlConfigOps.INSTANCE, obj);
-            return parseResult.get().map(result -> result, failure -> {
-                LOGGER.error("Config failure: Using default config value due to parsing error: {}", failure.message());
-                return this.defaultObject;
-            });
+            return parseResult.resultOrPartial(failure -> {
+                LOGGER.error("Config failure: Using default config value due to parsing error: {}", failure);
+            }).orElseThrow();
         }
     }
     
@@ -273,7 +272,7 @@ public record TomlConfigHelper(ModConfigSpec.Builder builder) {
             }
 			
             DataResult<String> stringResult = this.getStringValue(key);
-            Optional<PartialResult<String>> badResult = stringResult.error();
+            Optional<DataResult.Error<String>> badResult = stringResult.error();
             if (badResult.isPresent()) {
                 return DataResult.error(() -> "key is not a string: " + key, map);
             }
@@ -300,7 +299,7 @@ public record TomlConfigHelper(ModConfigSpec.Builder builder) {
         @Override
         public Object createMap(Stream<Pair<Object, Object>> map) {
             final Config result = TomlFormat.newConfig();
-            map.forEach(p -> result.add(this.getStringValue(p.getFirst()).getOrThrow(false, s -> { }), p.getSecond()));
+            map.forEach(p -> result.add(this.getStringValue(p.getFirst()).getOrThrow(), p.getSecond()));
             return result;
         }
         

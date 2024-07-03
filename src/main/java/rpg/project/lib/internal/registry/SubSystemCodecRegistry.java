@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.resources.ResourceLocation;
@@ -26,15 +27,15 @@ public class SubSystemCodecRegistry {
 	}
 	
 	public static record DefaultType() implements SubSystemConfigType {
-		public static final ResourceLocation ID = new ResourceLocation(Reference.MODID, "placeholder");
+		public static final ResourceLocation ID = Reference.resource("placeholder");
 		public static final DefaultType IMPL = new DefaultType();
 
 		@Override
-		public Codec<SubSystemConfig> getCodec() { return DefaultConfig.CODEC;
+		public MapCodec<SubSystemConfig> getCodec() { return DefaultConfig.CODEC;
 		}
 		
 		public static record DefaultConfig() implements SubSystemConfig {
-			public static final Codec<SubSystemConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 					Codec.BOOL.optionalFieldOf("placeholder").forGetter(o -> Optional.of(true))
 					).apply(instance, bool -> new DefaultConfig()));
 
@@ -48,7 +49,7 @@ public class SubSystemCodecRegistry {
 			public SubSystemConfigType getType() {return IMPL;}
 
 			@Override
-			public Codec<SubSystemConfig> getCodec() {return CODEC;}
+			public MapCodec<SubSystemConfig> getCodec() {return CODEC;}
 
 			@Override
 			public SubSystemConfig getDefault() {

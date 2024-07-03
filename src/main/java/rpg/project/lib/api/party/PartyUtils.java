@@ -16,7 +16,7 @@ public class PartyUtils {
 	 * 
 	 * @param id a unique identifier used to create a party system
 	 * config.  The namespace and path will be used to create the 
-	 * config an will display like "projectrpg-namespace-path.toml"
+	 * config and will display like "projectrpg-namespace-path.toml"
 	 * @param config the config type used to obtain the config codec
 	 * used in generating the config file.
 	 * @param system a supplier, used to get a new instance of the

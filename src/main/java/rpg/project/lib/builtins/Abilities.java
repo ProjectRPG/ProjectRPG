@@ -2,9 +2,11 @@ package rpg.project.lib.builtins;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -15,8 +17,8 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.common.ToolAction;
-import net.neoforged.neoforge.common.ToolActions;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.common.ItemAbility;
 import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.abilities.AbilityUtils;
 import rpg.project.lib.api.enums.AbilitySide;
@@ -30,8 +32,8 @@ public class Abilities {
 		AbilityUtils.registerAbility(Reference.resource("effect"), EFFECT, AbilitySide.SERVER);
 	}
 
-	private static final Set<ToolAction> DIG_ACTIONS = Set.of(ToolActions.PICKAXE_DIG, ToolActions.AXE_DIG,
-			ToolActions.SHOVEL_DIG, ToolActions.HOE_DIG, ToolActions.SHEARS_DIG, ToolActions.SWORD_DIG);
+	private static final Set<ItemAbility> DIG_ACTIONS = Set.of(ItemAbilities.PICKAXE_DIG, ItemAbilities.AXE_DIG,
+			ItemAbilities.SHOVEL_DIG, ItemAbilities.HOE_DIG, ItemAbilities.SHEARS_DIG, ItemAbilities.SWORD_DIG);
 	
 	private static Ability BREAK_SPEED = Ability.begin().addDefaults(getBreakSpeedDefaults()).setStart((player, compoundTag) -> {
 		float speedIn = compoundTag.contains(AbilityUtils.BREAK_SPEED_INPUT_VALUE)
@@ -58,7 +60,7 @@ public class Abilities {
 
 	private static float getRatioForTool(ItemStack tool, CompoundTag nbt) {
 		float ratio = 0f;
-		for (ToolAction action : DIG_ACTIONS) {
+		for (ItemAbility action : DIG_ACTIONS) {
 			if (tool.canPerformAction(action)) {
 				ratio += nbt.getFloat(action.name());
 			}
@@ -68,17 +70,18 @@ public class Abilities {
 
 	private static CompoundTag getBreakSpeedDefaults() {
 		TagBuilder builder = TagBuilder.start();
-		for (ToolAction action : DIG_ACTIONS) {
+		for (ItemAbility action : DIG_ACTIONS) {
 			builder.withFloat(action.name(), 0);
 		}
 		return builder.build();
 	}
 	
 	public static BiFunction<Player, CompoundTag, CompoundTag> EFFECT_SETTER = (player, nbt) -> {
-		MobEffect effect;
-		if ((effect = BuiltInRegistries.MOB_EFFECT.get(new ResourceLocation(nbt.getString("effect")))) != null) {
+		Optional<Holder.Reference<MobEffect>> effectHolder = BuiltInRegistries.MOB_EFFECT.getHolder(ResourceLocation.parse(nbt.getString("effect")));
+		if (effectHolder.isPresent()) {
+			Holder<MobEffect> effect = effectHolder.get();
 			int configDuration = nbt.getInt(AbilityUtils.DURATION);
-			int duration = player.hasEffect(effect) && player.getEffect(effect).getDuration() > configDuration 
+			int duration = player.hasEffect(effect) && player.getEffect(effect).getDuration() > configDuration
 					? player.getEffect(effect).getDuration() 
 					: configDuration;
 			int perLevel = nbt.getInt(AbilityUtils.PER_LEVEL);
@@ -101,7 +104,7 @@ public class Abilities {
 			.setTick((player, nbt, ticks) -> EFFECT_SETTER.apply(player, nbt))
 			.setDescription(LangProvider.PERK_EFFECT_DESC.asComponent())
 			.setStatus((player, nbt) -> List.of(
-					LangProvider.PERK_EFFECT_STATUS_1.asComponent(Component.translatable(BuiltInRegistries.MOB_EFFECT.get(new ResourceLocation(nbt.getString("effect"))).getDescriptionId())),
+					LangProvider.PERK_EFFECT_STATUS_1.asComponent(Component.translatable(BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(nbt.getString("effect"))).getDescriptionId())),
 					LangProvider.PERK_EFFECT_STATUS_2.asComponent(nbt.getInt(AbilityUtils.MODIFIER), nbt.getInt(AbilityUtils.DURATION))))
 			.build();
 }

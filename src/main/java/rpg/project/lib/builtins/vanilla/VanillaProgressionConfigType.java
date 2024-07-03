@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.resources.ResourceLocation;
@@ -14,17 +15,17 @@ import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.internal.registry.EventRegistry;
 
 public record VanillaProgressionConfigType() implements SubSystemConfigType{
-	public static final ResourceLocation ID = new ResourceLocation("minecraft:progression");
+	public static final ResourceLocation ID = ResourceLocation.withDefaultNamespace("progression");
 	public static final VanillaProgressionConfigType IMPL = new VanillaProgressionConfigType();
 
 	@Override
-	public Codec<SubSystemConfig> getCodec() {
+	public MapCodec<SubSystemConfig> getCodec() {
 		return VanillaProgressionConfig.CODEC;
 	}
 
 	public static record VanillaProgressionConfig(Map<ResourceLocation, Integer> eventToXp) implements SubSystemConfig {
 		
-		public static final Codec<SubSystemConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+		public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 				Codec.unboundedMap(ResourceLocation.CODEC, Codec.INT).fieldOf("events").forGetter(ssc -> ((VanillaProgressionConfig)ssc).eventToXp())
 				).apply(instance, VanillaProgressionConfig::new));
 
@@ -47,7 +48,7 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 		}
 
 		@Override
-		public Codec<SubSystemConfig> getCodec() {
+		public MapCodec<SubSystemConfig> getCodec() {
 			return CODEC;
 		}
 

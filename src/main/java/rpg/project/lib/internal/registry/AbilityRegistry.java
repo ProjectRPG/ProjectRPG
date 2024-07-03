@@ -6,7 +6,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.event.TickEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.jetbrains.annotations.NotNull;
 import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.abilities.AbilityUtils;
@@ -83,8 +83,8 @@ public class AbilityRegistry {
     private final List<TickSchedule> tickTracker = new ArrayList<>();
     private final List<AbilityCooldown> coolTracker = new ArrayList<>();
     
-    public void executeAbilityTicks(TickEvent.LevelTickEvent event) {
-        coolTracker.removeIf(tracker -> tracker.cooledDown(event.level));
+    public void executeAbilityTicks(LevelTickEvent.Pre event) {
+        coolTracker.removeIf(tracker -> tracker.cooledDown(event.getLevel()));
         new ArrayList<>(tickTracker).forEach(schedule -> {
             if (schedule.shouldTick()) {
                 schedule.tick();
@@ -96,7 +96,7 @@ public class AbilityRegistry {
     }
     
     public boolean isAbilityCooledDown(Player player, CompoundTag src) {
-        ResourceLocation abilityID = new ResourceLocation(src.getString("ability"));
+        ResourceLocation abilityID = ResourceLocation.parse(src.getString("ability"));
         return coolTracker.stream().noneMatch(cd -> cd.player().equals(player) && cd.abilityID().equals(abilityID));
     }
 }

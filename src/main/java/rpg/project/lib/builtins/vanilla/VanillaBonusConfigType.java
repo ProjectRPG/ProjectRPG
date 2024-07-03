@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.resources.ResourceLocation;
@@ -15,16 +16,16 @@ import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
 
 public record VanillaBonusConfigType() implements SubSystemConfigType {
-	public static final ResourceLocation ID = new ResourceLocation("bonus");
+	public static final ResourceLocation ID = ResourceLocation.withDefaultNamespace("bonus");
 	public static final VanillaBonusConfigType IMPL = new VanillaBonusConfigType();
 
 	@Override
-	public Codec<SubSystemConfig> getCodec() {
+	public MapCodec<SubSystemConfig> getCodec() {
 		return VanillaBonusConfig.CODEC;
 	}
 
 	public record VanillaBonusConfig(Map<String, List<SubSystemConfig>> values) implements SubSystemConfig {
-		public static final Codec<SubSystemConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+		public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 				Codec.unboundedMap(Codec.STRING, Codec.list(APIUtils.getDispatchCodec().dispatch("type", SubSystemConfig::getType, SubSystemConfigType::getCodec))
 					).fieldOf("bonuses").forGetter(ssc -> ((VanillaBonusConfig)ssc).values())
 				).apply(instance, VanillaBonusConfig::new));
@@ -56,7 +57,7 @@ public record VanillaBonusConfigType() implements SubSystemConfigType {
 		}
 
 		@Override
-		public Codec<SubSystemConfig> getCodec() {
+		public MapCodec<SubSystemConfig> getCodec() {
 			return CODEC;
 		}
 

@@ -1,6 +1,7 @@
 package rpg.project.lib.api.data;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 /**A type identifier used to reference and reverse-get
  * a configuration object.
@@ -8,5 +9,5 @@ import com.mojang.serialization.Codec;
 public interface SubSystemConfigType {
 	/**@return the codec used to parse the associated config object
 	 */
-	Codec<SubSystemConfig> getCodec();
+	MapCodec<SubSystemConfig> getCodec();
 }

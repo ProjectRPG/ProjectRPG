@@ -48,9 +48,9 @@ public class RegistryUtil {
 		return BuiltInRegistries.ENTITY_TYPE.getKey(entity);
 	}
 	
-	public static ResourceLocation getId(Enchantment enchant) {
-		return BuiltInRegistries.ENCHANTMENT.getKey(enchant);
-	}
+//	public static ResourceLocation getId(Enchantment enchant) {
+//		return ;
+//	}
 
 	public static ResourceLocation getId(MobEffect effect) {
 		return BuiltInRegistries.MOB_EFFECT.getKey(effect);

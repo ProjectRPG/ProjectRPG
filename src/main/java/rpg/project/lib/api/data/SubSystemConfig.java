@@ -1,6 +1,7 @@
 package rpg.project.lib.api.data;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 /**Implemented to define an object which can be parsed from
  * a configuration file.
@@ -15,7 +16,7 @@ public interface SubSystemConfig extends MergeableData {
 	
 	/**@return The codec used to encode/decode this object
 	 */
-	public Codec<SubSystemConfig> getCodec();
+	public MapCodec<SubSystemConfig> getCodec();
 	
 	/**Supplies a value-less instance of this object.  This is 
 	 * used by the internal config writer to build config files

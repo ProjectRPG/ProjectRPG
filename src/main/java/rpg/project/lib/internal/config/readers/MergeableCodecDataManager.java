@@ -35,11 +35,14 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceKey;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -67,8 +70,7 @@ import rpg.project.lib.internal.util.MsLoggy.LOG_CODE;
  * This works best if initialized during your mod's construction.
  * After creating the manager, subscribeAsSyncable can optionally be called on it to subscribe the manager
  * to the forge events necessary for syncing datapack data to clients.
- * @param <MainSystemConfig> The type of the objects that the codec is parsing jsons as
- * @param <V>
+ * @param <V> The type of the objects that the codec is parsing jsons as
  */
 public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener<Map<ResourceLocation, MainSystemConfig>>
 {
@@ -76,7 +78,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	protected static final int JSON_EXTENSION_LENGTH = JSON_EXTENSION.length();
 	protected static final Gson STANDARD_GSON = new Gson();
 	@Nonnull
-	/** Mutable, non-null map containing whatever data was loaded last time server datapacks were loaded **/ 
+	/** Mutable, non-null map containing whatever data was loaded last time server datapacks were loaded */
 	protected Map<ResourceLocation, MainSystemConfig> data = new HashMap<>();
 	
 	private final String folderName;
@@ -86,7 +88,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	private final Consumer<Map<ResourceLocation, MainSystemConfig>> finalizer;
 	private final Gson gson;
 	private final Supplier<MainSystemConfig> defaultImpl = MainSystemConfig::new;
-	private final Registry<V> registry;
+	private final ResourceKey<Registry<V>> registry;
 	private Map<ResourceLocation, MainSystemConfig> defaultSettings = new HashMap<>();
 	private Map<ResourceLocation, MainSystemConfig> overrideSettings = new HashMap<>();
 	
@@ -105,7 +107,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	 * and then all tag jsons defined with the same ID are merged additively into a single set of items, etc
 	 */
 	public MergeableCodecDataManager(final String folderName, final Logger logger, final Function<List<MainSystemConfig>, MainSystemConfig> merger
-			, final Consumer<Map<ResourceLocation, MainSystemConfig>> finalizer, Registry<V> registry)
+			, final Consumer<Map<ResourceLocation, MainSystemConfig>> finalizer, ResourceKey<Registry<V>> registry)
 	{
 		this(folderName, logger, merger, finalizer, STANDARD_GSON, registry);
 	}
@@ -128,7 +130,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	 * raw json to a JsonElement, which the Codec then parses into a proper java object.
 	 */
 	public MergeableCodecDataManager(final String folderName, final Logger logger, final Function<List<MainSystemConfig>, MainSystemConfig> merger
-			, final Consumer<Map<ResourceLocation, MainSystemConfig>> finalizer, final Gson gson, Registry<V> registry)
+			, final Consumer<Map<ResourceLocation, MainSystemConfig>> finalizer, final Gson gson, ResourceKey<Registry<V>> registry)
 	{
 		this.folderName = folderName;
 		this.logger = logger;
@@ -195,7 +197,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 			final String dataPath = filePath.substring(this.folderName.length() + 1, filePath.length() - JSON_EXTENSION_LENGTH);
 			
 			// this is a json with identifier "somemodid:somedata"
-			final ResourceLocation jsonIdentifier = new ResourceLocation(namespace, dataPath);
+			final ResourceLocation jsonIdentifier = ResourceLocation.fromNamespaceAndPath(namespace, dataPath);
 			// this is the list of all json objects with the given resource location (i.e. in multiple datapacks)
 			final List<MainSystemConfig> unmergedRaws = new ArrayList<>();
 			// it's entirely possible that there are multiple jsons with this identifier,
@@ -261,7 +263,8 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 		this.data.putAll(overrideSettings);
 	}
 	
-	public void postProcess() {
+	public void postProcess(RegistryAccess registryAccess) {
+		Registry<V> activeRegistry = registryAccess.registryOrThrow(registry);
 		MsLoggy.DEBUG.log(LOG_CODE.DATA, "Begin PostProcessing for {}", folderName);
 		for (Map.Entry<ResourceLocation, MainSystemConfig> dataRaw : new HashMap<>(this.data).entrySet()) {
 			MainSystemConfig dataValue = dataRaw.getValue();
@@ -271,20 +274,19 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 			for (String str : dataValue.tagValues()) {
 				MsLoggy.INFO.log(LOG_CODE.DATA, "Applying Setting to Tag: {}", str);
 				if (str.startsWith("#")) {
-					tags.addAll(registry
-							.getTag(TagKey.create(registry.key(), new ResourceLocation(str.substring(1))))
-							.stream()
-							.map(item -> item.key().location())
-							.toList());
+					activeRegistry.getTag(TagKey.create(registry, ResourceLocation.parse(str.substring(1))))
+					.ifPresent(holder -> tags.addAll(holder.stream()
+							.map(h -> h.unwrapKey().get().location())
+							.collect(Collectors.toSet())));
 				}
 				else if (str.endsWith(":*")) {
-					tags.addAll(registry.keySet()
+					tags.addAll(activeRegistry.keySet()
 							.stream()
 							.filter(key -> key.getNamespace().equals(str.replace(":*", "")))
 							.toList());
 				}
 				else
-					tags.add(new ResourceLocation(str));
+					tags.add(ResourceLocation.parse(str));
 			}
 			dataValue.tagValues().clear();
 			tags.forEach(rl -> this.data.merge(rl, (MainSystemConfig)dataValue, (o, n) -> (MainSystemConfig)o.combine(n)));
@@ -318,11 +320,10 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 				if (entry.getKey() == null) continue;
 				packets.add(packetFactory.apply(Map.of(entry.getKey(), entry.getValue())));
 			}
-
-			PacketDistributor.PacketTarget target = player == null
-				? PacketDistributor.ALL.noArg()
-				: PacketDistributor.PLAYER.with(player);
-			packets.forEach(target::send);
+			if (player == null)
+				packets.forEach(PacketDistributor::sendToAllPlayers);
+			else
+				packets.forEach(p -> PacketDistributor.sendToPlayer(player, p));
 		};
 	}
 }

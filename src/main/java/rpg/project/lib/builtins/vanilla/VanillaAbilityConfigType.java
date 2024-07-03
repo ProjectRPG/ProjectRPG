@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.nbt.CompoundTag;
@@ -14,16 +15,16 @@ import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
 
 public record VanillaAbilityConfigType() implements SubSystemConfigType {
-	public static final ResourceLocation ID = new ResourceLocation("abilities");
+	public static final ResourceLocation ID = ResourceLocation.withDefaultNamespace("abilities");
 	public static final VanillaAbilityConfigType IMPL = new VanillaAbilityConfigType();
 
 	@Override
-	public Codec<SubSystemConfig> getCodec() {
+	public MapCodec<SubSystemConfig> getCodec() {
 		return VanillaAbilityConfig.CODEC;
 	}
 
 	public static record VanillaAbilityConfig(List<CompoundTag> data) implements SubSystemConfig {
-		public static final Codec<SubSystemConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+		public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 				CompoundTag.CODEC.listOf().fieldOf("configurations").forGetter(ssc -> ((VanillaAbilityConfig)ssc).data())
 				).apply(instance, VanillaAbilityConfig::new));
 
@@ -46,7 +47,7 @@ public record VanillaAbilityConfigType() implements SubSystemConfigType {
 		}
 
 		@Override
-		public Codec<SubSystemConfig> getCodec() {
+		public MapCodec<SubSystemConfig> getCodec() {
 			return CODEC;
 		}
 

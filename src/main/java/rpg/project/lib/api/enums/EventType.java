@@ -2,7 +2,6 @@ package rpg.project.lib.api.enums;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.util.StringRepresentable;
-import net.neoforged.neoforge.common.IExtensibleEnum;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -11,7 +10,7 @@ import java.util.stream.Collectors;
 /**
  * Keeping this here just for easy reference, can be removed if needed anytime.
  */
-public enum EventType implements StringRepresentable, IExtensibleEnum {
+public enum EventType implements StringRepresentable{
     ANVIL_REPAIR(true, false, false, "smithing"),
     BLOCK_BREAK(false, true, false, "mining"),
         BREAK_SPEED(false, true, false, "mining"),
@@ -82,7 +81,7 @@ public enum EventType implements StringRepresentable, IExtensibleEnum {
     public static final EventType[] BLOCK_APPLICABLE_EVENTS = Arrays.asList(EventType.values()).stream().filter((type) -> type.blockApplicable).toArray(EventType[]::new);
     public static final EventType[] ENTITY_APPLICABLE_EVENTS = Arrays.asList(EventType.values()).stream().filter((type) -> type.entityApplicable).toArray(EventType[]::new);
     public static final EventType[] BLOCKITEM_APPLICABLE_EVENTS = Arrays.asList(EventType.values()).stream().filter((type) -> type.itemApplicable || type.blockApplicable).toArray(EventType[]::new);
-    public static final Codec<EventType> CODEC = IExtensibleEnum.createCodecForExtensibleEnum(EventType::values, EventType::byName);
+    public static final Codec<EventType> CODEC = StringRepresentable.fromEnum(EventType::values);
     private static final Map<String, EventType> BY_NAME = Arrays.stream(values()).collect(Collectors.toMap(EventType::getSerializedName, s -> s));
     
     public static EventType byName(String name) { return BY_NAME.get(name); }

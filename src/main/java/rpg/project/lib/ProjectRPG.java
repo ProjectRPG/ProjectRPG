@@ -1,6 +1,7 @@
 package rpg.project.lib;
 
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
@@ -11,11 +12,11 @@ import rpg.project.lib.internal.util.Reference;
 
 @Mod(Reference.MODID)
 public class ProjectRPG {    
-    public ProjectRPG(IEventBus bus) {
+    public ProjectRPG(IEventBus bus, ModContainer container) {
     	//Configs
-    	ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_CONFIG);
-    	ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG);
-    	ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SERVER_CONFIG);
+    	container.registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_CONFIG);
+    	container.registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG);
+    	container.registerConfig(ModConfig.Type.SERVER, Config.SERVER_CONFIG);
 
     	EventRegistry.EVENTS.register(bus);
     	
