@@ -26,7 +26,7 @@ public record EventListenerSpecification<T extends Event>(
 		 * if ProjectRPG should internally consider this event as having fired.
 		 * This discrimination allows two ProjectRPG events which listen to the
 		 * same Forge event to execute RPG logic under different circumstances.*/
-		Predicate<T> validEventContext,
+		Predicate<EventContext> validEventContext,
 		/**This consumes the valid event and returns the necessary context 
 		 * values needed to perform standard behavior within the gameplay
 		 * event system*/
@@ -42,7 +42,7 @@ public record EventListenerSpecification<T extends Event>(
 		 * there may be information about the event which features expect to
 		 * modify. The original values should be supplied by the contextFactory
 		 * at the event's firing and are subsequently consumed here.</p>*/
-		BiConsumer<T, CompoundTag> dynamicVariableConsumer) {
+		BiConsumer<T, EventContext> contextCallback) {
 	
 	public static enum CancellationType {
 		/**Passed to indicate no cancellation should apply.*/

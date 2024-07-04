@@ -7,6 +7,7 @@ import java.util.function.Function;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.fml.LogicalSide;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.abilities.AbilitySystem;
@@ -52,7 +53,7 @@ public class Core implements Hub {
 	public static Core get(final LogicalSide side) {
 	    return INSTANCES.get(side).apply(side);
 	}
-	public static Core get(final Level level) {
+	public static Core get(final LevelAccessor level) {
 	    return get(level.isClientSide() ? LogicalSide.CLIENT : LogicalSide.SERVER);
 	}
 	

@@ -6,7 +6,9 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.common.util.TriPredicate;
 import org.apache.commons.lang3.function.TriFunction;
+import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.internal.Core;
 
 import java.util.List;
@@ -41,18 +43,18 @@ import java.util.function.BiPredicate;
  */
 public record Ability(
 	/**Determines if the ability can start and if it should continue ticking.*/
-    BiPredicate<Player, CompoundTag> conditions,
+    TriPredicate<Player, CompoundTag, EventContext> conditions,
     /**Default settings to be supplied if the configuration omits them*/
     CompoundTag propertyDefaults,
     /**The initial behavior of this ability.*/
-    BiFunction<Player, CompoundTag, CompoundTag> start,
+    AbilityFunction start,
     /**continued behavior after {@link #start} that lasts for the duration
      * set by the configuration via {@link AbilityUtils#DURATION}*/
-    TriFunction<Player, CompoundTag, Integer, CompoundTag> tick,
+    TickFunction tick,
     /**The final behavior of this ability.  This is always called when ticking
      * completes and should be used to clean up anything the ability does not 
      * want to persist beyond its lifespan*/
-    BiFunction<Player, CompoundTag, CompoundTag> stop,
+    AbilityFunction stop,
     /**A displayable explanation of what the ability does.*/
     MutableComponent description,
     /**Consumes the player and configuration setting to produce information
@@ -61,16 +63,16 @@ public record Ability(
      * about how the ability will behave specifical for them.  For example:
      * how much an attributes will be boosted, the strength behind a manuever
      * or the quantity of some form of output.*/
-    BiFunction<Player, CompoundTag, List<MutableComponent>> status) {
+    TriFunction<Player, CompoundTag, EventContext, List<MutableComponent>> status) {
     
     public static class Builder {
-        private BiPredicate<Player, CompoundTag> conditions = (p, n) -> true;
+        private TriPredicate<Player, CompoundTag, EventContext> conditions = (p, s, c) -> true;
         private CompoundTag propertyDefaults = new CompoundTag();
-        private BiFunction<Player, CompoundTag, CompoundTag> start = (p, c) -> new CompoundTag();
-        private TriFunction<Player, CompoundTag, Integer, CompoundTag> tick = (p, c, i) -> new CompoundTag();
-        private BiFunction<Player, CompoundTag, CompoundTag> stop = (p, c) -> new CompoundTag();
+        private AbilityFunction start = (p, s, c) -> new CompoundTag();
+        private TickFunction tick = (p, s, c, i) -> new CompoundTag();
+        private AbilityFunction stop = (p, s, c) -> new CompoundTag();
         private MutableComponent description = Component.empty();
-        private BiFunction<Player, CompoundTag, List<MutableComponent>> status = (p, s) -> List.of();
+        private TriFunction<Player, CompoundTag, EventContext, List<MutableComponent>> status = (p, s, c) -> List.of();
         
         protected Builder() { }
         /**Sets the custom conditions for this ability.  By default,
@@ -80,7 +82,7 @@ public record Ability(
          * @param conditions sets the {@link Ability#conditions}
          * @return the builder instance
          */
-        public Builder addConditions(BiPredicate<Player, CompoundTag> conditions) {
+        public Builder addConditions(TriPredicate<Player, CompoundTag, EventContext> conditions) {
             this.conditions = conditions;
             return this;
         }
@@ -94,21 +96,21 @@ public record Ability(
         /**@param start sets the {@link Ability#start}
          * @return the builder instance
          */
-        public Builder setStart(BiFunction<Player, CompoundTag, CompoundTag> start) {
+        public Builder setStart(AbilityFunction start) {
             this.start = start;
             return this;
         }
         /**@param tick sets the {@link Ability#tick}
          * @return the builder instance
          */
-        public Builder setTick(TriFunction<Player, CompoundTag, Integer, CompoundTag> tick) {
+        public Builder setTick(TickFunction tick) {
             this.tick = tick;
             return this;
         }
         /**@param stop sets the {@link Ability#stop}
          * @return the builder instance
          */
-        public Builder setStop(BiFunction<Player, CompoundTag, CompoundTag> stop) {
+        public Builder setStop(AbilityFunction stop) {
             this.stop = stop;
             return this;
         }
@@ -122,7 +124,7 @@ public record Ability(
         /**@param status sets the {@link Ability#status}
          * @return the builder instance
          */
-        public Builder setStatus(BiFunction<Player, CompoundTag, List<MutableComponent>> status) {
+        public Builder setStatus(TriFunction<Player, CompoundTag, EventContext, List<MutableComponent>> status) {
             this.status = status;
             return this;
         }
@@ -145,8 +147,8 @@ public record Ability(
      * @param settings the configuration settings for this ability
      * @return whether this ability can start and continue ticking
      */
-    private boolean canActivate(Player player, CompoundTag settings) {
-        return VALID_CONTEXT.test(player, settings) && conditions().test(player, settings);
+    private boolean canActivate(Player player, CompoundTag settings, EventContext context) {
+        return VALID_CONTEXT.test(player, settings) && conditions().test(player, settings, context);
     }
     
     /**If conditions are met, executes the initial behavior of the ability
@@ -155,8 +157,8 @@ public record Ability(
      * @param nbt the configuration settings for this ability
      * @return the start behavior output tag
      */
-    public CompoundTag start(Player player, CompoundTag nbt) {
-        return canActivate(player, nbt) ? start.apply(player, nbt) : new CompoundTag();
+    public void start(Player player, CompoundTag nbt, EventContext context) {
+        if (canActivate(player, nbt, context)) start.start(player, nbt, context);
     }
     
     /**If conditions are still met, executes the tick behavior of the ability
@@ -166,8 +168,8 @@ public record Ability(
      * @param elapsedTicks the number of ticks already elapsed
      * @return the tick behavior output tag
      */
-    public CompoundTag tick(Player player, CompoundTag nbt, int elapsedTicks) {
-        return canActivate(player, nbt) ? tick.apply(player, nbt, elapsedTicks) : new CompoundTag();
+    public void tick(Player player, CompoundTag nbt, EventContext context, int elapsedTicks) {
+        if (canActivate(player, nbt, context)) tick.tick(player, nbt, context, elapsedTicks);
     }
     
     /**When the ability is not longer conditionally valid or reaches its tick
@@ -177,8 +179,8 @@ public record Ability(
      * @param nbt the configuration settings for this ability
      * @return the stop behavior output tag
      */
-    public CompoundTag stop(Player player, CompoundTag nbt) {
-        return stop.apply(player, nbt);
+    public void stop(Player player, CompoundTag nbt, EventContext context) {
+        stop.start(player, nbt, context);
     }
     
     /**Common conditions for all abilities.  Whether specified or not, users can provide

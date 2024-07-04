@@ -11,6 +11,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -46,6 +47,10 @@ public class RegistryUtil {
 
 	public static ResourceLocation getId(EntityType<?> entity) {
 		return BuiltInRegistries.ENTITY_TYPE.getKey(entity);
+	}
+
+	public static ResourceLocation getDimension(LevelAccessor level) {
+		return level.registryAccess().registryOrThrow(Registries.DIMENSION_TYPE).getKey(level.dimensionType());
 	}
 	
 //	public static ResourceLocation getId(Enchantment enchant) {

@@ -19,7 +19,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
+import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.abilities.Ability;
+import rpg.project.lib.api.abilities.AbilityFunction;
 import rpg.project.lib.api.abilities.AbilityUtils;
 import rpg.project.lib.api.enums.AbilitySide;
 import rpg.project.lib.internal.setup.datagen.LangProvider;
@@ -35,18 +37,17 @@ public class Abilities {
 	private static final Set<ItemAbility> DIG_ACTIONS = Set.of(ItemAbilities.PICKAXE_DIG, ItemAbilities.AXE_DIG,
 			ItemAbilities.SHOVEL_DIG, ItemAbilities.HOE_DIG, ItemAbilities.SHEARS_DIG, ItemAbilities.SWORD_DIG);
 	
-	private static Ability BREAK_SPEED = Ability.begin().addDefaults(getBreakSpeedDefaults()).setStart((player, compoundTag) -> {
-		float speedIn = compoundTag.contains(AbilityUtils.BREAK_SPEED_INPUT_VALUE)
-				? compoundTag.getFloat(AbilityUtils.BREAK_SPEED_INPUT_VALUE)
+	private static final Ability BREAK_SPEED = Ability.begin().addDefaults(getBreakSpeedDefaults()).setStart((player, settings, context) -> {
+		float speedIn = context.hasParam(AbilityUtils.BREAK_SPEED_INPUT_VALUE)
+				? context.getParam(AbilityUtils.BREAK_SPEED_INPUT_VALUE)
 				: player.getMainHandItem().getDestroySpeed(Blocks.OBSIDIAN.defaultBlockState());
-		float speedBonus = getRatioForTool(player.getMainHandItem(), compoundTag);
-		if (speedBonus == 0) {
-			return new CompoundTag();
-		}
+		float speedBonus = getRatioForTool(player.getMainHandItem(), settings);
+		if (speedBonus == 0)
+			return ;
 
-		float newSpeed = speedIn * Math.max(0, 1 + compoundTag.getInt(AbilityUtils.PROGRESS_LEVEL) * speedBonus);
-		return TagBuilder.start().withFloat(AbilityUtils.BREAK_SPEED_OUTPUT_VALUE, newSpeed).build();
-	}).setStatus((player, settings) -> {
+		float newSpeed = speedIn * Math.max(0, 1 + settings.getInt(AbilityUtils.PROGRESS_LEVEL) * speedBonus);
+		context.setParam(AbilityUtils.BREAK_SPEED_OUTPUT_VALUE, newSpeed);
+	}).setStatus((player, settings, context) -> {
 		List<MutableComponent> lines = new ArrayList<>();
 		// int skillLevel = settings.getInt(APIUtils.SKILL_LEVEL);
 		// DIG_ACTIONS.stream()
@@ -76,7 +77,7 @@ public class Abilities {
 		return builder.build();
 	}
 	
-	public static BiFunction<Player, CompoundTag, CompoundTag> EFFECT_SETTER = (player, nbt) -> {
+	public static AbilityFunction EFFECT_SETTER = (player, nbt, context) -> {
 		Optional<Holder.Reference<MobEffect>> effectHolder = BuiltInRegistries.MOB_EFFECT.getHolder(ResourceLocation.parse(nbt.getString("effect")));
 		if (effectHolder.isPresent()) {
 			Holder<MobEffect> effect = effectHolder.get();
@@ -90,10 +91,9 @@ public class Abilities {
 			boolean visible = nbt.getBoolean(AbilityUtils.VISIBLE);
 			player.addEffect(new MobEffectInstance(effect, perLevel * duration, amplifier, ambient, visible));
 		}
-		return new CompoundTag();
 	};
 	
-	public static Ability EFFECT = Ability.begin()
+	public static final Ability EFFECT = Ability.begin()
 			.addDefaults(TagBuilder.start().withString("effect", "modid:effect")
 					.withInt(AbilityUtils.DURATION, 100)
 					.withInt(AbilityUtils.PER_LEVEL, 1)
@@ -101,9 +101,9 @@ public class Abilities {
 					.withBool(AbilityUtils.AMBIENT, false)
 					.withBool(AbilityUtils.VISIBLE, true).build())
 			.setStart(EFFECT_SETTER)
-			.setTick((player, nbt, ticks) -> EFFECT_SETTER.apply(player, nbt))
+			.setTick((player, nbt, context, ticks) -> EFFECT_SETTER.start(player, nbt, context))
 			.setDescription(LangProvider.PERK_EFFECT_DESC.asComponent())
-			.setStatus((player, nbt) -> List.of(
+			.setStatus((player, nbt, context) -> List.of(
 					LangProvider.PERK_EFFECT_STATUS_1.asComponent(Component.translatable(BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(nbt.getString("effect"))).getDescriptionId())),
 					LangProvider.PERK_EFFECT_STATUS_2.asComponent(nbt.getInt(AbilityUtils.MODIFIER), nbt.getInt(AbilityUtils.DURATION))))
 			.build();

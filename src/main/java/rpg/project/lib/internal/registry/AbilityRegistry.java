@@ -9,7 +9,10 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.jetbrains.annotations.NotNull;
 import rpg.project.lib.api.abilities.Ability;
+import rpg.project.lib.api.abilities.AbilityFunction;
 import rpg.project.lib.api.abilities.AbilityUtils;
+import rpg.project.lib.api.abilities.TickFunction;
+import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.internal.util.MsLoggy;
 import rpg.project.lib.internal.util.MsLoggy.LOG_CODE;
 import rpg.project.lib.internal.util.TagUtils;
@@ -34,7 +37,7 @@ public class AbilityRegistry {
         Preconditions.checkNotNull(abilityID);
         Preconditions.checkNotNull(ability);
         
-        Ability clientCopy = new Ability(ability.conditions(), ability.propertyDefaults(), (a, b) -> new CompoundTag(), (a, b, c) -> new CompoundTag(), (a, b) -> new CompoundTag(), ability.description(), ability.status());
+        Ability clientCopy = new Ability(ability.conditions(), ability.propertyDefaults(), AbilityFunction.NOOP, TickFunction.NOOP, AbilityFunction.NOOP, ability.description(), ability.status());
         abilities.putIfAbsent(abilityID, clientCopy);
     }
     
@@ -42,35 +45,31 @@ public class AbilityRegistry {
         return abilities.getOrDefault(id, Ability.empty()).description();
     }
     
-    public List<MutableComponent> getStatusLines(ResourceLocation id, Player player, CompoundTag settings) {
-        return abilities.getOrDefault(id, Ability.empty()).status().apply(player, settings);
+    public List<MutableComponent> getStatusLines(ResourceLocation id, Player player, CompoundTag settings, EventContext context) {
+        return abilities.getOrDefault(id, Ability.empty()).status().apply(player, settings, context);
     }
     
-    public CompoundTag executeAbility(ResourceLocation abilityID, Player player, @NotNull CompoundTag dataIn) {
-        if (player == null) { return new CompoundTag(); }
-        
-        CompoundTag output = new CompoundTag();
+    public void executeAbility(ResourceLocation abilityID, Player player, CompoundTag dataIn, EventContext context) {
+        if (player == null) return;
+
         Ability ability = abilities.getOrDefault(abilityID, Ability.empty());
         CompoundTag config = ability.propertyDefaults().merge(dataIn);
-        CompoundTag executionOutput = ability.start(player, config);
-        tickTracker.add(new TickSchedule(ability, player, config, new AtomicInteger(0)));
+        ability.start(player, config, context);
+        tickTracker.add(new TickSchedule(ability, player, config, context, new AtomicInteger(0)));
         
         if (config.contains(AbilityUtils.COOLDOWN)) {
             coolTracker.add(new AbilityCooldown(abilityID, player, config, player.level().getGameTime()));
         }
-        
-        output.merge(TagUtils.mergeTags(output, executionOutput));
-        return output;
     }
     
-    private record TickSchedule(Ability ability, Player player, CompoundTag src, AtomicInteger ticksElapsed) {
+    private record TickSchedule(Ability ability, Player player, CompoundTag src, EventContext context, AtomicInteger ticksElapsed) {
         public boolean shouldTick() {
             return src.contains(AbilityUtils.DURATION) && ticksElapsed.get() <= src.getInt(AbilityUtils.DURATION);
         }
         
         public void tick() {
             ticksElapsed().getAndIncrement();
-            ability.tick(player, src, ticksElapsed.get());
+            ability.tick(player, src, context, ticksElapsed.get());
         }
     }
     
@@ -89,7 +88,7 @@ public class AbilityRegistry {
             if (schedule.shouldTick()) {
                 schedule.tick();
             } else {
-                schedule.ability().stop(schedule.player(), schedule.src());
+                schedule.ability().stop(schedule.player(), schedule.src(), schedule.context());
             }
             tickTracker.remove(schedule);
         });

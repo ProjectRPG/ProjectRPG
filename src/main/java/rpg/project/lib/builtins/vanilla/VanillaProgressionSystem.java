@@ -84,7 +84,7 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 					core.getProgressionAddons().forEach(addon -> {
 						xpToAward.getAndSet(((VanillaProgressionData)addon.modifyProgression(core, context, new VanillaProgressionData(xpToAward.get()))).exp());						
 					});
-					List<Pair<String, Consumer<Float>>> output = List.of(Pair.of(container, gate -> this.addXp(context.actor().getUUID(), new VanillaProgressionData((int)((float)xpToAward.get() * gate)))));
+					List<Pair<String, Consumer<Float>>> output = List.of(Pair.of(container, gate -> this.addXp(context.getActor().getUUID(), new VanillaProgressionData((int)((float)xpToAward.get() * gate)))));
 					return output;
 				}
 			).orElse(List.of());

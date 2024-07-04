@@ -1,6 +1,8 @@
 package rpg.project.lib.builtins;
 
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.ICancellableEvent;
@@ -22,9 +24,10 @@ public class EventFactories {
 			Reference.resource("break_block"),
 			EventPriority.LOWEST,
 			BlockEvent.BreakEvent.class,
-			event -> true,
-			event -> EventContext.build(ObjectType.BLOCK, RegistryUtil.getId(event.getState()), event.getPlayer())
-				.withPos(event.getPos()).build(),
+			context -> context.getParam(LootContextParams.THIS_ENTITY) instanceof Player,
+			event -> EventContext.build(RegistryUtil.getId(event.getState()), LootContextParams.BLOCK_STATE, event.getState(), event.getPlayer())
+					.withParam(LootContextParams.ORIGIN, event.getPos().getCenter())
+					.withParam(EventContext.LEVEL, event.getLevel()).create(),
 			EventFactories::fullCancel,
 			(event, vars) -> {});
 	
@@ -32,9 +35,10 @@ public class EventFactories {
 			Reference.resource("place_block"), 
 			EventPriority.LOWEST, 
 			BlockEvent.EntityPlaceEvent.class,
-			event -> event.getEntity() instanceof Player,
-			event -> EventContext.build(ObjectType.BLOCK, RegistryUtil.getId(event.getState()), (Player)event.getEntity())
-				.withPos(event.getPos()).build(),
+			context -> context.getParam(LootContextParams.THIS_ENTITY) instanceof Player,
+			event -> EventContext.build(RegistryUtil.getId(event.getState()), LootContextParams.BLOCK_STATE, event.getState(), (Player)event.getEntity())
+					.withParam(LootContextParams.ORIGIN, event.getPos().getCenter())
+					.withParam(EventContext.LEVEL, event.getLevel()).create(),
 			EventFactories::fullCancel,
 			(event, vars) -> {});
 	

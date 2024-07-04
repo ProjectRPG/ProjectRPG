@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Supplier;
 
+import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.neoforged.fml.LogicalSide;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -12,6 +13,7 @@ import rpg.project.lib.api.enums.AbilitySide;
 import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.registry.SubSystemCodecRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
+import rpg.project.lib.internal.util.Reference;
 
 public class AbilityUtils {
 	/**The key to specify which ability this config applies to.
@@ -32,13 +34,14 @@ public class AbilityUtils {
     /**Sets how long this ability should tick for before stopping*/
     public static final String DURATION = "duration";
     public static final String REDUCTION = "reduce";
+    public static final LootContextParam<Float> REDUCE = new LootContextParam<>(Reference.resource(REDUCTION));
     
     public static final String BLOCK_POS = "block_pos";
     public static final String CONTAINER_NAME = "progress_type";
     public static final String PROGRESS_LEVEL = "progress";
     
-    public static final String BREAK_SPEED_INPUT_VALUE = "speedIn";
-    public static final String BREAK_SPEED_OUTPUT_VALUE = "speed";
+    public static final LootContextParam<Float> BREAK_SPEED_INPUT_VALUE =  new LootContextParam<>(Reference.resource("speed_in"));
+    public static final LootContextParam<Float> BREAK_SPEED_OUTPUT_VALUE = new LootContextParam<>(Reference.resource("speed"));
     
     public static final String DAMAGE_IN = "damageIn";
     public static final String DAMAGE_OUT ="damage";
