@@ -5,6 +5,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.registries.RegistryBuilder;
 import rpg.project.lib.internal.config.Config;
 import rpg.project.lib.internal.registry.EventRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
@@ -18,6 +19,7 @@ public class ProjectRPG {
     	container.registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG);
     	container.registerConfig(ModConfig.Type.SERVER, Config.SERVER_CONFIG);
 
+		EventRegistry.EVENTS.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
     	EventRegistry.EVENTS.register(bus);
     	
     	//MOD BUS event listeners

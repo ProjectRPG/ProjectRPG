@@ -66,6 +66,7 @@ public class CommonSetup {
 	}
 	
 	public static void init(final FMLCommonSetupEvent event) {
+		event.enqueueWork(() -> EventRegistry.EVENTS.getRegistry().get().stream().forEach(EventRegistry::registerListener));
 		Abilities.init();
 	}
 	
@@ -73,11 +74,6 @@ public class CommonSetup {
     public static void tickPerks(LevelTickEvent.Pre event) {
         Core.get(event.getLevel()).getAbilities().executeAbilityTicks(event);
     }
-	
-	@SubscribeEvent
-	public static void onServerAboutToStart(ServerStartedEvent event) {
-		event.getServer().registryAccess().registryOrThrow(EventRegistry.EVENTS.getRegistryKey()).stream().forEach(EventRegistry::registerListener);
-	}
 	
 	@SubscribeEvent
 	public static void registerCommands(RegisterCommandsEvent event) {
