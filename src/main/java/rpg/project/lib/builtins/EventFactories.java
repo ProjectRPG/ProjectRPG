@@ -27,70 +27,78 @@ import java.util.function.Function;
  */
 public class EventFactories<T extends Event> {
 	public static final EventFactories<AnvilRepairEvent> ANVIL_REPAIR = new EventFactories<>("anvil_repair", id -> new EventListenerSpecification<>(
-			Reference.resource(id),
-			EventPriority.LOWEST,
-			AnvilRepairEvent.class,
-			context -> true,
-			event -> EventContext.build(RegistryUtil.getId(event.getOutput()), EventContext.ITEMSTACK, event.getOutput(), event.getEntity(), event.getEntity().level()).create(),
-			(e, v) -> {},
-			(event, vars) -> {}
+		Reference.resource(id),
+		EventPriority.LOWEST,
+		AnvilRepairEvent.class,
+		context -> true,
+		event -> EventContext.build(RegistryUtil.getId(event.getOutput()), EventContext.ITEMSTACK, event.getOutput(), event.getEntity(), event.getEntity().level()).create(),
+		(e, v) -> {},
+		(event, vars) -> {}
 	));
 	public static final EventFactories<BlockEvent.BreakEvent> BLOCK_BREAK = new EventFactories<>("break_block", id -> new EventListenerSpecification<>(
-			Reference.resource(id),
-			EventPriority.LOWEST,
-			BlockEvent.BreakEvent.class,
-			context -> context.getParam(LootContextParams.THIS_ENTITY) instanceof Player,
-			event -> EventContext.build(RegistryUtil.getId(event.getState()), LootContextParams.BLOCK_STATE, event.getState(), event.getPlayer(), event.getLevel())
-					.withParam(LootContextParams.ORIGIN, event.getPos().getCenter()).create(),
-			EventFactories::fullCancel,
-			(event, vars) -> {}
+		Reference.resource(id),
+		EventPriority.LOWEST,
+		BlockEvent.BreakEvent.class,
+		context -> context.getParam(LootContextParams.THIS_ENTITY) instanceof Player,
+		event -> EventContext.build(RegistryUtil.getId(event.getState()), LootContextParams.BLOCK_STATE, event.getState(), event.getPlayer(), event.getLevel())
+				.withParam(LootContextParams.ORIGIN, event.getPos().getCenter()).create(),
+		EventFactories::fullCancel,
+		(event, vars) -> {}
 	));
 	public static final EventFactories<PlayerEvent.BreakSpeed> BREAK_SPEED = new EventFactories<>("break_speed", id -> new EventListenerSpecification<>(
-			Reference.resource(id),
-			EventPriority.LOWEST,
-			PlayerEvent.BreakSpeed.class,
-			context -> true,
-			event -> EventContext.build(RegistryUtil.getId(event.getState()), LootContextParams.BLOCK_STATE, event.getState(), event.getEntity(), event.getEntity().level())
-					.withParam(LootContextParams.ORIGIN, event.getPosition().orElse(BlockPos.ZERO).getCenter()).create(),
-			EventFactories::fullCancel,
-			(event, context) -> {
-				if (context.hasParam(AbilityUtils.BREAK_SPEED_OUTPUT_VALUE))
-					event.setNewSpeed(context.getParam(AbilityUtils.BREAK_SPEED_OUTPUT_VALUE));
-			}
+		Reference.resource(id),
+		EventPriority.LOWEST,
+		PlayerEvent.BreakSpeed.class,
+		context -> true,
+		event -> EventContext.build(RegistryUtil.getId(event.getState()), LootContextParams.BLOCK_STATE, event.getState(), event.getEntity(), event.getEntity().level())
+				.withParam(LootContextParams.ORIGIN, event.getPosition().orElse(BlockPos.ZERO).getCenter()).create(),
+		EventFactories::fullCancel,
+		(event, context) -> {
+			if (context.hasParam(AbilityUtils.BREAK_SPEED_OUTPUT_VALUE))
+				event.setNewSpeed(context.getParam(AbilityUtils.BREAK_SPEED_OUTPUT_VALUE));
+		}
 	));
 	public static final EventFactories<BlockEvent.EntityPlaceEvent> BLOCK_PLACE = new EventFactories<>("place_block", id -> new EventListenerSpecification<>(
-            Reference.resource(id),
-            EventPriority.LOWEST,
-            BlockEvent.EntityPlaceEvent.class,
-            context -> context.getParam(LootContextParams.THIS_ENTITY) instanceof Player,
-            event -> EventContext.build(RegistryUtil.getId(event.getState()), LootContextParams.BLOCK_STATE, event.getState(), (Player) event.getEntity(), event.getLevel())
-                    .withParam(LootContextParams.ORIGIN, event.getPos().getCenter()).create(),
-            EventFactories::fullCancel,
-            (event, vars) -> {}
+		Reference.resource(id),
+		EventPriority.LOWEST,
+		BlockEvent.EntityPlaceEvent.class,
+		context -> context.getParam(LootContextParams.THIS_ENTITY) instanceof Player,
+		event -> EventContext.build(RegistryUtil.getId(event.getState()), LootContextParams.BLOCK_STATE, event.getState(), (Player) event.getEntity(), event.getLevel())
+				.withParam(LootContextParams.ORIGIN, event.getPos().getCenter()).create(),
+		EventFactories::fullCancel,
+		(event, vars) -> {}
 	));
 	public static final EventFactories<LivingBreatheEvent> BREATH_CHANGE = new EventFactories<>("breath_change", id -> new EventListenerSpecification<>(
-			Reference.resource(id),
-			EventPriority.LOWEST,
-			LivingBreatheEvent.class,
-			context -> context.getParam(LootContextParams.THIS_ENTITY) instanceof Player player
-					&& player.tickCount % 10 == 0
-					&& context.getParam(EventContext.BREATH_CHANGE) != 0,
-			event -> {
-				int diff = event.canBreathe() ? event.getRefillAirAmount() : event.getConsumeAirAmount();
-				return EventContext.build(ResourceLocation.withDefaultNamespace("player"), LootContextParams.THIS_ENTITY, event.getEntity(), event.getEntity() instanceof Player player ? player : null, event.getEntity().level())
-					.withDynamicParam(EventContext.BREATH_CHANGE, diff).create();
-			},
-			(e, v) -> {},
-			(event, context) -> {
-				int change = context.getParam(EventContext.BREATH_CHANGE);
-				if (event.canBreathe()) event.setRefillAirAmount(change);
-				else event.setConsumeAirAmount(change);
-			}
+		Reference.resource(id),
+		EventPriority.LOWEST,
+		LivingBreatheEvent.class,
+		context -> context.getParam(LootContextParams.THIS_ENTITY) instanceof Player player
+				&& player.tickCount % 10 == 0
+				&& context.getParam(EventContext.BREATH_CHANGE) != 0,
+		event -> {
+			int diff = event.canBreathe() ? event.getRefillAirAmount() : event.getConsumeAirAmount();
+			return EventContext.build(ResourceLocation.withDefaultNamespace("player"), LootContextParams.THIS_ENTITY, event.getEntity(), event.getEntity() instanceof Player player ? player : null, event.getEntity().level())
+				.withDynamicParam(EventContext.BREATH_CHANGE, diff).create();
+		},
+		(e, v) -> {},
+		(event, context) -> {
+			int change = context.getParam(EventContext.BREATH_CHANGE);
+			if (event.canBreathe()) event.setRefillAirAmount(change);
+			else event.setConsumeAirAmount(change);
+		}
 	));
 //	BREED("taming", null),
 //	BREW("alchemy", null),
 //	CONSUME("cooking", null),
-//	CRAFT("crafting", null),
+	public static final EventFactories<PlayerEvent.ItemCraftedEvent> CRAFT = new EventFactories<>("item_crafted", id -> new EventListenerSpecification<>(
+		Reference.resource("item_crafted"),
+		EventPriority.LOWEST,
+		PlayerEvent.ItemCraftedEvent.class,
+		context -> true,
+		event -> EventContext.build(RegistryUtil.getId(event.getCrafting()), EventContext.ITEMSTACK, event.getCrafting(), event.getEntity(), event.getEntity().level()).create(),
+		(e, v) -> {},
+		(e, v) -> {}
+	));
 //	RECEIVE_DAMAGE("endurance", null),
 //	DEAL_DAMAGE("combat", null),
 //	MITIGATE_DAMAGE("combat", null),
