@@ -4,7 +4,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.Event;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingBreatheEvent;
 import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -79,6 +81,8 @@ public class EventRegistry {
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<BlockEvent.BreakEvent>> BREAK = register(EventFactories.BLOCK_BREAK);
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<BlockEvent.EntityPlaceEvent>> PLACE = register(EventFactories.BLOCK_PLACE);
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<AnvilRepairEvent>> ANVIL_REPAIR = register(EventFactories.ANVIL_REPAIR);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<PlayerEvent.BreakSpeed>> BREAK_SPEED = register(EventFactories.BREAK_SPEED);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<LivingBreatheEvent>> BREATH_CHANGE = register(EventFactories.BREATH_CHANGE);
 
 	public static <T extends Event> DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<T>> register(EventFactories<T> factory) {
 		return EVENTS.register(factory.id, factory::getFactory);

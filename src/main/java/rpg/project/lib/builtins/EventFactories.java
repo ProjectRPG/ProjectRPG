@@ -1,17 +1,17 @@
 package rpg.project.lib.builtins;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.ICancellableEvent;
+import net.neoforged.neoforge.event.entity.living.LivingBreatheEvent;
 import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import rpg.project.lib.api.abilities.AbilityUtils;
-import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.EventListenerSpecification;
 import rpg.project.lib.internal.util.Reference;
@@ -20,7 +20,7 @@ import rpg.project.lib.internal.util.RegistryUtil;
 import java.util.function.Function;
 
 /**Contains default factories for translating 
- * {@link net.minecraftforge.eventbus.api.Event Event}s 
+ * {@link net.neoforged.bus.api.Event Event}s
  * to {@link EventContext}s for use by declarations in 
  * {@link rpg.project.lib.internal.registry.EventRegistry EventRegistry}
  * for relevant ecosystem events.
@@ -68,27 +68,32 @@ public class EventFactories<T extends Event> {
             EventFactories::fullCancel,
             (event, vars) -> {}
 	));
-//	BREATH_CHANGE("swimming", null),
+	public static final EventFactories<LivingBreatheEvent> BREATH_CHANGE = new EventFactories<>("breath_change", id -> new EventListenerSpecification<>(
+			Reference.resource(id),
+			EventPriority.LOWEST,
+			LivingBreatheEvent.class,
+			context -> context.getParam(LootContextParams.THIS_ENTITY) instanceof Player player
+					&& player.tickCount % 10 == 0
+					&& context.getParam(EventContext.BREATH_CHANGE) != 0,
+			event -> {
+				int diff = event.canBreathe() ? event.getRefillAirAmount() : event.getConsumeAirAmount();
+				return EventContext.build(ResourceLocation.withDefaultNamespace("player"), LootContextParams.THIS_ENTITY, event.getEntity(), event.getEntity() instanceof Player player ? player : null, event.getEntity().level())
+					.withDynamicParam(EventContext.BREATH_CHANGE, diff).create();
+			},
+			(e, v) -> {},
+			(event, context) -> {
+				int change = context.getParam(EventContext.BREATH_CHANGE);
+				if (event.canBreathe()) event.setRefillAirAmount(change);
+				else event.setConsumeAirAmount(change);
+			}
+	));
 //	BREED("taming", null),
 //	BREW("alchemy", null),
 //	CONSUME("cooking", null),
 //	CRAFT("crafting", null),
 //	RECEIVE_DAMAGE("endurance", null),
-//	FROM_MOBS("endurance", null),
-//	FROM_PLAYERS("endurance", null),
-//	FROM_ANIMALS("endurance", null),
-//	FROM_PROJECTILES("endurance", null),
-//	FROM_MAGIC("endurance", null),
-//	FROM_ENVIRONMENT("endurance", null),
-//	FROM_IMPACT("endurance", null),
-//	DEAL_MELEE_DAMAGE("combat", null),
-//	MELEE_TO_MOBS("combat", null),
-//	MELEE_TO_PLAYERS("combat", null),
-//	MELEE_TO_ANIMALS("combat", null),
-//	DEAL_RANGED_DAMAGE("archery", null),
-//	RANGED_TO_MOBS("archery", null),
-//	RANGED_TO_PLAYERS("archery", null),
-//	RANGED_TO_ANIMALS("archery", null),
+//	DEAL_DAMAGE("combat", null),
+//	MITIGATE_DAMAGE("combat", null),
 //	DEATH("endurance", null),
 //	ENCHANT("magic", null),
 //	EFFECT("magic", null),
@@ -125,7 +130,7 @@ public class EventFactories<T extends Event> {
 		this.factory = factory.apply(id);
 	}
 	public EventListenerSpecification<T> getFactory() {return factory;}
-	
+
 	public static void fullCancel(ICancellableEvent event, EventListenerSpecification.CancellationType cancelType) {
 		event.setCanceled(true);
 	}
