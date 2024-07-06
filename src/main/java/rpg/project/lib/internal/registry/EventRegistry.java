@@ -57,7 +57,7 @@ public class EventRegistry {
 			ResourceLocation abilityID = ResourceLocation.parse(config.getString(AbilityUtils.TYPE));
 			float gating = GateRegistry.isAbilityPermitted(context.getActor(), core, eventID, context, abilityID);
 			if (gating != GateRegistry.HARD_FAIL) {
-				context.addParam(AbilityUtils.REDUCE, gating);
+				context.setParam(AbilityUtils.REDUCE, gating);
 				core.getAbilities().executeAbility(eventID, context.getActor(), config, context);
 			}
 		}
@@ -83,6 +83,7 @@ public class EventRegistry {
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<AnvilRepairEvent>> ANVIL_REPAIR = register(EventFactories.ANVIL_REPAIR);
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<PlayerEvent.BreakSpeed>> BREAK_SPEED = register(EventFactories.BREAK_SPEED);
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<LivingBreatheEvent>> BREATH_CHANGE = register(EventFactories.BREATH_CHANGE);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<PlayerEvent.ItemCraftedEvent>> ITEM_CRAFTED = register(EventFactories.CRAFT);
 
 	public static <T extends Event> DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<T>> register(EventFactories<T> factory) {
 		return EVENTS.register(factory.id, factory::getFactory);

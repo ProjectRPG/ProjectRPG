@@ -76,9 +76,7 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 	
 	@Override
 	public List<Pair<String, Consumer<Float>>> getProgressionToBeAwarded(Hub core, ResourceLocation eventID, EventContext context) {
-		ResourceLocation objectID = context.subjectObject().getSecond();
-		ObjectType type = context.subjectObject().getFirst();
-		return core.getProgressionData(VanillaProgressionConfigType.IMPL, type, objectID)
+		return core.getProgressionData(VanillaProgressionConfigType.IMPL, context.getSubjectType(), context.getSubjectID())
 				.map(config -> {
 					AtomicInteger xpToAward = new AtomicInteger(((VanillaProgressionConfig)config).eventToXp().getOrDefault(eventID, 0));
 					core.getProgressionAddons().forEach(addon -> {
