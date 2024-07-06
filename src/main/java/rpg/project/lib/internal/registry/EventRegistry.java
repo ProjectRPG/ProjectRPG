@@ -4,6 +4,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.Event;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -63,7 +64,7 @@ public class EventRegistry {
 		core.getProgression().getProgressionToBeAwarded(core, eventID, context).forEach(
 				pair -> pair.getSecond().accept(GateRegistry.isProgressionPermitted(core, eventID, context, pair.getFirst())));
 		
-		//Process any event modificaiton from features, abilities, or progress
+		//Process any event modification from features, abilities, or progress
 		spec.contextCallback().accept(event, context);
 	}
 	
@@ -75,6 +76,11 @@ public class EventRegistry {
 	public static final DeferredRegister<EventListenerSpecification<?>> EVENTS = DeferredRegister.create(APIUtils.GAMEPLAY_EVENTS, Reference.MODID);
 	//public static final Supplier<IForgeRegistry<EventListenerSpecification<?>>> REGISTRY_SUPPLIER = EVENTS.makeRegistry(RegistryBuilder::create);
 	
-	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<BlockEvent.BreakEvent>> BREAK = EVENTS.register("break_block", () -> EventFactories.BLOCK_BREAK);
-	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<BlockEvent.EntityPlaceEvent>> PLACE = EVENTS.register("place_block",	() -> EventFactories.BLOCK_PLACE);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<BlockEvent.BreakEvent>> BREAK = register(EventFactories.BLOCK_BREAK);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<BlockEvent.EntityPlaceEvent>> PLACE = register(EventFactories.BLOCK_PLACE);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<AnvilRepairEvent>> ANVIL_REPAIR = register(EventFactories.ANVIL_REPAIR);
+
+	public static <T extends Event> DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<T>> register(EventFactories<T> factory) {
+		return EVENTS.register(factory.id, factory::getFactory);
+	}
 }

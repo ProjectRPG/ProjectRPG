@@ -6,18 +6,13 @@ import java.util.Map;
 import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import rpg.project.lib.api.data.ObjectType;
+import rpg.project.lib.api.data.DataObject;
 import rpg.project.lib.internal.util.Reference;
 
 /**<p>This translates a specific event into the attributes needed by all
@@ -34,11 +29,13 @@ public record EventContext(
 		Map<LootContextParam<?>, Object> contextParams,
 		Map<LootContextParam<?>, Object> dynamicParams) {
 	public static final LootContextParam<LevelAccessor> LEVEL = new LootContextParam<>(Reference.resource("event_level"));
+	public static final LootContextParam<ItemStack> ITEMSTACK = new LootContextParam<>(Reference.resource("itemstack"));
 
 	public boolean hasParam(LootContextParam<?> param) {
 		return contextParams().containsKey(param) || dynamicParams().containsKey(param);
 	}
 
+	@SuppressWarnings("unchecked") //public setters enforce key-value type parity
 	public <T> T getParam(LootContextParam<T> param) {
 		return (T) (contextParams().containsKey(param)
                         ? contextParams().get(param)
@@ -51,17 +48,18 @@ public record EventContext(
 		addParam(key, newValue);
 	}
 	public Player getActor() {return (Player) contextParams().get(LootContextParams.THIS_ENTITY);}
-	public static <T> ContextBuilder build(ResourceLocation subjectID, LootContextParam<T> subjectParam, T subject, Player actor) {
-		return new ContextBuilder(subjectID, subjectParam, subject, actor);
+	public static <T> ContextBuilder build(ResourceLocation subjectID, LootContextParam<T> subjectParam, T subject, Player actor, LevelAccessor level) {
+		return new ContextBuilder(subjectID, subjectParam, subject, actor, level);
 	}
 
 	public static class ContextBuilder {
 		private final Pair<ObjectType, ResourceLocation> subjectReference;
 		private final Map<LootContextParam<?>, Object> contextParams = new HashMap<>();
-		protected <T> ContextBuilder(ResourceLocation subjectID, LootContextParam<T> subjectParam, T subject, Player actor) {
+		protected <T> ContextBuilder(ResourceLocation subjectID, LootContextParam<T> subjectParam, T subject, Player actor, LevelAccessor level) {
 			this.subjectReference = Pair.of(getType(subject), subjectID);
 			contextParams.put(subjectParam, subject);
 			contextParams.put(LootContextParams.THIS_ENTITY, actor);
+			contextParams.put(LEVEL, level);
 		}
 		public <T> ContextBuilder withParam(LootContextParam<T> paramKey, T param) {
 			contextParams.put(paramKey, param);
@@ -70,17 +68,8 @@ public record EventContext(
 		public EventContext create() {return new EventContext(subjectReference, contextParams, new HashMap<>());}
 
 		private static ObjectType getType(Object subject) {
-			return switch (subject) {
-				case Player p -> ObjectType.PLAYER;
-				case Entity e -> ObjectType.ENTITY;
-				case Block b -> ObjectType.BLOCK;
-				case BlockState bs -> ObjectType.BLOCK;
-				case Item i -> ObjectType.ITEM;
-				case Biome b -> ObjectType.BIOME;
-				case Enchantment e -> ObjectType.ENCHANTMENT;
-				case MobEffect m -> ObjectType.EFFECT;
-				default -> ObjectType.DIMENSION;
-			};
+			if (subject instanceof DataObject obj) return obj.prpg$getObjectType();
+			return ObjectType.PLAYER; //default to the least likely used data type to avoid null but not load real data.
 		}
 	}
 }
