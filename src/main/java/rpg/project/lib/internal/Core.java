@@ -21,6 +21,7 @@ import rpg.project.lib.api.progression.ProgressionSystem;
 import rpg.project.lib.internal.config.readers.DataLoader;
 import rpg.project.lib.internal.config.readers.MergeableCodecDataManager;
 import rpg.project.lib.internal.registry.AbilityRegistry;
+import rpg.project.lib.internal.registry.FeatureRegistry;
 import rpg.project.lib.internal.registry.ProgressionAddonRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
 import rpg.project.lib.internal.util.Functions;
@@ -44,10 +45,12 @@ public class Core implements Hub {
 	private final ProgressionSystem<?> progress = CommonSetup.progressionSupplier.get();
 	private final AbilitySystem abilitySys = CommonSetup.abilitySupplier.get();
 	private final AbilityRegistry abilities;
+	private final FeatureRegistry features;
 	
 	private Core(LogicalSide side) {
 		this.side = side;
 		this.abilities = new AbilityRegistry();
+		this.features = new FeatureRegistry();
 	}
 	
 	public static Core get(final LogicalSide side) {
@@ -71,6 +74,8 @@ public class Core implements Hub {
 	public AbilitySystem getAbility() {return abilitySys;}
 	@Override
 	public AbilityRegistry getAbilities() { return abilities; }
+	@Override
+	public FeatureRegistry getFeatures() {return features;}
 
 	@Override
 	public Optional<SubSystemConfig> getProgressionData(SubSystemConfigType systemType, ObjectType type, ResourceLocation objectID) {

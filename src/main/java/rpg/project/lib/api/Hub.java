@@ -13,6 +13,7 @@ import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.api.progression.ProgressionAddon;
 import rpg.project.lib.api.progression.ProgressionSystem;
 import rpg.project.lib.internal.registry.AbilityRegistry;
+import rpg.project.lib.internal.registry.FeatureRegistry;
 
 /**Implementations of this provide access to shared
  * features of the library.  Project RPG provides an
@@ -92,4 +93,6 @@ public interface Hub {
 	/**@return the registry containing {@link Ability} types from all addons
 	 */
 	AbilityRegistry getAbilities();
+	/**@return the registry containing all the {@link rpg.project.lib.api.feature.Feature}s from all addons.*/
+	FeatureRegistry getFeatures();
 }

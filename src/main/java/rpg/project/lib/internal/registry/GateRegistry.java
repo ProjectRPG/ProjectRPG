@@ -10,6 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.EventListenerSpecification.CancellationType;
+import rpg.project.lib.api.feature.Feature;
 import rpg.project.lib.api.gating.GateSystem;
 import rpg.project.lib.api.gating.GateUtils.Type;
 
@@ -78,17 +79,17 @@ public class GateRegistry{
 	 * If this returns falls, the feature system will not be notified
 	 * the event occurred and the feature will not execute.
 	 * 
-	 * @param corethe {@link Hub} instance to be used by consumers
+	 * @param core the {@link Hub} instance to be used by consumers
 	 * @param event the event ID used to get the correct callbacks
 	 * @param context event information provided to the gate system for evaluation
-	 * @param featureReferenceWIP
+	 * @param featureReference the feature specification being invoked
 	 * @return whether a feature is allowed to perform its function
 	 */
-	public static float isFeaturePermitted(Hub core, ResourceLocation event, EventContext context, String featureReference) {
+	public static float isFeaturePermitted(Hub core, ResourceLocation event, EventContext context, Feature featureReference) {
 		if (registeredSystems.get(Type.FEATURE).isEmpty())
 			return HARD_PASS;
 		return registeredSystems.get(Type.FEATURE).stream()
-				.map(system -> system.isActionPermitted(context, core, event, featureReference))
+				.map(system -> system.isActionPermitted(context, core, event, featureReference.featureID().toString()))
 				.min(Comparator.naturalOrder())
 				.orElse(HARD_PASS);
 	}
@@ -99,7 +100,7 @@ public class GateRegistry{
 	 * that collection independently.
 	 * 
 	 * @param player the player using the ability
-	 * @param corethe {@link Hub} instance to be used by consumers
+	 * @param core the {@link Hub} instance to be used by consumers
 	 * @param event the event ID used to get the correct callbacks
 	 * @param context event information provided to the gate system for evaluation
 	 * @param ability the ability instance being activated

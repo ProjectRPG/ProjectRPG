@@ -15,6 +15,7 @@ import rpg.project.lib.api.abilities.AbilityUtils;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.EventListenerSpecification;
 import rpg.project.lib.api.events.EventListenerSpecification.CancellationType;
+import rpg.project.lib.api.feature.Feature;
 import rpg.project.lib.builtins.EventFactories;
 import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.util.MsLoggy;
@@ -44,13 +45,12 @@ public class EventRegistry {
 		CancellationType eventCancellationStatus = GateRegistry.isEventPermitted(core, eventID, context);
 		if (eventCancellationStatus != CancellationType.NONE)
 			spec.cancellationCallback().accept(event, eventCancellationStatus);
-		
-		/*TODO Feature Gates
-		 * for (Object thing : system.getThings(hub, spec.registryID(), context)) {
-		 * 		if (GateRegistry.isThingPermitted(hub, spec.registryID(), context, thing))
-		 * 			system.executeThing(hub, spec.registryID(), context, thing);
-		 * }
-		 */
+
+		for (Feature feature : core.getFeatures().getFeaturesForContext(core, eventID, context)) {
+			float gating = GateRegistry.isFeaturePermitted(core, eventID, context, feature);
+			if (gating != GateRegistry.HARD_FAIL)
+				feature.execution().execute(core, eventID, context, gating);
+		}
 				
 		//Activate event-specific abilities
 		for (CompoundTag config : core.getAbility().getAbilitiesForContext(core, eventID, context)) {
