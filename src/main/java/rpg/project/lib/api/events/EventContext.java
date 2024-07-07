@@ -29,7 +29,7 @@ public class EventContext{
 	 * expected to never change and that doing so would create instability in the event sequence.*/
 	private final Map<LootContextParam<?>, Object> contextParams;
 	/**May be populated with initial values via {@link ContextBuilder}, however this map contains mutable values
-	 * that subsystems can add and modify with {@link #addParam(LootContextParam, Object)} and {@link #setParam(LootContextParam, Object)}.
+	 * that subsystems can add and modify with {@link #setParam(LootContextParam, Object)}.
 	 * Values in this map are typically used for event callbacks where the event exposes properties to a subsystem
 	 * expecting to then re-consume that value at some point in the event.
 	 * <h4>Note: {@link LootContextParam} keys in {@link #contextParams} will always be returned instead of the same
@@ -97,18 +97,31 @@ public class EventContext{
 	 * @param <T> the object class of the subject object.
 	 */
 	public static <T> ContextBuilder build(ResourceLocation subjectID, LootContextParam<T> subjectParam, T subject, Player actor, LevelAccessor level) {
-		return new ContextBuilder(subjectID, subjectParam, subject, actor, level);
+		return new ContextBuilder(subjectID, subjectParam, subject)
+				.withParam(LootContextParams.THIS_ENTITY, actor)
+				.withParam(LEVEL, level);
+	}
+
+	/**Creates a special {@link ContextBuilder} where the player is also the subject of the event.  This builder
+	 * is ideal for player behavior such as jumping, sprinting, breathing, healing, swimming, etc, where there is
+	 * no worldly object interacting with the player to predicate or facilitate the behavior.
+	 *
+	 * @param actor the player
+	 * @param level the level from the event.
+	 * @return a new {@link ContextBuilder}
+	 */
+	public static ContextBuilder self(Player actor, LevelAccessor level) {
+		return new ContextBuilder(ResourceLocation.withDefaultNamespace("player"), LootContextParams.THIS_ENTITY, actor)
+				.withParam(LEVEL, level);
 	}
 
 	public static class ContextBuilder {
 		private final Pair<ObjectType, ResourceLocation> subjectReference;
 		private final Map<LootContextParam<?>, Object> contextParams = new HashMap<>();
 		private final Map<LootContextParam<?>, Object> dynamicParams = new HashMap<>();
-		protected <T> ContextBuilder(ResourceLocation subjectID, LootContextParam<T> subjectParam, T subject, Player actor, LevelAccessor level) {
+		protected <T> ContextBuilder(ResourceLocation subjectID, LootContextParam<T> subjectParam, T subject) {
 			this.subjectReference = Pair.of(getType(subject), subjectID);
 			contextParams.put(subjectParam, subject);
-			contextParams.put(LootContextParams.THIS_ENTITY, actor);
-			contextParams.put(LEVEL, level);
 		}
 
 		/**Adds an immutable value to the context.  These values cannot be changed by subsystems.

@@ -77,7 +77,7 @@ public class EventFactories<T extends Event> {
 				&& context.getParam(EventContext.BREATH_CHANGE) != 0,
 		event -> {
 			int diff = event.canBreathe() ? event.getRefillAirAmount() : event.getConsumeAirAmount();
-			return EventContext.build(ResourceLocation.withDefaultNamespace("player"), LootContextParams.THIS_ENTITY, event.getEntity(), event.getEntity() instanceof Player player ? player : null, event.getEntity().level())
+			return EventContext.self(event.getEntity() instanceof Player player ? player : null, event.getEntity().level())
 				.withDynamicParam(EventContext.BREATH_CHANGE, diff).create();
 		},
 		(e, v) -> {},
