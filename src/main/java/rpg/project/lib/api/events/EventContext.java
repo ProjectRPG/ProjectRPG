@@ -84,6 +84,12 @@ public class EventContext{
 	 */
 	public Player getActor() {return (Player) contextParams.get(LootContextParams.THIS_ENTITY);}
 
+	/**A helper method for access the level associated with this context.
+	 *
+	 * @return the level associated with this event.
+	 */
+	public LevelAccessor getLevel() {return (LevelAccessor) contextParams.get(LEVEL);}
+
 	/**Creates a new {@link ContextBuilder} with the required initial properties.  Every event represents a specific
 	 * scenario in which the player interacts with a subject object.  This builder ensures the required objects for
 	 * referencing that relationship exist for reference by the subsystems.

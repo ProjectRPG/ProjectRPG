@@ -37,7 +37,7 @@ public class EventRegistry {
 		if (!spec.validEventContext().test(context))
 			return;
 
-		Core core = Core.get(context.getParam(EventContext.LEVEL));
+		Core core = Core.get(context.getLevel());
 		ResourceLocation eventID = spec.registryID();
 		MsLoggy.DEBUG.log(LOG_CODE.EVENT, "Firing Event: {} with Context: {}", eventID, context);
 		//Process EVENT gates

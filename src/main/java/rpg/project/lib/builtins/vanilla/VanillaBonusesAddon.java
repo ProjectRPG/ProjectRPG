@@ -25,14 +25,14 @@ public class VanillaBonusesAddon implements ProgressionAddon{
 				.getProgressionData(
 						VanillaBonusConfigType.IMPL, 
 						ObjectType.DIMENSION, 
-						RegistryUtil.getDimension(context.getParam(EventContext.LEVEL)))
+						RegistryUtil.getDimension(context.getLevel()))
 				.orElse(null);
 		
 		VanillaBonusConfig biomeConfig = (VanillaBonusConfig) core
 				.getProgressionData(
 						VanillaBonusConfigType.IMPL, 
 						ObjectType.BIOME, 
-						RegistryUtil.getId(context.getParam(EventContext.LEVEL).getBiome(context.getParam(LootContextParams.THIS_ENTITY).blockPosition())))
+						RegistryUtil.getId(context.getLevel().getBiome(context.getParam(LootContextParams.THIS_ENTITY).blockPosition())))
 				.orElse(null);
 		
 		List<VanillaBonusConfig> allConfigs = getItemConfigs(core, context.getActor());
