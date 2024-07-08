@@ -25,6 +25,8 @@ public class SubSystemCodecRegistry {
 		Preconditions.checkNotNull(type);
 		TYPES.put(identity, type);
 	}
+
+	public static ResourceLocation lookup(SubSystemConfigType type) {return TYPES.inverse().get(type);}
 	
 	public static record DefaultType() implements SubSystemConfigType {
 		public static final ResourceLocation ID = Reference.resource("placeholder");

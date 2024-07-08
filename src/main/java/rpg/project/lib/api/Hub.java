@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import net.minecraft.resources.ResourceLocation;
+import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.abilities.AbilitySystem;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.data.SubSystemConfig;
@@ -69,15 +70,15 @@ public interface Hub {
 	 * specified and for the configuration type.</p>
 	 * <p>Note: if no configuration for the supplied type is present
 	 * in the user's configuration files, this will return an empty
-	 * optional.</p>  
-	 * 
-	 * @param systemType the config object type being requested
+	 * list.</p>
+	 *
 	 * @param type the in-game object type.  This helps distinguish 
 	 * between objects with the same ID such as blocks and items
-	 * @param objectID the id of the object
+	 * @param objectID the id of the subject object
+	 * @param eventID the event this feature data is being invoked for
 	 * @return an optional containing the configuration, if present
 	 */
-	Optional<SubSystemConfig> getFeatureData(SubSystemConfigType systemType, ObjectType type, ResourceLocation objectID);
+	List<SubSystemConfig> getFeatureData(ObjectType type, ResourceLocation objectID, ResourceLocation eventID);
 	/**@return the active {@link PartySystem} implementation for this instance
 	 */
 	PartySystem getParty();
