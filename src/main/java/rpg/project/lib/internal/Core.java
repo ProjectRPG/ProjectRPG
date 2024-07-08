@@ -19,6 +19,7 @@ import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.api.progression.ProgressionAddon;
 import rpg.project.lib.api.progression.ProgressionSystem;
 import rpg.project.lib.internal.config.readers.DataLoader;
+import rpg.project.lib.internal.config.readers.MainSystemConfig;
 import rpg.project.lib.internal.config.readers.MergeableCodecDataManager;
 import rpg.project.lib.internal.registry.AbilityRegistry;
 import rpg.project.lib.internal.registry.FeatureRegistry;
@@ -80,24 +81,31 @@ public class Core implements Hub {
 	@Override
 	public Optional<SubSystemConfig> getProgressionData(SubSystemConfigType systemType, ObjectType type, ResourceLocation objectID) {
 		MergeableCodecDataManager<?> loader = getLoader().getLoader(type);
-		return loader.getData(objectID).progression().stream().filter(config -> config.getType().equals(systemType)).findFirst();
+		return loader.getData(objectID).progression().stream()
+				.filter(config -> config.getType().equals(systemType))
+				.reduce((a, b) -> (SubSystemConfig) a.combine(b));
 	}
 
 	@Override
 	public Optional<SubSystemConfig> getGateData(SubSystemConfigType systemType, ObjectType type, Type gateType, ResourceLocation objectID) {
 		MergeableCodecDataManager<?> loader = getLoader().getLoader(type);
-		return loader.getData(objectID).gates().getOrDefault(gateType, List.of()).stream().filter(config -> config.getType().equals(systemType)).findFirst();
+		return loader.getData(objectID).gates().getOrDefault(gateType, List.of()).stream()
+				.filter(config -> config.getType().equals(systemType))
+				.reduce((a, b) -> (SubSystemConfig) a.combine(b));
 	}
 
 	@Override
 	public Optional<SubSystemConfig> getAbilityData(SubSystemConfigType systemType, ObjectType type, ResourceLocation objectID) {
 		MergeableCodecDataManager<?> loader = getLoader().getLoader(type);
-		return loader.getData(objectID).abilities().stream().filter(config -> config.getType().equals(systemType)).findFirst();
+		return loader.getData(objectID).abilities().stream()
+				.filter(config -> config.getType().equals(systemType))
+				.reduce((a, b) -> (SubSystemConfig) a.combine(b));
 	}
 
 	@Override
-	public Optional<SubSystemConfig> getFeatureData(SubSystemConfigType systemType, ObjectType type, ResourceLocation objectID) {
+	public List<SubSystemConfig> getFeatureData(ObjectType type, ResourceLocation objectID, ResourceLocation eventID) {
 		MergeableCodecDataManager<?> loader = getLoader().getLoader(type);
-		return loader.getData(objectID).features().stream().filter(config -> config.getType().equals(systemType)).findFirst();
+		MainSystemConfig eventData = (MainSystemConfig) getLoader().EVENT_LOADER.getData(eventID).combine(loader.getData(objectID));
+		return eventData.features();
 	}
 }
