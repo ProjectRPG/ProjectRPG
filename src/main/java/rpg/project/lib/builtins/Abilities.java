@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiFunction;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -14,24 +13,22 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
-import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.abilities.AbilityFunction;
 import rpg.project.lib.api.abilities.AbilityUtils;
-import rpg.project.lib.api.enums.AbilitySide;
+import rpg.project.lib.api.enums.RegistrationSide;
 import rpg.project.lib.internal.setup.datagen.LangProvider;
 import rpg.project.lib.internal.util.Reference;
 import rpg.project.lib.internal.util.TagBuilder;
 
 public class Abilities {
 	public static void init() {
-		AbilityUtils.registerAbility(Reference.resource("break_speed"), BREAK_SPEED, AbilitySide.BOTH);
-		AbilityUtils.registerAbility(Reference.resource("effect"), EFFECT, AbilitySide.SERVER);
+		AbilityUtils.registerAbility(Reference.resource("break_speed"), BREAK_SPEED, RegistrationSide.BOTH);
+		AbilityUtils.registerAbility(Reference.resource("effect"), EFFECT, RegistrationSide.SERVER);
 	}
 
 	private static final Set<ItemAbility> DIG_ACTIONS = Set.of(ItemAbilities.PICKAXE_DIG, ItemAbilities.AXE_DIG,

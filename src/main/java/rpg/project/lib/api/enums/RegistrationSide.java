@@ -1,6 +1,6 @@
 package rpg.project.lib.api.enums;
 
-public enum AbilitySide {
+public enum RegistrationSide {
 	CLIENT,
 	SERVER,
 	BOTH

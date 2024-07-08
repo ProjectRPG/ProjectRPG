@@ -9,7 +9,7 @@ import net.neoforged.fml.LogicalSide;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import rpg.project.lib.api.data.SubSystemConfigType;
-import rpg.project.lib.api.enums.AbilitySide;
+import rpg.project.lib.api.enums.RegistrationSide;
 import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.registry.SubSystemCodecRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
@@ -69,7 +69,7 @@ public class AbilityUtils {
      * @param abilityID a custom id for your ability that can be used in abilities.json to reference this ability
      * @param side the logical sides this ability should execute on.  Your implementation should factor in sidedness to avoid crashes.
      */
-    public static void registerAbility(@NonNull ResourceLocation abilityID, @NonNull Ability ability, @NonNull AbilitySide side) {
+    public static void registerAbility(@NonNull ResourceLocation abilityID, @NonNull Ability ability, @NonNull RegistrationSide side) {
         switch (side) {
             case SERVER -> {
                 Core.get(LogicalSide.SERVER).getAbilities().registerAbility(abilityID, ability);
