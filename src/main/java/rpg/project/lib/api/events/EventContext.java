@@ -6,6 +6,9 @@ import java.util.Map;
 import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelAccessor;
@@ -44,6 +47,9 @@ public class EventContext{
 	public static final LootContextParam<LevelAccessor> LEVEL = new LootContextParam<>(Reference.resource("event_level"));
 	public static final LootContextParam<ItemStack> ITEMSTACK = new LootContextParam<>(Reference.resource("itemstack"));
 	public static final LootContextParam<Integer> BREATH_CHANGE = new LootContextParam<>(Reference.resource("breath_change"));
+	public static final LootContextParam<AgeableMob> BABY = new LootContextParam<>(Reference.resource("baby"));
+	public static final LootContextParam<Mob> PARENT_A = new LootContextParam<>(Reference.resource("parent_a"));
+	public static final LootContextParam<Mob> PARENT_B = new LootContextParam<>(Reference.resource("parent_b"));
 
 	public ObjectType getSubjectType() {return subjectObject.getFirst();}
 	public ResourceLocation getSubjectID() {return subjectObject.getSecond();}

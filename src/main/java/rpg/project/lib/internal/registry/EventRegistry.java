@@ -4,7 +4,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.Event;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.enchanting.EnchantmentLevelSetEvent;
+import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingBreatheEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -84,8 +87,11 @@ public class EventRegistry {
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<PlayerEvent.BreakSpeed>> BREAK_SPEED = register(EventFactories.BREAK_SPEED);
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<LivingBreatheEvent>> BREATH_CHANGE = register(EventFactories.BREATH_CHANGE);
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<PlayerEvent.ItemCraftedEvent>> ITEM_CRAFTED = register(EventFactories.CRAFT);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<EnchantmentLevelSetEvent>> ITEM_ENCHANT = register(EventFactories.ENCHANT);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<BabyEntitySpawnEvent>> BREED = register(EventFactories.BREED);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<LivingEntityUseItemEvent.Finish>> CONSUME = register(EventFactories.CONSUME);
 
 	public static <T extends Event> DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<T>> register(EventFactories<T> factory) {
-		return EVENTS.register(factory.id, factory::getFactory);
+		return EVENTS.register(factory.id, factory::getSpec);
 	}
 }

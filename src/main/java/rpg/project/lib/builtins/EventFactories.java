@@ -1,13 +1,18 @@
 package rpg.project.lib.builtins;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.ICancellableEvent;
+import net.neoforged.neoforge.event.brewing.PotionBrewEvent;
+import net.neoforged.neoforge.event.enchanting.EnchantmentLevelSetEvent;
+import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingBreatheEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -87,9 +92,28 @@ public class EventFactories<T extends Event> {
 			else event.setConsumeAirAmount(change);
 		}
 	));
-//	BREED("taming", null),
-//	BREW("alchemy", null),
-//	CONSUME("cooking", null),
+	public static final EventFactories<BabyEntitySpawnEvent> BREED = new EventFactories<>("breed_animal", id -> new EventListenerSpecification<>(
+			Reference.resource(id),
+			EventPriority.LOWEST,
+			BabyEntitySpawnEvent.class,
+			context -> true,
+			event -> EventContext.build(RegistryUtil.getId(event.getChild()), EventContext.BABY, event.getChild(), event.getCausedByPlayer(), event.getCausedByPlayer().level())
+					.withParam(EventContext.PARENT_A, event.getParentA())
+					.withParam(EventContext.PARENT_B, event.getParentB()).create(),
+			EventFactories::fullCancel,
+			(e, v) -> {}
+	));
+//	public static final EventFactories<PotionBrewEvent> BREW = new EventFactories<>("brew_potion", id -> null);
+	public static final EventFactories<LivingEntityUseItemEvent.Finish> CONSUME = new EventFactories<>("consume", id -> new EventListenerSpecification<>(
+		Reference.resource(id),
+		EventPriority.LOWEST,
+		LivingEntityUseItemEvent.Finish.class,
+		context -> context.getActor() instanceof Player player
+					&& context.getParam(EventContext.ITEMSTACK).getFoodProperties(player) != null,
+		event -> EventContext.build(RegistryUtil.getId(event.getItem()), EventContext.ITEMSTACK, event.getItem(), event.getEntity() instanceof Player player ? player : null, event.getEntity().level()).create(),
+		(e,v) -> {},
+		(e,v) -> {}
+));
 	public static final EventFactories<PlayerEvent.ItemCraftedEvent> CRAFT = new EventFactories<>("item_crafted", id -> new EventListenerSpecification<>(
 		Reference.resource("item_crafted"),
 		EventPriority.LOWEST,
@@ -103,7 +127,20 @@ public class EventFactories<T extends Event> {
 //	DEAL_DAMAGE("combat", null),
 //	MITIGATE_DAMAGE("combat", null),
 //	DEATH("endurance", null),
-//	ENCHANT("magic", null),
+	//TODO replace this shit with something better.  This might be a candidate for an addon that can add the mixin/patch, unless NF adds it first.
+	public static final EventFactories<EnchantmentLevelSetEvent> ENCHANT = new EventFactories<>("enchant_item", id -> new EventListenerSpecification<>(
+		Reference.resource(id),
+		EventPriority.LOWEST,
+		EnchantmentLevelSetEvent.class,
+		context -> context.getActor() != null,
+		event -> EventContext.build(RegistryUtil.getId(event.getItem()), EventContext.ITEMSTACK, event.getItem(),
+				event.getLevel().getEntitiesOfClass(Player.class,
+						AABB.ofSize(event.getPos().getCenter(), 5, 5, 5),
+					   p -> p.hasContainerOpen() && p.containerMenu.getType().equals(MenuType.ENCHANTMENT))
+						.stream().findFirst().orElse(null), event.getLevel()).create(),
+		(e,v) -> {},
+		(e,v) -> {}
+	));
 //	EFFECT("magic", null),
 //	FISH("fishing", null),
 //	SMELT("smithing", null),
@@ -131,13 +168,13 @@ public class EventFactories<T extends Event> {
 //	SWIM_SPRINTING("swimming", null),
 //	TAMING("taming", null);
 
-	public EventListenerSpecification<T> factory;
+	public EventListenerSpecification<T> spec;
 	public String id;
 	protected EventFactories(String id, Function<String, EventListenerSpecification<T>> factory) {
 		this.id = id;
-		this.factory = factory.apply(id);
+		this.spec = factory.apply(id);
 	}
-	public EventListenerSpecification<T> getFactory() {return factory;}
+	public EventListenerSpecification<T> getSpec() {return spec;}
 
 	public static void fullCancel(ICancellableEvent event, EventListenerSpecification.CancellationType cancelType) {
 		event.setCanceled(true);

@@ -4,7 +4,8 @@
     {"type":"minecraft:progression",
      "events": {
        "projectrpg:anvil_repair":10000,
-       "projectrpg:item_crafted":30
+       "projectrpg:item_crafted":30,
+       "projectrpg:enchant_item": 5000
     }}
  ]
 }
