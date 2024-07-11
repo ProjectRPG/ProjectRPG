@@ -8,6 +8,7 @@ import net.neoforged.neoforge.event.enchanting.EnchantmentLevelSetEvent;
 import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingBreatheEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -38,7 +39,7 @@ public class EventRegistry {
 	public static <T extends Event> void internalEventLogic(T event, EventListenerSpecification<T> spec) {
 		EventContext context = spec.contextFactory().apply(event);
 		//exit if this event is not situation-applicable for the eventID and specification.
-		if (!spec.validEventContext().test(context))
+		if (context.getActor() == null || !spec.validEventContext().test(context))
 			return;
 
 		Core core = Core.get(context.getLevel());
@@ -90,6 +91,7 @@ public class EventRegistry {
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<EnchantmentLevelSetEvent>> ITEM_ENCHANT = register(EventFactories.ENCHANT);
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<BabyEntitySpawnEvent>> BREED = register(EventFactories.BREED);
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<LivingEntityUseItemEvent.Finish>> CONSUME = register(EventFactories.CONSUME);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<MobEffectEvent.Applicable>> ADD_EFFECT = register(EventFactories.EFFECT);
 
 	public static <T extends Event> DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<T>> register(EventFactories<T> factory) {
 		return EVENTS.register(factory.id, factory::getSpec);
