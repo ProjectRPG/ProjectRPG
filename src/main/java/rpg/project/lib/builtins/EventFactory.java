@@ -15,6 +15,7 @@ import net.neoforged.neoforge.event.entity.living.LivingBreatheEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
+import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import rpg.project.lib.api.abilities.AbilityUtils;
@@ -150,7 +151,15 @@ public record EventFactory<T extends Event>(String id, EventListenerSpecificatio
 		(event, c) -> event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY),
 		(e, v) -> {}
 	));
-//	FISH("fishing", null),
+	public static final EventFactory<ItemFishedEvent> FISH = new EventFactory<>("player_fish", id -> new EventListenerSpecification<>(
+			Reference.resource(id),
+			EventPriority.LOWEST,
+			ItemFishedEvent.class,
+			context -> true,
+			event -> EventContext.build(RegistryUtil.getId(event.getDrops().getFirst()), EventContext.ITEMSTACK, event.getDrops().getFirst(), event.getEntity(), event.getEntity().level()).create(),
+			EventFactory::fullCancel,
+			(e, c) -> {}
+	));
 //	SMELT("smithing", null),
 //	GROW("farming", null),
 //	HEALTH_CHANGE("", null),
