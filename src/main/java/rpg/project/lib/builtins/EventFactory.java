@@ -9,7 +9,6 @@ import net.minecraft.world.phys.AABB;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.ICancellableEvent;
-import net.neoforged.neoforge.event.brewing.PotionBrewEvent;
 import net.neoforged.neoforge.event.enchanting.EnchantmentLevelSetEvent;
 import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingBreatheEvent;
@@ -32,8 +31,8 @@ import java.util.function.Function;
  * {@link rpg.project.lib.internal.registry.EventRegistry EventRegistry}
  * for relevant ecosystem events.
  */
-public class EventFactories<T extends Event> {
-	public static final EventFactories<AnvilRepairEvent> ANVIL_REPAIR = new EventFactories<>("anvil_repair", id -> new EventListenerSpecification<>(
+public record EventFactory<T extends Event>(String id, EventListenerSpecification<T> spec) {
+	public static final EventFactory<AnvilRepairEvent> ANVIL_REPAIR = new EventFactory<>("anvil_repair", id -> new EventListenerSpecification<>(
 		Reference.resource(id),
 		EventPriority.LOWEST,
 		AnvilRepairEvent.class,
@@ -42,40 +41,40 @@ public class EventFactories<T extends Event> {
 		(e, v) -> {},
 		(event, vars) -> {}
 	));
-	public static final EventFactories<BlockEvent.BreakEvent> BLOCK_BREAK = new EventFactories<>("break_block", id -> new EventListenerSpecification<>(
+	public static final EventFactory<BlockEvent.BreakEvent> BLOCK_BREAK = new EventFactory<>("break_block", id -> new EventListenerSpecification<>(
 		Reference.resource(id),
 		EventPriority.LOWEST,
 		BlockEvent.BreakEvent.class,
 		context -> context.getParam(LootContextParams.THIS_ENTITY) instanceof Player,
 		event -> EventContext.build(RegistryUtil.getId(event.getState()), LootContextParams.BLOCK_STATE, event.getState(), event.getPlayer(), event.getLevel())
 				.withParam(LootContextParams.ORIGIN, event.getPos().getCenter()).create(),
-		EventFactories::fullCancel,
+		EventFactory::fullCancel,
 		(event, vars) -> {}
 	));
-	public static final EventFactories<PlayerEvent.BreakSpeed> BREAK_SPEED = new EventFactories<>("break_speed", id -> new EventListenerSpecification<>(
+	public static final EventFactory<PlayerEvent.BreakSpeed> BREAK_SPEED = new EventFactory<>("break_speed", id -> new EventListenerSpecification<>(
 		Reference.resource(id),
 		EventPriority.LOWEST,
 		PlayerEvent.BreakSpeed.class,
 		context -> true,
 		event -> EventContext.build(RegistryUtil.getId(event.getState()), LootContextParams.BLOCK_STATE, event.getState(), event.getEntity(), event.getEntity().level())
 				.withParam(LootContextParams.ORIGIN, event.getPosition().orElse(BlockPos.ZERO).getCenter()).create(),
-		EventFactories::fullCancel,
+		EventFactory::fullCancel,
 		(event, context) -> {
 			if (context.hasParam(AbilityUtils.BREAK_SPEED_OUTPUT_VALUE))
 				event.setNewSpeed(context.getParam(AbilityUtils.BREAK_SPEED_OUTPUT_VALUE));
 		}
 	));
-	public static final EventFactories<BlockEvent.EntityPlaceEvent> BLOCK_PLACE = new EventFactories<>("place_block", id -> new EventListenerSpecification<>(
+	public static final EventFactory<BlockEvent.EntityPlaceEvent> BLOCK_PLACE = new EventFactory<>("place_block", id -> new EventListenerSpecification<>(
 		Reference.resource(id),
 		EventPriority.LOWEST,
 		BlockEvent.EntityPlaceEvent.class,
 		context -> true,
 		event -> EventContext.build(RegistryUtil.getId(event.getState()), LootContextParams.BLOCK_STATE, event.getState(), orNull(event.getEntity()), event.getLevel())
 				.withParam(LootContextParams.ORIGIN, event.getPos().getCenter()).create(),
-		EventFactories::fullCancel,
+		EventFactory::fullCancel,
 		(event, vars) -> {}
 	));
-	public static final EventFactories<LivingBreatheEvent> BREATH_CHANGE = new EventFactories<>("breath_change", id -> new EventListenerSpecification<>(
+	public static final EventFactory<LivingBreatheEvent> BREATH_CHANGE = new EventFactory<>("breath_change", id -> new EventListenerSpecification<>(
 		Reference.resource(id),
 		EventPriority.LOWEST,
 		LivingBreatheEvent.class,
@@ -93,7 +92,7 @@ public class EventFactories<T extends Event> {
 			else event.setConsumeAirAmount(change);
 		}
 	));
-	public static final EventFactories<BabyEntitySpawnEvent> BREED = new EventFactories<>("breed_animal", id -> new EventListenerSpecification<>(
+	public static final EventFactory<BabyEntitySpawnEvent> BREED = new EventFactory<>("breed_animal", id -> new EventListenerSpecification<>(
 			Reference.resource(id),
 			EventPriority.LOWEST,
 			BabyEntitySpawnEvent.class,
@@ -101,11 +100,11 @@ public class EventFactories<T extends Event> {
 			event -> EventContext.build(RegistryUtil.getId(event.getChild()), EventContext.BABY, event.getChild(), event.getCausedByPlayer(), event.getCausedByPlayer().level())
 					.withParam(EventContext.PARENT_A, event.getParentA())
 					.withParam(EventContext.PARENT_B, event.getParentB()).create(),
-			EventFactories::fullCancel,
+			EventFactory::fullCancel,
 			(e, v) -> {}
 	));
 //	public static final EventFactories<PotionBrewEvent> BREW = new EventFactories<>("brew_potion", id -> null);
-	public static final EventFactories<LivingEntityUseItemEvent.Finish> CONSUME = new EventFactories<>("consume", id -> new EventListenerSpecification<>(
+	public static final EventFactory<LivingEntityUseItemEvent.Finish> CONSUME = new EventFactory<>("consume", id -> new EventListenerSpecification<>(
 		Reference.resource(id),
 		EventPriority.LOWEST,
 		LivingEntityUseItemEvent.Finish.class,
@@ -114,7 +113,7 @@ public class EventFactories<T extends Event> {
 		(e,v) -> {},
 		(e,v) -> {}
 ));
-	public static final EventFactories<PlayerEvent.ItemCraftedEvent> CRAFT = new EventFactories<>("item_crafted", id -> new EventListenerSpecification<>(
+	public static final EventFactory<PlayerEvent.ItemCraftedEvent> CRAFT = new EventFactory<>("item_crafted", id -> new EventListenerSpecification<>(
 		Reference.resource("item_crafted"),
 		EventPriority.LOWEST,
 		PlayerEvent.ItemCraftedEvent.class,
@@ -128,7 +127,7 @@ public class EventFactories<T extends Event> {
 //	MITIGATE_DAMAGE("combat", null),
 //	DEATH("endurance", null),
 	//TODO replace this shit with something better.  This might be a candidate for an addon that can add the mixin/patch, unless NF adds it first.
-	public static final EventFactories<EnchantmentLevelSetEvent> ENCHANT = new EventFactories<>("enchant_item", id -> new EventListenerSpecification<>(
+	public static final EventFactory<EnchantmentLevelSetEvent> ENCHANT = new EventFactory<>("enchant_item", id -> new EventListenerSpecification<>(
 		Reference.resource(id),
 		EventPriority.LOWEST,
 		EnchantmentLevelSetEvent.class,
@@ -141,7 +140,7 @@ public class EventFactories<T extends Event> {
 		(e,v) -> {},
 		(e,v) -> {}
 	));
-	public static final EventFactories<MobEffectEvent.Applicable> EFFECT = new EventFactories<>("effect_added", id -> new EventListenerSpecification<>(
+	public static final EventFactory<MobEffectEvent.Applicable> EFFECT = new EventFactory<>("effect_added", id -> new EventListenerSpecification<>(
 		Reference.resource(id),
 		EventPriority.LOWEST,
 		MobEffectEvent.Applicable.class,
@@ -177,13 +176,9 @@ public class EventFactories<T extends Event> {
 //	SWIM_SPRINTING("swimming", null),
 //	TAMING("taming", null);
 
-	public EventListenerSpecification<T> spec;
-	public String id;
-	protected EventFactories(String id, Function<String, EventListenerSpecification<T>> factory) {
-		this.id = id;
-		this.spec = factory.apply(id);
+	private EventFactory(String id, Function<String, EventListenerSpecification<T>> factory) {
+		this(id, factory.apply(id));
 	}
-	public EventListenerSpecification<T> getSpec() {return spec;}
 
 	private static Player orNull(Entity entity) {
 		return entity instanceof Player player ? player : null;

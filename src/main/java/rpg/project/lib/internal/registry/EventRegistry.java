@@ -20,7 +20,7 @@ import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.EventListenerSpecification;
 import rpg.project.lib.api.events.EventListenerSpecification.CancellationType;
 import rpg.project.lib.api.feature.Feature;
-import rpg.project.lib.builtins.EventFactories;
+import rpg.project.lib.builtins.EventFactory;
 import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.util.MsLoggy;
 import rpg.project.lib.internal.util.Reference;
@@ -82,18 +82,18 @@ public class EventRegistry {
 	public static final DeferredRegister<EventListenerSpecification<?>> EVENTS = DeferredRegister.create(APIUtils.GAMEPLAY_EVENTS, Reference.MODID);
 	//public static final Supplier<IForgeRegistry<EventListenerSpecification<?>>> REGISTRY_SUPPLIER = EVENTS.makeRegistry(RegistryBuilder::create);
 	
-	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<BlockEvent.BreakEvent>> BREAK = register(EventFactories.BLOCK_BREAK);
-	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<BlockEvent.EntityPlaceEvent>> PLACE = register(EventFactories.BLOCK_PLACE);
-	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<AnvilRepairEvent>> ANVIL_REPAIR = register(EventFactories.ANVIL_REPAIR);
-	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<PlayerEvent.BreakSpeed>> BREAK_SPEED = register(EventFactories.BREAK_SPEED);
-	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<LivingBreatheEvent>> BREATH_CHANGE = register(EventFactories.BREATH_CHANGE);
-	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<PlayerEvent.ItemCraftedEvent>> ITEM_CRAFTED = register(EventFactories.CRAFT);
-	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<EnchantmentLevelSetEvent>> ITEM_ENCHANT = register(EventFactories.ENCHANT);
-	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<BabyEntitySpawnEvent>> BREED = register(EventFactories.BREED);
-	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<LivingEntityUseItemEvent.Finish>> CONSUME = register(EventFactories.CONSUME);
-	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<MobEffectEvent.Applicable>> ADD_EFFECT = register(EventFactories.EFFECT);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<BlockEvent.BreakEvent>> BREAK = register(EventFactory.BLOCK_BREAK);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<BlockEvent.EntityPlaceEvent>> PLACE = register(EventFactory.BLOCK_PLACE);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<AnvilRepairEvent>> ANVIL_REPAIR = register(EventFactory.ANVIL_REPAIR);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<PlayerEvent.BreakSpeed>> BREAK_SPEED = register(EventFactory.BREAK_SPEED);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<LivingBreatheEvent>> BREATH_CHANGE = register(EventFactory.BREATH_CHANGE);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<PlayerEvent.ItemCraftedEvent>> ITEM_CRAFTED = register(EventFactory.CRAFT);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<EnchantmentLevelSetEvent>> ITEM_ENCHANT = register(EventFactory.ENCHANT);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<BabyEntitySpawnEvent>> BREED = register(EventFactory.BREED);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<LivingEntityUseItemEvent.Finish>> CONSUME = register(EventFactory.CONSUME);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<MobEffectEvent.Applicable>> ADD_EFFECT = register(EventFactory.EFFECT);
 
-	public static <T extends Event> DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<T>> register(EventFactories<T> factory) {
-		return EVENTS.register(factory.id, factory::getSpec);
+	public static <T extends Event> DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<T>> register(EventFactory<T> factory) {
+		return EVENTS.register(factory.id(), factory::spec);
 	}
 }
