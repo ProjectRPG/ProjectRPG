@@ -33,7 +33,7 @@ public class RegistryUtil {
 		return BuiltInRegistries.BLOCK.getKey(block);
 	}
 
-	public static ResourceLocation getId(Holder<Biome> biome) {
+	public static ResourceLocation getId(Holder<?> biome) {
 		return biome.unwrapKey().get().location();
 	}
 
@@ -51,13 +51,5 @@ public class RegistryUtil {
 
 	public static ResourceLocation getDimension(LevelAccessor level) {
 		return level.registryAccess().registryOrThrow(Registries.DIMENSION_TYPE).getKey(level.dimensionType());
-	}
-	
-//	public static ResourceLocation getId(Enchantment enchant) {
-//		return ;
-//	}
-
-	public static ResourceLocation getId(MobEffect effect) {
-		return BuiltInRegistries.MOB_EFFECT.getKey(effect);
 	}
 }
