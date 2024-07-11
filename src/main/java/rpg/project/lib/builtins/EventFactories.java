@@ -1,6 +1,7 @@
 package rpg.project.lib.builtins;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -13,6 +14,7 @@ import net.neoforged.neoforge.event.enchanting.EnchantmentLevelSetEvent;
 import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingBreatheEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -67,8 +69,8 @@ public class EventFactories<T extends Event> {
 		Reference.resource(id),
 		EventPriority.LOWEST,
 		BlockEvent.EntityPlaceEvent.class,
-		context -> context.getParam(LootContextParams.THIS_ENTITY) instanceof Player,
-		event -> EventContext.build(RegistryUtil.getId(event.getState()), LootContextParams.BLOCK_STATE, event.getState(), (Player) event.getEntity(), event.getLevel())
+		context -> true,
+		event -> EventContext.build(RegistryUtil.getId(event.getState()), LootContextParams.BLOCK_STATE, event.getState(), orNull(event.getEntity()), event.getLevel())
 				.withParam(LootContextParams.ORIGIN, event.getPos().getCenter()).create(),
 		EventFactories::fullCancel,
 		(event, vars) -> {}
@@ -77,12 +79,11 @@ public class EventFactories<T extends Event> {
 		Reference.resource(id),
 		EventPriority.LOWEST,
 		LivingBreatheEvent.class,
-		context -> context.getParam(LootContextParams.THIS_ENTITY) instanceof Player player
-				&& player.tickCount % 10 == 0
+		context -> context.getActor().tickCount % 10 == 0
 				&& context.getParam(EventContext.BREATH_CHANGE) != 0,
 		event -> {
 			int diff = event.canBreathe() ? event.getRefillAirAmount() : event.getConsumeAirAmount();
-			return EventContext.self(event.getEntity() instanceof Player player ? player : null, event.getEntity().level())
+			return EventContext.self(orNull(event.getEntity()), event.getEntity().level())
 				.withDynamicParam(EventContext.BREATH_CHANGE, diff).create();
 		},
 		(e, v) -> {},
@@ -108,9 +109,8 @@ public class EventFactories<T extends Event> {
 		Reference.resource(id),
 		EventPriority.LOWEST,
 		LivingEntityUseItemEvent.Finish.class,
-		context -> context.getActor() instanceof Player player
-					&& context.getParam(EventContext.ITEMSTACK).getFoodProperties(player) != null,
-		event -> EventContext.build(RegistryUtil.getId(event.getItem()), EventContext.ITEMSTACK, event.getItem(), event.getEntity() instanceof Player player ? player : null, event.getEntity().level()).create(),
+		context -> context.getParam(EventContext.ITEMSTACK).getFoodProperties(context.getActor()) != null,
+		event -> EventContext.build(RegistryUtil.getId(event.getItem()), EventContext.ITEMSTACK, event.getItem(), orNull(event.getEntity()), event.getEntity().level()).create(),
 		(e,v) -> {},
 		(e,v) -> {}
 ));
@@ -132,7 +132,7 @@ public class EventFactories<T extends Event> {
 		Reference.resource(id),
 		EventPriority.LOWEST,
 		EnchantmentLevelSetEvent.class,
-		context -> context.getActor() != null,
+		context -> true,
 		event -> EventContext.build(RegistryUtil.getId(event.getItem()), EventContext.ITEMSTACK, event.getItem(),
 				event.getLevel().getEntitiesOfClass(Player.class,
 						AABB.ofSize(event.getPos().getCenter(), 5, 5, 5),
@@ -141,7 +141,16 @@ public class EventFactories<T extends Event> {
 		(e,v) -> {},
 		(e,v) -> {}
 	));
-//	EFFECT("magic", null),
+	public static final EventFactories<MobEffectEvent.Applicable> EFFECT = new EventFactories<>("effect_added", id -> new EventListenerSpecification<>(
+		Reference.resource(id),
+		EventPriority.LOWEST,
+		MobEffectEvent.Applicable.class,
+		context -> !context.getParam(EventContext.CANCELLED),
+		event -> EventContext.build(RegistryUtil.getId(event.getEffectInstance().getEffect()), EventContext.MOB_EFFECT, event.getEffectInstance(), orNull(event.getEntity()), event.getEntity().level())
+				.withParam(EventContext.CANCELLED, event.getResult() == MobEffectEvent.Applicable.Result.DO_NOT_APPLY).create(),
+		(event, c) -> event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY),
+		(e, v) -> {}
+	));
 //	FISH("fishing", null),
 //	SMELT("smithing", null),
 //	GROW("farming", null),
@@ -175,6 +184,10 @@ public class EventFactories<T extends Event> {
 		this.spec = factory.apply(id);
 	}
 	public EventListenerSpecification<T> getSpec() {return spec;}
+
+	private static Player orNull(Entity entity) {
+		return entity instanceof Player player ? player : null;
+	}
 
 	public static void fullCancel(ICancellableEvent event, EventListenerSpecification.CancellationType cancelType) {
 		event.setCanceled(true);

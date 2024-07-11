@@ -1,0 +1,9 @@
+{"replace":false,
+ "copyTo":[],
+ "progression": [
+    {"type":"minecraft:progression",
+     "events": {
+       "projectrpg:effect_added":50
+    }}
+ ]
+}
