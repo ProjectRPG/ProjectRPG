@@ -6,6 +6,8 @@ import java.util.Map;
 import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.Animal;
@@ -17,6 +19,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import org.jetbrains.annotations.Nullable;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.data.DataObject;
+import rpg.project.lib.internal.util.MsLoggy;
 import rpg.project.lib.internal.util.Reference;
 
 /**Contains a key-value pair system for storing, retrieving, and modifying values related to events.  Interacting
@@ -50,6 +53,8 @@ public class EventContext{
 	public static final LootContextParam<AgeableMob> BABY = new LootContextParam<>(Reference.resource("baby"));
 	public static final LootContextParam<Mob> PARENT_A = new LootContextParam<>(Reference.resource("parent_a"));
 	public static final LootContextParam<Mob> PARENT_B = new LootContextParam<>(Reference.resource("parent_b"));
+	public static final LootContextParam<MobEffectInstance> MOB_EFFECT = new LootContextParam<>(Reference.resource("mob_effect"));
+	public static final LootContextParam<Boolean> CANCELLED = new LootContextParam<>(Reference.resource("event_cancelled"));
 
 	public ObjectType getSubjectType() {return subjectObject.getFirst();}
 	public ResourceLocation getSubjectID() {return subjectObject.getSecond();}
@@ -125,6 +130,15 @@ public class EventContext{
 	public static ContextBuilder self(Player actor, LevelAccessor level) {
 		return new ContextBuilder(ResourceLocation.withDefaultNamespace("player"), LootContextParams.THIS_ENTITY, actor)
 				.withParam(LEVEL, level);
+	}
+
+	@Override
+	public String toString() {
+		return "EventContext{" +
+				"subjectObject=" + subjectObject +
+				", contextParams=" + MsLoggy.mapToString(contextParams) +
+				", dynamicParams=" + MsLoggy.mapToString(dynamicParams) +
+				'}';
 	}
 
 	public static class ContextBuilder {
