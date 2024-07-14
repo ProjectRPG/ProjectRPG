@@ -7,6 +7,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.enchanting.EnchantmentLevelSetEvent;
 import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingBreatheEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
@@ -94,6 +95,7 @@ public class EventRegistry {
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<LivingEntityUseItemEvent.Finish>> CONSUME = register(EventFactory.CONSUME);
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<MobEffectEvent.Applicable>> ADD_EFFECT = register(EventFactory.EFFECT);
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<ItemFishedEvent>> FISH = register(EventFactory.FISH);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<LivingDeathEvent>> DEATH = register(EventFactory.DEATH);
 
 	public static <T extends Event> DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<T>> register(EventFactory<T> factory) {
 		return EVENTS.register(factory.id(), factory::spec);

@@ -12,6 +12,7 @@ import net.neoforged.bus.api.ICancellableEvent;
 import net.neoforged.neoforge.event.enchanting.EnchantmentLevelSetEvent;
 import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingBreatheEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
@@ -126,7 +127,15 @@ public record EventFactory<T extends Event>(String id, EventListenerSpecificatio
 //	RECEIVE_DAMAGE("endurance", null),
 //	DEAL_DAMAGE("combat", null),
 //	MITIGATE_DAMAGE("combat", null),
-//	DEATH("endurance", null),
+	public static final EventFactory<LivingDeathEvent> DEATH = new EventFactory<>("on_death", id -> new EventListenerSpecification<>(
+		Reference.resource(id),
+		EventPriority.LOWEST,
+		LivingDeathEvent.class,
+		context -> true,
+		event -> EventContext.build(RegistryUtil.getId(event.getEntity()), LootContextParams.THIS_ENTITY, event.getEntity(), orNull(event.getSource().getEntity()), event.getEntity().level()).create(),
+		EventFactory::fullCancel,
+		(e, v) -> {}
+	));
 	//TODO replace this shit with something better.  This might be a candidate for an addon that can add the mixin/patch, unless NF adds it first.
 	public static final EventFactory<EnchantmentLevelSetEvent> ENCHANT = new EventFactory<>("enchant_item", id -> new EventListenerSpecification<>(
 		Reference.resource(id),
