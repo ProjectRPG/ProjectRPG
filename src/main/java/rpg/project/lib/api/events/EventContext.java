@@ -6,16 +6,13 @@ import java.util.Map;
 import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import org.jetbrains.annotations.Nullable;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.data.DataObject;
@@ -47,6 +44,7 @@ public class EventContext{
 		this.contextParams = contextParams;
 		this.dynamicParams = dynamicParams;
 	}
+	public static final LootContextParam<Player> PLAYER = new LootContextParam<>(Reference.resource("actor"));
 	public static final LootContextParam<LevelAccessor> LEVEL = new LootContextParam<>(Reference.resource("event_level"));
 	public static final LootContextParam<ItemStack> ITEMSTACK = new LootContextParam<>(Reference.resource("itemstack"));
 	public static final LootContextParam<Integer> BREATH_CHANGE = new LootContextParam<>(Reference.resource("breath_change"));
@@ -93,7 +91,7 @@ public class EventContext{
 	 *
 	 * @return the player associated with this event.
 	 */
-	public Player getActor() {return (Player) contextParams.get(LootContextParams.THIS_ENTITY);}
+	public Player getActor() {return (Player) contextParams.get(PLAYER);}
 
 	/**A helper method for access the level associated with this context.
 	 *
@@ -115,7 +113,7 @@ public class EventContext{
 	 */
 	public static <T> ContextBuilder build(ResourceLocation subjectID, LootContextParam<T> subjectParam, T subject, Player actor, LevelAccessor level) {
 		return new ContextBuilder(subjectID, subjectParam, subject)
-				.withParam(LootContextParams.THIS_ENTITY, actor)
+				.withParam(PLAYER, actor)
 				.withParam(LEVEL, level);
 	}
 
@@ -128,7 +126,7 @@ public class EventContext{
 	 * @return a new {@link ContextBuilder}
 	 */
 	public static ContextBuilder self(Player actor, LevelAccessor level) {
-		return new ContextBuilder(ResourceLocation.withDefaultNamespace("player"), LootContextParams.THIS_ENTITY, actor)
+		return new ContextBuilder(ResourceLocation.withDefaultNamespace("player"), PLAYER, actor)
 				.withParam(LEVEL, level);
 	}
 
