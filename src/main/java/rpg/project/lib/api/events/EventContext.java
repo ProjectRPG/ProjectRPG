@@ -53,7 +53,7 @@ public class EventContext{
 	public static final LootContextParam<Mob> PARENT_B = new LootContextParam<>(Reference.resource("parent_b"));
 	public static final LootContextParam<MobEffectInstance> MOB_EFFECT = new LootContextParam<>(Reference.resource("mob_effect"));
 	public static final LootContextParam<Boolean> CANCELLED = new LootContextParam<>(Reference.resource("event_cancelled"));
-	public static final LootContextParam<Float> HEALTH_CHANGE = new LootContextParam<>(Reference.resource("health_change"));
+	public static final LootContextParam<Float> CHANGE_AMOUNT = new LootContextParam<>(Reference.resource("amount_changed"));
 
 	public ObjectType getSubjectType() {return subjectObject.getFirst();}
 	public ResourceLocation getSubjectID() {return subjectObject.getSecond();}

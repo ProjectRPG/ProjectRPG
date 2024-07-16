@@ -3,18 +3,15 @@ package rpg.project.lib.builtins;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraft.world.phys.AABB;
-import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.ICancellableEvent;
 import net.neoforged.neoforge.event.brewing.PlayerBrewedPotionEvent;
-import net.neoforged.neoforge.event.enchanting.EnchantmentLevelSetEvent;
 import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingBreatheEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import net.neoforged.neoforge.event.entity.living.LivingHealEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
@@ -28,10 +25,9 @@ import rpg.project.lib.api.events.EventListenerSpecification;
 import rpg.project.lib.internal.util.Reference;
 import rpg.project.lib.internal.util.RegistryUtil;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 
 /**Contains default factories for translating 
  * {@link net.neoforged.bus.api.Event Event}s
@@ -40,15 +36,15 @@ import java.util.function.Function;
  * for relevant ecosystem events.
  */
 public class EventFactories {
-	private static final Map<String, Function<String, EventListenerSpecification<?>>> VALUES = new HashMap<>();
+	private static final List<EventListenerSpecification<?>> VALUES = new ArrayList<>();
 
 	public static void registerEvents(DeferredRegister<EventListenerSpecification<?>> registry) {
-		VALUES.forEach((id, func) -> registry.register(id, () -> func.apply(id)));
+		VALUES.forEach(spec -> registry.register(spec.registryID().getPath(), () -> spec));
 	}
 
 	static {
-		VALUES.put("anvil_repair", id -> new EventListenerSpecification<>(
-				Reference.resource(id),
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("anvil_repair"),
 				EventPriority.LOWEST,
 				AnvilRepairEvent.class,
 				context -> true,
@@ -56,8 +52,8 @@ public class EventFactories {
 				(e, v) -> {},
 				(event, vars) -> {}
 		));
-		VALUES.put("break_block", id -> new EventListenerSpecification<>(
-				Reference.resource(id),
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("break_block"),
 				EventPriority.LOWEST,
 				BlockEvent.BreakEvent.class,
 				context -> context.getParam(LootContextParams.THIS_ENTITY) instanceof Player,
@@ -66,8 +62,8 @@ public class EventFactories {
 				EventFactories::fullCancel,
 				(event, vars) -> {}
 		));
-		VALUES.put("break_speed", id -> new EventListenerSpecification<>(
-				Reference.resource(id),
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("break_speed"),
 				EventPriority.LOWEST,
 				PlayerEvent.BreakSpeed.class,
 				context -> true,
@@ -79,8 +75,8 @@ public class EventFactories {
 						event.setNewSpeed(context.getParam(AbilityUtils.BREAK_SPEED_OUTPUT_VALUE));
 				}
 		));
-		VALUES.put("place_block", id -> new EventListenerSpecification<>(
-				Reference.resource(id),
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("place_block"),
 				EventPriority.LOWEST,
 				BlockEvent.EntityPlaceEvent.class,
 				context -> true,
@@ -89,8 +85,8 @@ public class EventFactories {
 				EventFactories::fullCancel,
 				(event, vars) -> {}
 		));
-		VALUES.put("breath_change", id -> new EventListenerSpecification<>(
-				Reference.resource(id),
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("breath_change"),
 				EventPriority.LOWEST,
 				LivingBreatheEvent.class,
 				context -> context.getActor().tickCount % 10 == 0
@@ -107,8 +103,8 @@ public class EventFactories {
 					else event.setConsumeAirAmount(change);
 				}
 		));
-		VALUES.put("breed_animal", id -> new EventListenerSpecification<>(
-				Reference.resource(id),
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("breed_animal"),
 				EventPriority.LOWEST,
 				BabyEntitySpawnEvent.class,
 				context -> true,
@@ -118,8 +114,8 @@ public class EventFactories {
 				EventFactories::fullCancel,
 				(e, v) -> {}
 		));
-		VALUES.put("brew_potion", id -> new EventListenerSpecification<>(
-				Reference.resource(id),
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("brew_potion"),
 				EventPriority.LOWEST,
 				PlayerBrewedPotionEvent.class,
 				context -> true,
@@ -127,8 +123,8 @@ public class EventFactories {
 				(e, c) -> {},
 				(e, c) -> {}
 		));
-		VALUES.put("consume", id -> new EventListenerSpecification<>(
-				Reference.resource(id),
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("consume"),
 				EventPriority.LOWEST,
 				LivingEntityUseItemEvent.Finish.class,
 				context -> context.getParam(EventContext.ITEMSTACK).getFoodProperties(context.getActor()) != null,
@@ -136,7 +132,7 @@ public class EventFactories {
 				(e,v) -> {},
 				(e,v) -> {}
 		));
-		VALUES.put("item_crafted", id -> new EventListenerSpecification<>(
+		VALUES.add(new EventListenerSpecification<>(
 				Reference.resource("item_crafted"),
 				EventPriority.LOWEST,
 				PlayerEvent.ItemCraftedEvent.class,
@@ -145,8 +141,8 @@ public class EventFactories {
 				(e, v) -> {},
 				(e, v) -> {}
 		));
-		VALUES.put("on_death", id -> new EventListenerSpecification<>(
-				Reference.resource(id),
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("on_death"),
 				EventPriority.LOWEST,
 				LivingDeathEvent.class,
 				context -> true,
@@ -155,8 +151,8 @@ public class EventFactories {
 				(e, v) -> {}
 		));
 		//TODO replace this shit with something better.  This might be a candidate for an addon that can add the mixin/patch, unless NF adds it first.
-//		VALUES.put("enchant_item", id -> new EventListenerSpecification<>(
-//				Reference.resource(id),
+//		VALUES.add(new EventListenerSpecification<>(
+//				Reference.resource("enchant_item"),
 //				EventPriority.LOWEST,
 //				EnchantmentLevelSetEvent.class,
 //				context -> true,
@@ -168,8 +164,8 @@ public class EventFactories {
 //				(e,v) -> {},
 //				(e,v) -> {}
 //		));
-		VALUES.put("effect_added", id -> new EventListenerSpecification<>(
-				Reference.resource(id),
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("effect_added"),
 				EventPriority.LOWEST,
 				MobEffectEvent.Applicable.class,
 				context -> !context.getParam(EventContext.CANCELLED), //used to check if previous events have set the result to what is effectively cancelled.
@@ -178,8 +174,8 @@ public class EventFactories {
 				(event, c) -> event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY),
 				(e, v) -> {}
 		));
-		VALUES.put("player_fish", id -> new EventListenerSpecification<>(
-				Reference.resource(id),
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("player_fish"),
 				EventPriority.LOWEST,
 				ItemFishedEvent.class,
 				context -> true,
@@ -187,19 +183,47 @@ public class EventFactories {
 				EventFactories::fullCancel,
 				(e, c) -> {}
 		));
-		VALUES.put("heal", id -> new EventListenerSpecification<>(
-				Reference.resource(id),
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("heal"),
 				EventPriority.LOWEST,
 				LivingHealEvent.class,
 				context -> Objects.equals(context.getParam(EventContext.PLAYER), context.getActor()),
 				event -> EventContext.self(orNull(event.getEntity()), event.getEntity().level())
-						.withDynamicParam(EventContext.HEALTH_CHANGE, event.getAmount()).create(),
+						.withDynamicParam(EventContext.CHANGE_AMOUNT, event.getAmount()).create(),
 				EventFactories::fullCancel,
-				(event, context) -> event.setAmount(context.getParam(EventContext.HEALTH_CHANGE))
+				(event, context) -> event.setAmount(context.getParam(EventContext.CHANGE_AMOUNT))
+		));
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("jump"),
+				EventPriority.LOWEST,
+				LivingEvent.LivingJumpEvent.class,
+				context -> true,
+				event -> EventContext.self(orNull(event.getEntity()), event.getEntity().level())
+						.withParam(EventContext.CHANGE_AMOUNT, event.getEntity().getJumpPower()).create(),
+				(e, c) -> {},
+				(e, c) -> {}
+		));
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("sprint_jump"),
+				EventPriority.LOWEST,
+				LivingEvent.LivingJumpEvent.class,
+				context -> context.getActor().isSprinting(),
+				event -> EventContext.self(orNull(event.getEntity()), event.getEntity().level())
+						.withParam(EventContext.CHANGE_AMOUNT, event.getEntity().getJumpPower()).create(),
+				(e, c) -> {},
+				(e, c) -> {}
+		));
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("crouch_jump"),
+				EventPriority.LOWEST,
+				LivingEvent.LivingJumpEvent.class,
+				context -> context.getActor().isCrouching(),
+				event -> EventContext.self(orNull(event.getEntity()), event.getEntity().level())
+						.withParam(EventContext.CHANGE_AMOUNT, event.getEntity().getJumpPower()).create(),
+				(e, c) -> {},
+				(e, c) -> {}
 		));
 	}
-//	JUMP("agility", null),
-//	SPRINT_JUMP("agility", null),
 //	CROUCH_JUMP("agility", null),
 //	WORLD_CONNECT("", null),
 //	WORLD_DISCONNECT("", null),
