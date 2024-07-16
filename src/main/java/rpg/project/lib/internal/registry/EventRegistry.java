@@ -4,11 +4,13 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.Event;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.brewing.PlayerBrewedPotionEvent;
 import net.neoforged.neoforge.event.enchanting.EnchantmentLevelSetEvent;
 import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingBreatheEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.neoforged.neoforge.event.entity.living.LivingHealEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
 import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
@@ -82,7 +84,6 @@ public class EventRegistry {
 	}
 
 	public static final DeferredRegister<EventListenerSpecification<?>> EVENTS = DeferredRegister.create(APIUtils.GAMEPLAY_EVENTS, Reference.MODID);
-	//public static final Supplier<IForgeRegistry<EventListenerSpecification<?>>> REGISTRY_SUPPLIER = EVENTS.makeRegistry(RegistryBuilder::create);
 	
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<BlockEvent.BreakEvent>> BREAK = register(EventFactory.BLOCK_BREAK);
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<BlockEvent.EntityPlaceEvent>> PLACE = register(EventFactory.BLOCK_PLACE);
@@ -96,6 +97,8 @@ public class EventRegistry {
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<MobEffectEvent.Applicable>> ADD_EFFECT = register(EventFactory.EFFECT);
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<ItemFishedEvent>> FISH = register(EventFactory.FISH);
 	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<LivingDeathEvent>> DEATH = register(EventFactory.DEATH);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<PlayerBrewedPotionEvent>> BREW = register(EventFactory.BREW);
+	public static final DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<LivingHealEvent>> HEAL = register(EventFactory.HEALTH_CHANGE);
 
 	public static <T extends Event> DeferredHolder<EventListenerSpecification<?>, EventListenerSpecification<T>> register(EventFactory<T> factory) {
 		return EVENTS.register(factory.id(), factory::spec);

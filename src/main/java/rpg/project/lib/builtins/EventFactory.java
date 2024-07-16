@@ -9,11 +9,13 @@ import net.minecraft.world.phys.AABB;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.ICancellableEvent;
+import net.neoforged.neoforge.event.brewing.PlayerBrewedPotionEvent;
 import net.neoforged.neoforge.event.enchanting.EnchantmentLevelSetEvent;
 import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingBreatheEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.neoforged.neoforge.event.entity.living.LivingHealEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
 import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
@@ -25,6 +27,7 @@ import rpg.project.lib.api.events.EventListenerSpecification;
 import rpg.project.lib.internal.util.Reference;
 import rpg.project.lib.internal.util.RegistryUtil;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 /**Contains default factories for translating 
@@ -105,7 +108,15 @@ public record EventFactory<T extends Event>(String id, EventListenerSpecificatio
 			EventFactory::fullCancel,
 			(e, v) -> {}
 	));
-//	public static final EventFactories<PotionBrewEvent> BREW = new EventFactories<>("brew_potion", id -> null);
+	public static final EventFactory<PlayerBrewedPotionEvent> BREW = new EventFactory<>("brew_potion", id -> new EventListenerSpecification<>(
+		Reference.resource(id),
+		EventPriority.LOWEST,
+		PlayerBrewedPotionEvent.class,
+		context -> true,
+		event -> EventContext.build(RegistryUtil.getId(event.getStack()), EventContext.ITEMSTACK, event.getStack(), event.getEntity(), event.getEntity().level()).create(),
+		(e, c) -> {},
+		(e, c) -> {}
+	));
 	public static final EventFactory<LivingEntityUseItemEvent.Finish> CONSUME = new EventFactory<>("consume", id -> new EventListenerSpecification<>(
 		Reference.resource(id),
 		EventPriority.LOWEST,
@@ -124,9 +135,6 @@ public record EventFactory<T extends Event>(String id, EventListenerSpecificatio
 		(e, v) -> {},
 		(e, v) -> {}
 	));
-//	RECEIVE_DAMAGE("endurance", null),
-//	DEAL_DAMAGE("combat", null),
-//	MITIGATE_DAMAGE("combat", null),
 	public static final EventFactory<LivingDeathEvent> DEATH = new EventFactory<>("on_death", id -> new EventListenerSpecification<>(
 		Reference.resource(id),
 		EventPriority.LOWEST,
@@ -154,24 +162,31 @@ public record EventFactory<T extends Event>(String id, EventListenerSpecificatio
 		Reference.resource(id),
 		EventPriority.LOWEST,
 		MobEffectEvent.Applicable.class,
-		context -> !context.getParam(EventContext.CANCELLED),
+		context -> !context.getParam(EventContext.CANCELLED), //used to check if previous events have set the result to what is effectively cancelled.
 		event -> EventContext.build(RegistryUtil.getId(event.getEffectInstance().getEffect()), EventContext.MOB_EFFECT, event.getEffectInstance(), orNull(event.getEntity()), event.getEntity().level())
 				.withParam(EventContext.CANCELLED, event.getResult() == MobEffectEvent.Applicable.Result.DO_NOT_APPLY).create(),
 		(event, c) -> event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY),
 		(e, v) -> {}
 	));
 	public static final EventFactory<ItemFishedEvent> FISH = new EventFactory<>("player_fish", id -> new EventListenerSpecification<>(
-			Reference.resource(id),
-			EventPriority.LOWEST,
-			ItemFishedEvent.class,
-			context -> true,
-			event -> EventContext.build(RegistryUtil.getId(event.getDrops().getFirst()), EventContext.ITEMSTACK, event.getDrops().getFirst(), event.getEntity(), event.getEntity().level()).create(),
-			EventFactory::fullCancel,
-			(e, c) -> {}
+		Reference.resource(id),
+		EventPriority.LOWEST,
+		ItemFishedEvent.class,
+		context -> true,
+		event -> EventContext.build(RegistryUtil.getId(event.getDrops().getFirst()), EventContext.ITEMSTACK, event.getDrops().getFirst(), event.getEntity(), event.getEntity().level()).create(),
+		EventFactory::fullCancel,
+		(e, c) -> {}
 	));
-//	SMELT("smithing", null),
-//	GROW("farming", null),
-//	HEALTH_CHANGE("", null),
+	public static final EventFactory<LivingHealEvent> HEALTH_CHANGE = new EventFactory<>("heal", id -> new EventListenerSpecification<>(
+		Reference.resource(id),
+		EventPriority.LOWEST,
+		LivingHealEvent.class,
+		context -> Objects.equals(context.getParam(EventContext.PLAYER), context.getActor()),
+		event -> EventContext.self(orNull(event.getEntity()), event.getEntity().level())
+				.withDynamicParam(EventContext.HEALTH_CHANGE, event.getAmount()).create(),
+		EventFactory::fullCancel,
+		(event, context) -> event.setAmount(context.getParam(EventContext.HEALTH_CHANGE))
+	));
 //	JUMP("agility", null),
 //	SPRINT_JUMP("agility", null),
 //	CROUCH_JUMP("agility", null),
@@ -193,6 +208,11 @@ public record EventFactory<T extends Event>(String id, EventListenerSpecificatio
 //	SURFACING("swimming", null),
 //	SWIM_SPRINTING("swimming", null),
 //	TAMING("taming", null);
+//	RECEIVE_DAMAGE("endurance", null),
+//	DEAL_DAMAGE("combat", null),
+//	MITIGATE_DAMAGE("combat", null),
+//	SMELT("smithing", null),
+//	GROW("farming", null),
 
 	private EventFactory(String id, Function<String, EventListenerSpecification<T>> factory) {
 		this(id, factory.apply(id));
