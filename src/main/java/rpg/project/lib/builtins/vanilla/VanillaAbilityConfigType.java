@@ -23,7 +23,7 @@ public record VanillaAbilityConfigType() implements SubSystemConfigType {
 		return VanillaAbilityConfig.CODEC;
 	}
 
-	public static record VanillaAbilityConfig(List<CompoundTag> data) implements SubSystemConfig {
+	public record VanillaAbilityConfig(List<CompoundTag> data) implements SubSystemConfig {
 		public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 				CompoundTag.CODEC.listOf().fieldOf("configurations").forGetter(ssc -> ((VanillaAbilityConfig)ssc).data())
 				).apply(instance, VanillaAbilityConfig::new));

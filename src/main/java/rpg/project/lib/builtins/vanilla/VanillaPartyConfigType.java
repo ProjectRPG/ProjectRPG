@@ -20,7 +20,7 @@ public record VanillaPartyConfigType() implements SubSystemConfigType{
 		return VanillaPartyConfig.CODEC;
 	}
 
-	public static record VanillaPartyConfig() implements SubSystemConfig {
+	public record VanillaPartyConfig() implements SubSystemConfig {
 		
 		public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 				Codec.BOOL.optionalFieldOf("placeholder").forGetter(vpc -> Optional.of(true)))

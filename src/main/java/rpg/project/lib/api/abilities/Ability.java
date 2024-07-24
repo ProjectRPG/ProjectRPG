@@ -211,9 +211,7 @@ public record Ability(
                 if (milestone && !src.getList(AbilityUtils.MILESTONES, Tag.TAG_DOUBLE).stream().map(tag -> ((DoubleTag) tag).getAsInt()).toList().contains(skillLevel)) {
                     milestone_match = false;
                 }
-                if (!modulus_match && !milestone_match) {
-                    return false;
-                }
+                return modulus_match || milestone_match;
             }
         }
         return true;

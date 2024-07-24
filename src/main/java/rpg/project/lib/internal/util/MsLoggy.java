@@ -20,8 +20,8 @@ public enum MsLoggy {
 	FATAL(code -> Config.FATAL_LOGGING.get().contains(code.code),
 		(message, args) -> LogManager.getLogger().fatal(message, args));
 		
-	private Predicate<LOG_CODE> validator;
-	private BiConsumer<String, Object[]> logExecutor;
+	private final Predicate<LOG_CODE> validator;
+	private final BiConsumer<String, Object[]> logExecutor;
 	
 	MsLoggy(Predicate<LOG_CODE> validator, BiConsumer<String, Object[]> logger) {
 		this.validator = validator; 
@@ -86,9 +86,7 @@ public enum MsLoggy {
 			array.forEach(entry -> {
 				Object[] params = new Object[obj.length + 1];
 				params[0] = entry;
-				for (int i = 0; i < obj.length; i++) {
-					params[i + 1] = obj[i];
-				}
+                System.arraycopy(obj, 0, params, 1, obj.length);
 				logExecutor.accept(message, params);
 			});
 		}
@@ -113,9 +111,7 @@ public enum MsLoggy {
 				Object[] params = new Object[obj.length + 2];
 				params[0] = key;
 				params[1] = value;
-				for (int i = 0; i < obj.length; i++) {
-					params[i + 2] = obj[i];
-				}
+                System.arraycopy(obj, 0, params, 2, obj.length);
 				logExecutor.accept(message, params);
 			});
 		}
@@ -128,9 +124,7 @@ public enum MsLoggy {
 		if (validator.test(code)) {
 			Object[] params = new Object[obj.length + 1];
 			params[0] = value;
-			for (int i = 0; i < obj.length; i++) {
-				params[i + 1] = obj[i];
-			}
+            System.arraycopy(obj, 0, params, 1, obj.length);
 			this.logExecutor.accept(message, params);
 		}
 		return value;

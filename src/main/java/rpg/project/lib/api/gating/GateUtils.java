@@ -17,7 +17,7 @@ public class GateUtils {
 	 * registrations specify their applicable {@link Type} so the 
 	 * internal gating processor can apply them accordingly.  
 	 */
-	public static enum Type implements StringRepresentable {
+	public enum Type implements StringRepresentable {
 		/**Specifies gates that cancel or alter events.*/
 		EVENT,
 		/**Specifies gates that permit/deny progression advancement.*/

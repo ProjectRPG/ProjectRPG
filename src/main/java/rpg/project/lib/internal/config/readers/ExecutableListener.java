@@ -12,7 +12,7 @@ import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 public class ExecutableListener extends SimplePreparableReloadListener<Boolean> {
-	private Runnable executor;
+	private final Runnable executor;
 	
 	public ExecutableListener(Runnable executor) {
 		this.executor = executor;

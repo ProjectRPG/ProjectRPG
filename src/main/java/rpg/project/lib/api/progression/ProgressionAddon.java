@@ -35,5 +35,5 @@ public interface ProgressionAddon {
 	 * @param dataIn the data value being modified
 	 * @return a new modified value
 	 */
-	public ProgressionDataType modifyProgression(Hub core, EventContext context, ProgressionDataType dataIn);
+    ProgressionDataType modifyProgression(Hub core, EventContext context, ProgressionDataType dataIn);
 }

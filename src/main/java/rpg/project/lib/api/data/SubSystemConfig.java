@@ -12,11 +12,11 @@ public interface SubSystemConfig extends MergeableData {
 	 * 
 	 * @return the linked {@link SubSystemConfigType}
 	 */
-	public SubSystemConfigType getType();
+    SubSystemConfigType getType();
 	
 	/**@return The codec used to encode/decode this object
 	 */
-	public MapCodec<SubSystemConfig> getCodec();
+    MapCodec<SubSystemConfig> getCodec();
 	
 	/**Supplies a value-less instance of this object.  This is 
 	 * used by the internal config writer to build config files
@@ -26,5 +26,5 @@ public interface SubSystemConfig extends MergeableData {
 	 * 
 	 * @return a default instance of this object.
 	 */
-	public SubSystemConfig getDefault();
+    SubSystemConfig getDefault();
 }

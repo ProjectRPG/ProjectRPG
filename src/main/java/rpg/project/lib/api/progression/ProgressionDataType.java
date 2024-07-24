@@ -4,13 +4,13 @@ import rpg.project.lib.api.data.SubSystemConfig;
 
 public interface ProgressionDataType extends SubSystemConfig{
 	
-	public static enum Comparison {
+	enum Comparison {
 		EQUALS,
 		GREATER_THAN,
 		LESS_THAN,
 		GREATER_THAN_OR_EQUAL,
-		LESS_THAN_OR_EQUAL;
-	}
+		LESS_THAN_OR_EQUAL
+    }
 	/**<p>Returns this object's comparison with the supplied object. 
 	 * In sequence, this object is the first argument, followed by
 	 * the operator, then the supplied object</p>
@@ -25,7 +25,7 @@ public interface ProgressionDataType extends SubSystemConfig{
 	 */
 	float compare(Comparison operator, ProgressionDataType with);
 	
-	public static enum Modification {
+	enum Modification {
 		/**Similar to an add function, this operator summates the two
 		 * values according to the logical summation of the data type*/
 		INCREASE,
@@ -42,8 +42,8 @@ public interface ProgressionDataType extends SubSystemConfig{
 		 * logical division of the data type*/
 		DIVIDE,
 		/**Simply replaces the existing value with the one provided.*/
-		REPLACE;
-	}
+		REPLACE
+    }
 	/**returns a modified instance according to the operator using
 	 * the provided data reference.
 	 * 

@@ -9,10 +9,10 @@ import rpg.project.lib.internal.registry.SubSystemCodecRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
 
 public class ProgressionUtils {
-	/**<p>Set's the ecosystem's XP system.</p>  
-	 * <p>There can only be one XP system in an instance.
+	/**<p>Set's the ecosystem's progression system.</p>
+	 * <p>There can only be one progression system in an instance.
 	 * If this is invoked more than once, the latter
-	 * invocation will set the ultimate xp system.</p>
+	 * invocation will set the ultimate system.</p>
 	 * 
 	 * @param systemConfigId an identifier used in object configs as the
 	 * "type" for the configuration. This "type" specifies that
@@ -22,7 +22,7 @@ public class ProgressionUtils {
 	 * parse user-defined configurations.
 	 * @param system an {@link ProgressionSystem} implementation
 	 */
-	public static void registerXpSystem(
+	public static void registerProgressionSystem(
 			ResourceLocation systemConfigId, 
 			SubSystemConfigType systemConfig, 
 			ResourceLocation systemDataTypeId,

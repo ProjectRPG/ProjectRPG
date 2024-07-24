@@ -89,8 +89,8 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	private final Gson gson;
 	private final Supplier<MainSystemConfig> defaultImpl = MainSystemConfig::new;
 	private final ResourceKey<Registry<V>> registry;
-	private Map<ResourceLocation, MainSystemConfig> defaultSettings = new HashMap<>();
-	private Map<ResourceLocation, MainSystemConfig> overrideSettings = new HashMap<>();
+	private final Map<ResourceLocation, MainSystemConfig> defaultSettings = new HashMap<>();
+	private final Map<ResourceLocation, MainSystemConfig> overrideSettings = new HashMap<>();
 	
 	/**
 	 * Initialize a data manager with the given folder name, codec, and merger
@@ -163,7 +163,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	 * @param data the object containing the specific data
 	 */
 	public void registerDefault(ResourceLocation id, MainSystemConfig data) {
-		defaultSettings.merge(id, (MainSystemConfig) data, (currID, currData) -> (MainSystemConfig)currData.combine(data));
+		defaultSettings.merge(id, data, (currID, currData) -> (MainSystemConfig)currData.combine(data));
 	}
 	
 	/**Adds override data to the loader.  This data is applied on
@@ -180,7 +180,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	 * @param data the object containing the specific data
 	 */
 	public void registerOverride(ResourceLocation id, MainSystemConfig data) {
-		overrideSettings.merge(id, (MainSystemConfig) data, (currID, currData) -> (MainSystemConfig)currData.combine(data));
+		overrideSettings.merge(id, data, (currID, currData) -> (MainSystemConfig)currData.combine(data));
 	}
 
 	/** Off-thread processing (can include reading files from hard drive) **/
@@ -205,7 +205,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 			for (Resource resource : resourceManager.getResourceStack(resourceLocation))
 			{
 				try // with resources
-				(final Reader reader = resource.openAsReader();	)
+				(final Reader reader = resource.openAsReader())
 				{
 					// read the json file and save the parsed object for later
 					// this json element may return null
@@ -289,7 +289,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 					tags.add(ResourceLocation.parse(str));
 			}
 			dataValue.tagValues().clear();
-			tags.forEach(rl -> this.data.merge(rl, (MainSystemConfig)dataValue, (o, n) -> (MainSystemConfig)o.combine(n)));
+			tags.forEach(rl -> this.data.merge(rl, dataValue, (o, n) -> (MainSystemConfig)o.combine(n)));
 		}
 		//Execute post-processing behavior (mostly logging at this point).
 		finalizer.accept(this.data);

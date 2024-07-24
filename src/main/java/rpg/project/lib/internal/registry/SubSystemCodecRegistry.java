@@ -28,7 +28,7 @@ public class SubSystemCodecRegistry {
 
 	public static ResourceLocation lookup(SubSystemConfigType type) {return TYPES.inverse().get(type);}
 	
-	public static record DefaultType() implements SubSystemConfigType {
+	public record DefaultType() implements SubSystemConfigType {
 		public static final ResourceLocation ID = Reference.resource("placeholder");
 		public static final DefaultType IMPL = new DefaultType();
 
@@ -36,7 +36,7 @@ public class SubSystemCodecRegistry {
 		public MapCodec<SubSystemConfig> getCodec() { return DefaultConfig.CODEC;
 		}
 		
-		public static record DefaultConfig() implements SubSystemConfig {
+		public record DefaultConfig() implements SubSystemConfig {
 			public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 					Codec.BOOL.optionalFieldOf("placeholder").forGetter(o -> Optional.of(true))
 					).apply(instance, bool -> new DefaultConfig()));

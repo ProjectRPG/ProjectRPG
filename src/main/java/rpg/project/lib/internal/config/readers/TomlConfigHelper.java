@@ -130,7 +130,7 @@ public record TomlConfigHelper(ModConfigSpec.Builder builder) {
         private @Nonnull final Codec<T> codec;
         private @Nonnull Object cachedObject;
         private @Nonnull T parsedObject;
-        private @Nonnull T defaultObject;
+        private final @Nonnull T defaultObject;
         
         private ConfigObject(ModConfigSpec.ConfigValue<Object> value, Codec<T> codec, T defaultObject, Object encodedDefaultObject) {
             this.value = value;
