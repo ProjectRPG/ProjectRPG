@@ -10,6 +10,7 @@ import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.api.enums.RegistrationSide;
 import rpg.project.lib.api.events.EventListenerSpecification;
+import rpg.project.lib.api.events.EventProvider;
 import rpg.project.lib.api.feature.Feature;
 import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.internal.Core;
@@ -24,7 +25,7 @@ public class APIUtils {
 	/**{@link ResourceKey} for use with a {@link net.neoforged.neoforge.registries.DeferredRegister DeferredRegister}
 	 * to register custom events.  Custom events can be referenced by other addons' configurations to apply their
 	 * system implementation behavior to your event specification.*/
-	public static final ResourceKey<Registry<EventListenerSpecification<?>>> GAMEPLAY_EVENTS = ResourceKey.createRegistryKey(Reference.resource("gameplay_events"));
+	public static final ResourceKey<Registry<EventProvider<?>>> GAMEPLAY_EVENTS = ResourceKey.createRegistryKey(Reference.resource("gameplay_events"));
 	
 	public static Codec<SubSystemConfigType> getDispatchCodec() {
 		return SubSystemCodecRegistry.CODEC;

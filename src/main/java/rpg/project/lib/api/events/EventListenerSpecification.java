@@ -1,5 +1,6 @@
 package rpg.project.lib.api.events;
 
+import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -42,9 +43,12 @@ public record EventListenerSpecification<T extends Event>(
 		 * there may be information about the event which features expect to
 		 * modify. The original values should be supplied by the contextFactory
 		 * at the event's firing and are subsequently consumed here.</p>*/
-		BiConsumer<T, EventContext> contextCallback) {
+		BiConsumer<T, EventContext> contextCallback) implements EventProvider<T>{
+	public String registryPath() {return registryID().getPath();}
+
+	public List<EventListenerSpecification<T>> getListenerSpecifications() {return List.of(this);}
 	
-	public static enum CancellationType {
+	public enum CancellationType {
 		/**Passed to indicate no cancellation should apply.*/
 		NONE,
 		/**Cancels the entire event.*/

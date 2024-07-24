@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.Block;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.events.EventListenerSpecification;
+import rpg.project.lib.api.events.EventProvider;
 import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.registry.EventRegistry;
 import rpg.project.lib.internal.util.MsLoggy;
@@ -57,7 +58,7 @@ public class DataLoader {
 		case EFFECT -> EFFECT_LOADER.data.putAll(data);
 		case EVENT -> EVENT_LOADER.data.putAll(data);
 		default -> {}}
-		printData((Map<ResourceLocation, ? extends Record>) data);
+		printData(data);
 	}
 //	
 	public MergeableCodecDataManager<?> getLoader(ObjectType type) {
@@ -106,12 +107,12 @@ public class DataLoader {
 			"prpg/enchantments", DATA_LOGGER, this::mergeLoaderData, this::printData, Registries.ENCHANTMENT);
 	public final MergeableCodecDataManager<MobEffect> EFFECT_LOADER = new MergeableCodecDataManager<>(
 			"prpg/effects", DATA_LOGGER, this::mergeLoaderData, this::printData, Registries.MOB_EFFECT);
-	public final MergeableCodecDataManager<EventListenerSpecification<?>> EVENT_LOADER = new MergeableCodecDataManager<>(
+	public final MergeableCodecDataManager<EventProvider<?>> EVENT_LOADER = new MergeableCodecDataManager<>(
 			"prpg/events", DATA_LOGGER, this::mergeLoaderData, this::printData, APIUtils.GAMEPLAY_EVENTS);
 	
 	
 	private MainSystemConfig mergeLoaderData(final List<MainSystemConfig> raws) {
-		MainSystemConfig out = (MainSystemConfig) raws.stream().reduce((existing, element) -> (MainSystemConfig)existing.combine(element)).get();
+		MainSystemConfig out = raws.stream().reduce((existing, element) -> (MainSystemConfig)existing.combine(element)).get();
 		return out.isUnconfigured() ? null : out;
 	}
 	

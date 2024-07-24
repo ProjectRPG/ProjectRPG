@@ -10,6 +10,7 @@ import rpg.project.lib.api.abilities.AbilityUtils;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.EventListenerSpecification;
 import rpg.project.lib.api.events.EventListenerSpecification.CancellationType;
+import rpg.project.lib.api.events.EventProvider;
 import rpg.project.lib.api.feature.Feature;
 import rpg.project.lib.builtins.EventFactories;
 import rpg.project.lib.internal.Core;
@@ -66,11 +67,13 @@ public class EventRegistry {
 	}
 	
 	/**This is used to add listeners at the appropriate lifecycle stage.*/
-	public static <T extends Event> void registerListener(EventListenerSpecification<T> spec) {
-		NeoForge.EVENT_BUS.addListener(spec.priority(), true, spec.validEventClass(), event -> internalEventLogic(event, spec));
+	public static <T extends Event> void registerListener(EventProvider<T> provider) {
+		provider.getListenerSpecifications().forEach(spec ->
+			NeoForge.EVENT_BUS.addListener(spec.priority(), true, spec.validEventClass(), event -> internalEventLogic(event, spec))
+		);
 	}
 
-	public static final DeferredRegister<EventListenerSpecification<?>> EVENTS = DeferredRegister.create(APIUtils.GAMEPLAY_EVENTS, Reference.MODID);
+	public static final DeferredRegister<EventProvider<?>> EVENTS = DeferredRegister.create(APIUtils.GAMEPLAY_EVENTS, Reference.MODID);
 
 	static {
 		EventFactories.registerEvents(EVENTS);
