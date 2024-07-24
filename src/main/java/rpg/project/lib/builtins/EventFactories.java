@@ -4,24 +4,33 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.ICancellableEvent;
+import net.neoforged.neoforge.common.damagesource.DamageContainer;
 import net.neoforged.neoforge.event.brewing.PlayerBrewedPotionEvent;
+import net.neoforged.neoforge.event.entity.living.AnimalTameEvent;
 import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingBreatheEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import net.neoforged.neoforge.event.entity.living.LivingHealEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
+import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rpg.project.lib.api.abilities.AbilityUtils;
+import rpg.project.lib.api.events.DelegatedEventListenerSpecification;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.EventListenerSpecification;
+import rpg.project.lib.api.events.EventProvider;
+import rpg.project.lib.api.events.ProgressionAdvanceEvent;
 import rpg.project.lib.internal.util.Reference;
 import rpg.project.lib.internal.util.RegistryUtil;
 
@@ -36,13 +45,24 @@ import java.util.Objects;
  * for relevant ecosystem events.
  */
 public class EventFactories {
-	private static final List<EventListenerSpecification<?>> VALUES = new ArrayList<>();
+	private static final List<EventProvider<?>> VALUES = new ArrayList<>();
 
-	public static void registerEvents(DeferredRegister<EventListenerSpecification<?>> registry) {
-		VALUES.forEach(spec -> registry.register(spec.registryID().getPath(), () -> spec));
+	public static void registerEvents(DeferredRegister<EventProvider<?>> registry) {
+		VALUES.forEach(provider -> registry.register(provider.registryPath(), () -> provider));
 	}
 
 	static {
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("level_up"),
+				EventPriority.LOWEST,
+				ProgressionAdvanceEvent.class,
+				context -> true,
+				event -> EventContext.self(event.getEntity(), event.getEntity().level())
+						.withParam(ProgressionAdvanceEvent.CONTAINER, event.getContainer())
+						.withParam(ProgressionAdvanceEvent.PROGRESS, event.getCurrent()).create(),
+				(e, c) -> {},
+				(e, c) -> {}
+		));
 		VALUES.add(new EventListenerSpecification<>(
 				Reference.resource("anvil_repair"),
 				EventPriority.LOWEST,
@@ -115,6 +135,15 @@ public class EventFactories {
 				(e, v) -> {}
 		));
 		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("tame_animal"),
+				EventPriority.LOWEST,
+				AnimalTameEvent.class,
+				context -> true,
+				event -> EventContext.build(RegistryUtil.getId(event.getAnimal()), LootContextParams.THIS_ENTITY, event.getAnimal(), event.getTamer(), event.getAnimal().level()).create(),
+				EventFactories::fullCancel,
+				(e, c) -> {}
+		));
+		VALUES.add(new EventListenerSpecification<>(
 				Reference.resource("brew_potion"),
 				EventPriority.LOWEST,
 				PlayerBrewedPotionEvent.class,
@@ -150,20 +179,6 @@ public class EventFactories {
 				EventFactories::fullCancel,
 				(e, v) -> {}
 		));
-		//TODO replace this shit with something better.  This might be a candidate for an addon that can add the mixin/patch, unless NF adds it first.
-//		VALUES.add(new EventListenerSpecification<>(
-//				Reference.resource("enchant_item"),
-//				EventPriority.LOWEST,
-//				EnchantmentLevelSetEvent.class,
-//				context -> true,
-//				event -> EventContext.build(RegistryUtil.getId(event.getItem()), EventContext.ITEMSTACK, event.getItem(),
-//						event.getLevel().getEntitiesOfClass(Player.class,
-//										AABB.ofSize(event.getPos().getCenter(), 5, 5, 5),
-//										p -> p.hasContainerOpen() && p.containerMenu.getType().equals(MenuType.ENCHANTMENT))
-//								.stream().findFirst().orElse(null), event.getLevel()).create(),
-//				(e,v) -> {},
-//				(e,v) -> {}
-//		));
 		VALUES.add(new EventListenerSpecification<>(
 				Reference.resource("effect_added"),
 				EventPriority.LOWEST,
@@ -197,7 +212,7 @@ public class EventFactories {
 				Reference.resource("jump"),
 				EventPriority.LOWEST,
 				LivingEvent.LivingJumpEvent.class,
-				context -> true,
+				context -> !context.getActor().isSprinting() && !context.getActor().isCrouching(),
 				event -> EventContext.self(orNull(event.getEntity()), event.getEntity().level())
 						.withParam(EventContext.CHANGE_AMOUNT, event.getEntity().getJumpPower()).create(),
 				(e, c) -> {},
@@ -223,31 +238,202 @@ public class EventFactories {
 				(e, c) -> {},
 				(e, c) -> {}
 		));
+		VALUES.add(new EventListenerSpecification<>(
+			Reference.resource("player_attack_entity"),
+			EventPriority.LOWEST,
+			AttackEntityEvent.class,
+			context -> true,
+			event -> EventContext.build(RegistryUtil.getId(event.getTarget()), LootContextParams.THIS_ENTITY, event.getTarget(), event.getEntity(), event.getEntity().level()).create(),
+			EventFactories::fullCancel,
+			(e, c) -> {}
+		));
+		VALUES.add(new EventListenerSpecification<>(
+			Reference.resource("damaged_by_player"),
+			EventPriority.LOWEST,
+			LivingDamageEvent.Pre.class,
+			context -> true,
+			event -> EventContext.build(RegistryUtil.getId(event.getEntity()), LootContextParams.THIS_ENTITY, event.getEntity(), orNull(event.getSource().getEntity()), event.getEntity().level())
+					.withParam(LootContextParams.DAMAGE_SOURCE, event.getSource())
+					.withDynamicParam(EventContext.CHANGE_AMOUNT, event.getNewDamage()).create(),
+			(e, c) -> e.setNewDamage(0),
+			(e, c) -> e.setNewDamage(c.getParam(EventContext.CHANGE_AMOUNT))
+		));
+		VALUES.add(new EventListenerSpecification<>(
+			Reference.resource("damage_player"),
+			EventPriority.LOWEST,
+			LivingDamageEvent.Pre.class,
+			context -> context.getParam(LootContextParams.DAMAGE_SOURCE).getEntity() != null,
+			event -> EventContext.build(event.getSource().getEntity() == null ? Reference.resource("null") : RegistryUtil.getId(event.getSource().getEntity()), LootContextParams.THIS_ENTITY, event.getSource().getEntity(), orNull(event.getEntity()), event.getEntity().level())
+					.withParam(LootContextParams.DAMAGE_SOURCE, event.getSource())
+					.withDynamicParam(EventContext.CHANGE_AMOUNT, event.getNewDamage()).create(),
+			(e, c) -> e.setNewDamage(0),
+			(e, c) -> e.setNewDamage(c.getParam(EventContext.CHANGE_AMOUNT))
+		));
+		VALUES.add(new EventListenerSpecification<>(
+			Reference.resource("mitigated_damage"),
+			EventPriority.LOWEST,
+			LivingDamageEvent.Post.class,
+			context -> context.getParam(EventContext.CHANGE_AMOUNT) > 0f,
+			event -> EventContext.self(orNull(event.getEntity()), event.getEntity().level())
+					.withParam(EventContext.CHANGE_AMOUNT, event.getReduction(DamageContainer.Reduction.ABSORPTION)
+					+ event.getReduction(DamageContainer.Reduction.ARMOR)
+					+ event.getReduction(DamageContainer.Reduction.ENCHANTMENTS)
+					+ event.getReduction(DamageContainer.Reduction.MOB_EFFECTS)
+					+ event.getBlockedDamage()).create(),
+			(e, c) -> {},
+			(e, c) -> {}
+		));
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("mitigated_damage_armor"),
+				EventPriority.LOWEST,
+				LivingDamageEvent.Post.class,
+				context -> context.getParam(EventContext.CHANGE_AMOUNT) > 0f,
+				event -> EventContext.self(orNull(event.getEntity()), event.getEntity().level())
+						.withParam(EventContext.CHANGE_AMOUNT, event.getReduction(DamageContainer.Reduction.ARMOR)).create(),
+				(e, c) -> {},
+				(e, c) -> {}
+		));
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("mitigated_damage_absorption"),
+				EventPriority.LOWEST,
+				LivingDamageEvent.Post.class,
+				context -> context.getParam(EventContext.CHANGE_AMOUNT) > 0f,
+				event -> EventContext.self(orNull(event.getEntity()), event.getEntity().level())
+						.withParam(EventContext.CHANGE_AMOUNT, event.getReduction(DamageContainer.Reduction.ABSORPTION)).create(),
+				(e, c) -> {},
+				(e, c) -> {}
+		));
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("mitigated_damage_effect"),
+				EventPriority.LOWEST,
+				LivingDamageEvent.Post.class,
+				context -> context.getParam(EventContext.CHANGE_AMOUNT) > 0f,
+				event -> EventContext.self(orNull(event.getEntity()), event.getEntity().level())
+						.withParam(EventContext.CHANGE_AMOUNT, event.getReduction(DamageContainer.Reduction.MOB_EFFECTS)).create(),
+				(e, c) -> {},
+				(e, c) -> {}
+		));
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("mitigated_damage_enchants"),
+				EventPriority.LOWEST,
+				LivingDamageEvent.Post.class,
+				context -> context.getParam(EventContext.CHANGE_AMOUNT) > 0f,
+				event -> EventContext.self(orNull(event.getEntity()), event.getEntity().level())
+						.withParam(EventContext.CHANGE_AMOUNT, event.getReduction(DamageContainer.Reduction.ENCHANTMENTS)).create(),
+				(e, c) -> {},
+				(e, c) -> {}
+		));
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("mitigated_damage_block"),
+				EventPriority.LOWEST,
+				LivingDamageEvent.Post.class,
+				context -> context.getParam(EventContext.CHANGE_AMOUNT) > 0f,
+				event -> EventContext.self(orNull(event.getEntity()), event.getEntity().level())
+						.withParam(EventContext.CHANGE_AMOUNT, event.getBlockedDamage()).create(),
+				(e, c) -> {},
+				(e, c) -> {}
+		));
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("sprinting"),
+				EventPriority.LOWEST,
+				PlayerTickEvent.Post.class,
+				context -> context.getActor().tickCount % 10 == 0 && context.getActor().isSprinting(),
+				event -> EventContext.self(event.getEntity(), event.getEntity().level())
+						.withParam(EventContext.MAGNITUDE, event.getEntity().moveDist).create(),
+				(e, c) -> {},
+				(e, c) -> {}
+		));
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("submerged"),
+				EventPriority.LOWEST,
+				PlayerTickEvent.Post.class,
+				context -> context.getActor().tickCount % 10 == 0 && context.getActor().isUnderWater(),
+				event -> EventContext.self(event.getEntity(), event.getEntity().level()).create(),
+				(e, c) -> {},
+				(e, c) -> {}
+		));
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("swimming"),
+				EventPriority.LOWEST,
+				PlayerTickEvent.Post.class,
+				context -> context.getActor().tickCount % 10 == 0
+						&& context.getActor().isUnderWater()
+						&& context.getParam(EventContext.MAGNITUDE) > 0.001,
+				event -> EventContext.self(event.getEntity(), event.getEntity().level())
+						.withParam(EventContext.MAGNITUDE, event.getEntity().moveDist).create(),
+				(e, c) -> {},
+				(e, c) -> {}
+		));
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("diving"),
+				EventPriority.LOWEST,
+				PlayerTickEvent.Post.class,
+				context -> context.getActor().tickCount % 10 == 0
+						&& context.getActor().isUnderWater()
+						&& context.getParam(EventContext.MAGNITUDE) > 0.001
+						&& context.getActor().getDeltaMovement().y() < 0,
+				event -> EventContext.self(event.getEntity(), event.getEntity().level())
+						.withParam(EventContext.MAGNITUDE, event.getEntity().moveDist).create(),
+				(e, c) -> {},
+				(e, c) -> {}
+		));
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("surfacing"),
+				EventPriority.LOWEST,
+				PlayerTickEvent.Post.class,
+				context -> context.getActor().tickCount % 10 == 0
+						&& context.getActor().isUnderWater()
+						&& context.getParam(EventContext.MAGNITUDE) > 0.001
+						&& context.getActor().getDeltaMovement().y() > 0,
+				event -> EventContext.self(event.getEntity(), event.getEntity().level())
+						.withParam(EventContext.MAGNITUDE, event.getEntity().moveDist).create(),
+				(e, c) -> {},
+				(e, c) -> {}
+		));
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("swim_sprinting"),
+				EventPriority.LOWEST,
+				PlayerTickEvent.Post.class,
+				context -> context.getActor().tickCount % 10 == 0
+						&& context.getActor().isUnderWater()
+						&& context.getParam(EventContext.MAGNITUDE) > 0.001
+						&& context.getActor().isSprinting(),
+				event -> EventContext.self(event.getEntity(), event.getEntity().level())
+						.withParam(EventContext.MAGNITUDE, event.getEntity().moveDist).create(),
+				(e, c) -> {},
+				(e, c) -> {}
+		));
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("riding"),
+				EventPriority.LOWEST,
+				PlayerTickEvent.Post.class,
+				context -> context.getActor().tickCount % 10 == 0
+						&& context.getActor().isPassenger()
+						&& context.getParam(EventContext.MAGNITUDE) > 0.001,
+				event -> EventContext.self(event.getEntity(), event.getEntity().level())
+						.withParam(EventContext.MAGNITUDE, event.getEntity().moveDist).create(),
+				(e, c) -> {},
+				(e, c) -> {}
+		));
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("use_item"),
+				EventPriority.LOWEST,
+				LivingEntityUseItemEvent.Finish.class,
+				context -> true,
+				event -> EventContext.build(RegistryUtil.getId(event.getItem()), EventContext.ITEMSTACK, event.getItem(), orNull(event.getEntity()), event.getEntity().level()).create(),
+				(e, c) -> {},
+				(e, c) -> {}
+		));
 	}
-//	CROUCH_JUMP("agility", null),
-//	WORLD_CONNECT("", null),
-//	WORLD_DISCONNECT("", null),
 //	HIT_BLOCK("dexterity", null),
 //	ACTIVATE_BLOCK("dexterity", null),
-//	ACTIVATE_ITEM("dexterity", null),
-//	ENTITY("charisma", null),
-//	RESPAWN("", null),
-//	RIDING("taming", null),
-//	SHIELD_BLOCK("combat", null),
-//	SKILL_UP("", null),
-//	SLEEP("endurance", null),
-//	SPRINTING("agility", null),
-//	SUBMERGED("swimming", null),
-//	SWIMMING("swimming", null),
-//	DIVING("swimming", null),
-//	SURFACING("swimming", null),
-//	SWIM_SPRINTING("swimming", null),
-//	TAMING("taming", null);
-//	RECEIVE_DAMAGE("endurance", null),
-//	DEAL_DAMAGE("combat", null),
-//	MITIGATE_DAMAGE("combat", null),
+
+	//Events that don't exist and require hacks to work
+//	ENCHANT
+	//Events for an addon that require storing player action data or tracking the world.
 //	SMELT("smithing", null),
 //	GROW("farming", null),
+//	ENTITY("charisma", null),
 
 	private static Player orNull(Entity entity) {
 		return entity instanceof Player player ? player : null;
