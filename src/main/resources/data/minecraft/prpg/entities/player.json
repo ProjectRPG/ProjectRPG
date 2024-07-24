@@ -4,7 +4,11 @@
     {"type":"minecraft:progression",
      "events": {
        "projectrpg:breath_change":5,
-       "projectrpg:heal": 1337
+       "projectrpg:heal": 1337,
+       "projectrpg:jump": 1,
+       "projectrpg:sprint_jump": 100,
+       "projectrpg:crouch_jump": 1000,
+       "projectrpg:sprinting": 1
     }}
  ]
 }
