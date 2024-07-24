@@ -32,6 +32,7 @@ import rpg.project.lib.api.data.CodecTypes;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.api.events.EventContext;
+import rpg.project.lib.api.events.ProgressionAdvanceEvent;
 import rpg.project.lib.api.progression.ProgressionSystem;
 import rpg.project.lib.builtins.vanilla.VanillaProgressionConfigType.VanillaProgressionConfig;
 import rpg.project.lib.builtins.vanilla.VanillaProgressionDataType.VanillaProgressionData;
@@ -45,8 +46,13 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 	
 	public static void updateScoreFromOfflineProgress(PlayerEvent.PlayerLoggedInEvent event) {
 		VanillaProgressionData cache = OfflineProgress.get().cachedProgress.remove(event.getEntity().getUUID());
-		if (cache != null)
+		if (cache != null) {
+			VanillaProgressionData current = new VanillaProgressionData(event.getEntity().experienceLevel);
 			event.getEntity().increaseScore(cache.exp());
+			if (current.exp() < event.getEntity().experienceLevel)
+				NeoForge.EVENT_BUS.post(new ProgressionAdvanceEvent(event.getEntity(), container, current,
+						new VanillaProgressionData(event.getEntity().experienceLevel)));
+		}
 	}
 
 	@Override
@@ -63,15 +69,25 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 	public void setProgress(UUID playerID, String container, VanillaProgressionData value) {
 		if (ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID) == null)
 			OfflineProgress.get().cachedProgress.put(playerID, value);
-		else
-			ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID).setExperiencePoints(value.exp());		
+		else {
+			ServerPlayer player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID);
+			VanillaProgressionData current = new VanillaProgressionData(player.experienceLevel);
+			player.setExperiencePoints(value.exp());
+			if (current.exp() < player.experienceLevel)
+				NeoForge.EVENT_BUS.post(new ProgressionAdvanceEvent(player, container, current, new VanillaProgressionData(player.experienceLevel)));
+		}
 	}
 	
 	private void addXp(UUID playerID, VanillaProgressionData value) {
 		if (ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID) == null)
 			OfflineProgress.get().cachedProgress.merge(playerID, value, (og, ng) -> new VanillaProgressionData(og.exp() + ng.exp()));
-		else
-			ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID).giveExperiencePoints(value.exp());
+		else {
+			ServerPlayer player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID);
+			VanillaProgressionData current = new VanillaProgressionData(player.experienceLevel);
+			player.giveExperiencePoints(value.exp());
+			if (current.exp() < player.experienceLevel)
+				NeoForge.EVENT_BUS.post(new ProgressionAdvanceEvent(player, container, current, new VanillaProgressionData(player.experienceLevel)));
+		}
 	}
 	
 	@Override
@@ -89,7 +105,7 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 	}	
 	
 	private static class OfflineProgress extends SavedData {
-		private Map<UUID, VanillaProgressionData> cachedProgress;
+		private final Map<UUID, VanillaProgressionData> cachedProgress;
 		
 		private static final Codec<Map<UUID, VanillaProgressionData>> CODEC = Codec.unboundedMap(CodecTypes.UUID_CODEC, VanillaProgressionData.CODEC.xmap(s -> (VanillaProgressionData)s, s -> s).codec());
 		
