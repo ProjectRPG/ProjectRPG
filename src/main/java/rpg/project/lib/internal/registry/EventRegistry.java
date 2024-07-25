@@ -19,7 +19,7 @@ import rpg.project.lib.internal.util.Reference;
 import rpg.project.lib.internal.util.MsLoggy.LOG_CODE;
 
 public class EventRegistry {
-	/**<p>A standardized method used by {@link EventRegistry#registerListener(EventListenerSpecification) registerListener}
+	/**<p>A standardized method used by {@link EventRegistry#registerListener(EventProvider) registerListener}
 	 * to register event listeners to the forge event bus.</p>
 	 * <p>Internally this applies the gating, progression, ability, and feature hook logic
 	 * for every registered event.  Each system is independently queried for configurations
@@ -54,7 +54,7 @@ public class EventRegistry {
 			float gating = GateRegistry.isAbilityPermitted(context.getActor(), core, eventID, context, abilityID);
 			if (gating != GateRegistry.HARD_FAIL) {
 				context.setParam(AbilityUtils.REDUCE, gating);
-				core.getAbilities().executeAbility(eventID, context.getActor(), config, context);
+				core.getAbilities().executeAbility(abilityID, context.getActor(), config, context);
 			}
 		}
 		

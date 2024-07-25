@@ -1,0 +1,8 @@
+{"replace":true,
+ "copyTo":["projectrpg:submerged"],
+ "abilities": [
+   {"type": "minecraft:abilities", "configurations": [
+     {"type": "projectrpg:effect", "effect": "minecraft:night_vision", "duration": 500}
+   ]}
+ ]
+}

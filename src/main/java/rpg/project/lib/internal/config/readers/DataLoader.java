@@ -44,6 +44,7 @@ public class DataLoader {
 		core.getLoader().ENTITY_LOADER.postProcess(event.getRegistryAccess());
 		//core.getLoader().DIMENSION_LOADER.postProcess();
 		core.getLoader().BIOME_LOADER.postProcess(event.getRegistryAccess());
+		core.getLoader().EVENT_LOADER.postProcess(event.getRegistryAccess());
 	}
 	
 	public void applyData(ObjectType type, Map<ResourceLocation, MainSystemConfig> data) {

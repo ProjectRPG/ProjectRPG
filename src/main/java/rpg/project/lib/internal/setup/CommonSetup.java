@@ -91,5 +91,6 @@ public class CommonSetup {
 		event.addListener(Core.get(LogicalSide.SERVER).getLoader().PLAYER_LOADER);
 		event.addListener(Core.get(LogicalSide.SERVER).getLoader().ENCHANTMENT_LOADER);
 		event.addListener(Core.get(LogicalSide.SERVER).getLoader().EFFECT_LOADER);
+		event.addListener(Core.get(LogicalSide.SERVER).getLoader().EVENT_LOADER);
 	}
 }

@@ -50,7 +50,7 @@ public record MainSystemConfig(
 				.forGetter(msc -> Optional.of(msc.features()))
 			).apply(instance, (o, t, g, p, a, f) -> new MainSystemConfig(
 					o.orElse(false),
-					t.orElse(List.of()),
+					new ArrayList<>(t.orElse(List.of())),
 					g.orElse(Map.of()),
 					p.orElse(List.of()),
 					a.orElse(List.of()),
