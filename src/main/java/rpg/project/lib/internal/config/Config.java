@@ -26,9 +26,18 @@ public class Config {
 	}
 	
 	//====================CLIENT SETTINGS===============================
-	
+	public static ModConfigSpec.BooleanValue PROG_MENU_OPEN;
+	public static ModConfigSpec.BooleanValue ABILITY_MENU_OPEN;
+	public static ModConfigSpec.DoubleValue SIDE_MENU_SPEED;
 	private static void setupClient(ModConfigSpec.Builder builder) {
-		
+		PROG_MENU_OPEN = builder.comment("sets the current state of the progression menu.  Changes in game will",
+				" be stored here so your setting persists between loads")
+				.define("progresssion_menu_open", false);
+		ABILITY_MENU_OPEN = builder.comment("sets the current state of the ability menu.  Changes in game will",
+						" be stored here so your setting persists between loads")
+				.define("ability_menu_open", false);
+		SIDE_MENU_SPEED = builder.comment("How fast should the side menus open and close")
+				.defineInRange("side_menu_speed", 5d, 0d, Double.MAX_VALUE);
 	}
 
 	//====================COMMON SETTINGS===============================

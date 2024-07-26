@@ -83,6 +83,14 @@ public class LangProvider extends LanguageProvider {
 			.addLocale(Locale.EN_US, "Effect: %s").build();
 	public static final Translation PERK_EFFECT_STATUS_2 = Translation.Builder.start("perk.pmmo.effect.status2")
 			.addLocale(Locale.EN_US, "Lvl:%s for %ss").build();
+
+	//========KEY BINDS=========
+	public static final Translation KEYBIND_CATEGORY = Translation.Builder.start("category.projectrpg")
+			.addLocale(Locale.EN_US, "Project RPG").build();
+	public static final Translation KEYBIND_SHOW_PROGRESSION = Translation.Builder.start("key.projectrpg.showprogression")
+			.addLocale(Locale.EN_US, "Opens or closes the left-side menu").build();
+	public static final Translation KEYBIND_SHOW_ABILITIES = Translation.Builder.start("key.projectrpg.showabilities")
+			.addLocale(Locale.EN_US, "Opens or closes the right-side menu").build();
 	//End Translations
 	
 	@Override
