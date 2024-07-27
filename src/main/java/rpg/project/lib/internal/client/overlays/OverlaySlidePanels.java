@@ -1,13 +1,8 @@
 package rpg.project.lib.internal.client.overlays;
 
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -26,10 +21,9 @@ public class OverlaySlidePanels implements LayeredDraw.Layer {
     private final double ratioWidth;
     private final double ratioHeight;
     private final ModConfigSpec.BooleanValue openSetting;
-    private final Minecraft mc = Minecraft.getInstance();
+    private final Core core = Core.get(LogicalSide.CLIENT);
 
     public OverlaySlidePanels(boolean openLeft, double percentFromTop, double percentHeight, double percentWidth, ModConfigSpec.BooleanValue openSetting) {
-        Core core = Core.get(LogicalSide.CLIENT);
         provider = openLeft
                 ? Config.PROG_ON_LEFT.get() ? core.getAbility().getSidePanelProvider() : core.getProgression().getSidePanelProvider()
                 : Config.PROG_ON_LEFT.get() ? core.getProgression().getSidePanelProvider() : core.getAbility().getSidePanelProvider();
@@ -46,12 +40,20 @@ public class OverlaySlidePanels implements LayeredDraw.Layer {
         final int anchorY = (int)(pGuiGraphics.guiHeight() * ratioY);
         final int height = (int)(pGuiGraphics.guiHeight() * ratioHeight);
         final int width = (int)(pGuiGraphics.guiWidth() * ratioWidth);
-        setExtentionValue(width);
+        setExtensionValue(width);
         pGuiGraphics.blit(TEXTURE_LOCATION, anchorX, anchorY, 0, 0, 0, width, height, width, height);
-        provider.render(pGuiGraphics, anchorY + 9, anchorX + 9, width, height, pDeltaTracker.getGameTimeDeltaPartialTick(true));
+        //Constrain and render the delegated content.
+        pGuiGraphics.enableScissor(anchorX+9, anchorY + 9, anchorX + width - 18, anchorY + height - 18);
+        provider.render(pGuiGraphics, anchorY + 9, anchorX + 9, width, height, pDeltaTracker.getGameTimeDeltaPartialTick(true), core);
+        pGuiGraphics.disableScissor();
     }
 
-    private void setExtentionValue(int maxWidth) {
+    /**Change the position of the panel based on current position relative
+     * to the open/closed setting.
+     *
+     * @param maxWidth the upper limit for this to extend to when open.
+     */
+    private void setExtensionValue(int maxWidth) {
         if (openSetting.get() && openAmount < maxWidth)
             openAmount += Config.SIDE_MENU_SPEED.get();
         else if (!openSetting.get() && openAmount > 0)
