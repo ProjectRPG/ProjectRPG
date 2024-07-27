@@ -29,6 +29,7 @@ public class Config {
 	public static ModConfigSpec.BooleanValue PROG_MENU_OPEN;
 	public static ModConfigSpec.BooleanValue ABILITY_MENU_OPEN;
 	public static ModConfigSpec.DoubleValue SIDE_MENU_SPEED;
+	public static ModConfigSpec.BooleanValue PROG_ON_LEFT;
 	private static void setupClient(ModConfigSpec.Builder builder) {
 		PROG_MENU_OPEN = builder.comment("sets the current state of the progression menu.  Changes in game will",
 				" be stored here so your setting persists between loads")
@@ -38,6 +39,8 @@ public class Config {
 				.define("ability_menu_open", false);
 		SIDE_MENU_SPEED = builder.comment("How fast should the side menus open and close")
 				.defineInRange("side_menu_speed", 5d, 0d, Double.MAX_VALUE);
+		PROG_ON_LEFT = builder.comment("Should progression display on the left panel? if false, it will display on the right")
+				.define("progression_on_left", true);
 	}
 
 	//====================COMMON SETTINGS===============================

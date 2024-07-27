@@ -10,6 +10,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.resources.ResourceLocation;
 import rpg.project.lib.api.Hub;
+import rpg.project.lib.api.client.components.SidePanelContentProvider;
 import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.api.events.EventContext;
 
@@ -92,4 +93,9 @@ public interface ProgressionSystem<T extends ProgressionDataType> {
 	 * associated with the stored data of this progression system.
 	 */
 	SubSystemConfigType dataType();
+
+	/**@return a provider which supplies the side panel display for information this progression
+	 * system wants to present to the player.
+	 */
+	SidePanelContentProvider getSidePanelProvider();
 }

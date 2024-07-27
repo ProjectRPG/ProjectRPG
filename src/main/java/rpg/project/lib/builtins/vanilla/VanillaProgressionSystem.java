@@ -28,6 +28,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
 import rpg.project.lib.api.Hub;
+import rpg.project.lib.api.client.components.SidePanelContentProvider;
 import rpg.project.lib.api.data.CodecTypes;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.data.SubSystemConfigType;
@@ -159,5 +160,10 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 	@Override
 	public SubSystemConfigType dataType() {
 		return VanillaProgressionDataType.IMPL;
+	}
+
+	@Override
+	public SidePanelContentProvider getSidePanelProvider() {
+		return new VanillaProgressionPanel();
 	}
 }
