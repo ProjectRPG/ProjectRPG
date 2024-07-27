@@ -21,6 +21,6 @@ public class VanillaAbilitySystem implements AbilitySystem{
 
 	@Override
 	public SidePanelContentProvider getSidePanelProvider() {
-		return new VanillaAbilityPanel();
+		return VanillaAbilityPanel.INSTANCE;
 	}
 }

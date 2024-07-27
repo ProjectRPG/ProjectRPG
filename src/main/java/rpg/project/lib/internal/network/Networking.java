@@ -3,8 +3,12 @@ package rpg.project.lib.internal.network;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import rpg.project.lib.builtins.vanilla.network.VanillaProgressionSync;
 import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.config.readers.DataLoader;
 import rpg.project.lib.internal.util.MsLoggy;
@@ -13,9 +17,13 @@ import rpg.project.lib.internal.util.Reference;
 
 public class Networking {
 
-	public static void registerMessages() {
-		
-		//int ID = 0;
+	@SubscribeEvent
+	public static void registerMessages(RegisterPayloadHandlersEvent event) {
+		final PayloadRegistrar registrar = event.registrar(Reference.MODID);
+
+		registrar
+		//CLIENT BOUND PACKETS
+		.playToClient(VanillaProgressionSync.TYPE, VanillaProgressionSync.STREAM_CODEC, VanillaProgressionSync::handle);
 		//CLIENT BOUND PACKETS
 		
 		//SERVER BOUND PACKETS

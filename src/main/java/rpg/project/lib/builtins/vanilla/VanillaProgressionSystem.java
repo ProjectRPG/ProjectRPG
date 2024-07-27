@@ -37,6 +37,8 @@ import rpg.project.lib.api.events.ProgressionAdvanceEvent;
 import rpg.project.lib.api.progression.ProgressionSystem;
 import rpg.project.lib.builtins.vanilla.VanillaProgressionConfigType.VanillaProgressionConfig;
 import rpg.project.lib.builtins.vanilla.VanillaProgressionDataType.VanillaProgressionData;
+import rpg.project.lib.builtins.vanilla.network.VanillaProgressionSync;
+import rpg.project.lib.internal.network.Networking;
 
 public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgressionData>{
 	private static final String container = "exp";
@@ -99,7 +101,13 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 					core.getProgressionAddons().forEach(addon -> {
 						xpToAward.getAndSet(((VanillaProgressionData)addon.modifyProgression(core, context, new VanillaProgressionData(xpToAward.get()))).exp());						
 					});
-					List<Pair<String, Consumer<Float>>> output = List.of(Pair.of(container, gate -> this.addXp(context.getActor().getUUID(), new VanillaProgressionData((int)((float)xpToAward.get() * gate)))));
+					List<Pair<String, Consumer<Float>>> output = List.of(Pair.of(container, gate -> {
+						int xp = (int)((float)xpToAward.get() * gate);
+						if (xp <= 0) return;
+						this.addXp(context.getActor().getUUID(), new VanillaProgressionData(xp));
+						if (context.getActor() instanceof ServerPlayer player)
+							Networking.sendToClient(new VanillaProgressionSync(xp, eventID), player);
+					}));
 					return output;
 				}
 			).orElse(List.of());
@@ -164,6 +172,6 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 
 	@Override
 	public SidePanelContentProvider getSidePanelProvider() {
-		return new VanillaProgressionPanel();
+		return VanillaProgressionPanel.INSTANCE;
 	}
 }

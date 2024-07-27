@@ -7,6 +7,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.registries.RegistryBuilder;
 import rpg.project.lib.internal.config.Config;
+import rpg.project.lib.internal.network.Networking;
 import rpg.project.lib.internal.registry.EventRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
 import rpg.project.lib.internal.util.Reference;
@@ -25,5 +26,6 @@ public class ProjectRPG {
     	//MOD BUS event listeners
     	bus.addListener(CommonSetup::init);
     	bus.addListener(CommonSetup::gatherData);
+		bus.addListener(Networking::registerMessages);
     }
 }

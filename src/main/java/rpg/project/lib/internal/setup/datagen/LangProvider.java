@@ -51,6 +51,10 @@ public class LangProvider extends LanguageProvider {
 	//Example Translation
 	public static final Translation EXAMPLE = Translation.Builder.start("key.key.key")
 			.addLocale(Locale.EN_US, "Translated Text").build();
+
+	//======EVENTS===========
+	public static final Translation PLAYER_FISH = Translation.Builder.start("projectrpg.event.projectrpg.player_fish")
+			.addLocale(Locale.EN_US, "Player Fishing").build();
 	
 	//======PARTY SYSTEM=====
 	public static final Translation PARTY_CREATE_SUCCESS = Translation.Builder.start("projectrpg.cmd.party.create.success")
@@ -91,6 +95,14 @@ public class LangProvider extends LanguageProvider {
 			.addLocale(Locale.EN_US, "Opens or closes the left-side menu").build();
 	public static final Translation KEYBIND_SHOW_ABILITIES = Translation.Builder.start("key.projectrpg.showabilities")
 			.addLocale(Locale.EN_US, "Opens or closes the right-side menu").build();
+
+	//=======VANILLA SYSTEM TRANSLATIONS================
+	public static final Translation ABILITY_SIDE_PANEL_HEADER = Translation.Builder.start("vanilla.ability.panel.header")
+			.addLocale(Locale.EN_US, "Recently Activated Abilities").build();
+	public static final Translation PROGRESSION_SIDE_PANEL_HEADER = Translation.Builder.start("vanilla.progression.panel.header")
+			.addLocale(Locale.EN_US, "Recently Gained Experience").build();
+	public static final Translation PROGRESSION_GAIN = Translation.Builder.start("vanilla.progression.panel.gain")
+			.addLocale(Locale.EN_US, "%s Exp from %s").build();
 	//End Translations
 	
 	@Override
