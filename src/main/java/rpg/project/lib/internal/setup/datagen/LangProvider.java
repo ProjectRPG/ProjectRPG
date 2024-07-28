@@ -53,8 +53,76 @@ public class LangProvider extends LanguageProvider {
 			.addLocale(Locale.EN_US, "Translated Text").build();
 
 	//======EVENTS===========
+	public static final Translation LEVEL_UP = Translation.Builder.start("projectrpg.event.projectrpg.level_up")
+			.addLocale(Locale.EN_US, "Leveling Up").build();
+	public static final Translation ANVIL_REPAIR = Translation.Builder.start("projectrpg.event.projectrpg.anvil_repair")
+			.addLocale(Locale.EN_US, "Anvil Repairing").build();
+	public static final Translation BREAK_BLOCK = Translation.Builder.start("projectrpg.event.projectrpg.break_block")
+			.addLocale(Locale.EN_US, "Breaking Block").build();
+	public static final Translation BREAK_SPEED = Translation.Builder.start("projectrpg.event.projectrpg.break_speed")
+			.addLocale(Locale.EN_US, "Digging").build();
+	public static final Translation PLACE_BLOCK = Translation.Builder.start("projectrpg.event.projectrpg.place_block")
+			.addLocale(Locale.EN_US, "Placing Block").build();
+	public static final Translation BREATH_CHANGE = Translation.Builder.start("projectrpg.event.projectrpg.breath_change")
+			.addLocale(Locale.EN_US, "Breathing").build();
+	public static final Translation BREEDING = Translation.Builder.start("projectrpg.event.projectrpg.breed_animal")
+			.addLocale(Locale.EN_US, "Breeding").build();
+	public static final Translation TAMING = Translation.Builder.start("projectrpg.event.projectrpg.tame_animal")
+			.addLocale(Locale.EN_US, "Taming").build();
 	public static final Translation PLAYER_FISH = Translation.Builder.start("projectrpg.event.projectrpg.player_fish")
 			.addLocale(Locale.EN_US, "Player Fishing").build();
+	public static final Translation BREWING = Translation.Builder.start("projectrpg.event.projectrpg.brew_potion")
+			.addLocale(Locale.EN_US, "Brewing Potion").build();
+	public static final Translation EATING = Translation.Builder.start("projectrpg.event.projectrpg.consume")
+			.addLocale(Locale.EN_US, "Eating/Drinking").build();
+	public static final Translation CRAFTING = Translation.Builder.start("projectrpg.event.projectrpg.item_crafted")
+			.addLocale(Locale.EN_US, "Crafting").build();
+	public static final Translation DEATH = Translation.Builder.start("projectrpg.event.projectrpg.on_death")
+			.addLocale(Locale.EN_US, "Killing").build();
+	public static final Translation EFFECT = Translation.Builder.start("projectrpg.event.projectrpg.effect_added")
+			.addLocale(Locale.EN_US, "Effects").build();
+	public static final Translation HEAL = Translation.Builder.start("projectrpg.event.projectrpg.heal")
+			.addLocale(Locale.EN_US, "Healing").build();
+	public static final Translation JUMP = Translation.Builder.start("projectrpg.event.projectrpg.jump")
+			.addLocale(Locale.EN_US, "Jumping").build();
+	public static final Translation SPRINT_JUMP = Translation.Builder.start("projectrpg.event.projectrpg.sprint_jump")
+			.addLocale(Locale.EN_US, "Sprint Jumping").build();
+	public static final Translation CROUCH_JUMP = Translation.Builder.start("projectrpg.event.projectrpg.crouch_jump")
+			.addLocale(Locale.EN_US, "Crouch Jumping").build();
+	public static final Translation ON_ATTACK = Translation.Builder.start("projectrpg.event.projectrpg.player_attack_entity")
+			.addLocale(Locale.EN_US, "Attacking").build();
+	public static final Translation ON_DAMAGE = Translation.Builder.start("projectrpg.event.projectrpg.damaged_by_player")
+			.addLocale(Locale.EN_US, "Attacking").build();
+	public static final Translation GETTING_HURT = Translation.Builder.start("projectrpg.event.projectrpg.damage_player")
+			.addLocale(Locale.EN_US, "Getting Hurt").build();
+	public static final Translation MITIGATING = Translation.Builder.start("projectrpg.event.projectrpg.mitigated_damage")
+			.addLocale(Locale.EN_US, "Preventing Damage").build();
+	public static final Translation MITIGATING_ARMOR = Translation.Builder.start("projectrpg.event.projectrpg.mitigated_damage_armor")
+			.addLocale(Locale.EN_US, "Damage Blocked by Armor").build();
+	public static final Translation MITIGATING_ABS = Translation.Builder.start("projectrpg.event.projectrpg.mitigated_damage_absorption")
+			.addLocale(Locale.EN_US, "Damage Blocked by Absorption").build();
+	public static final Translation MITIGATING_EFFECT = Translation.Builder.start("projectrpg.event.projectrpg.mitigated_damage_effect")
+			.addLocale(Locale.EN_US, "Damage Blocked by Effects").build();
+	public static final Translation MITIGATING_ENCHANT = Translation.Builder.start("projectrpg.event.projectrpg.mitigated_damage_enchants")
+			.addLocale(Locale.EN_US, "Damage Blocked by Enchantments").build();
+	public static final Translation MITIGATING_SHIELD = Translation.Builder.start("projectrpg.event.projectrpg.mitigated_damage_block")
+			.addLocale(Locale.EN_US, "Damage Blocked by Shields").build();
+	public static final Translation SPRINTING = Translation.Builder.start("projectrpg.event.projectrpg.sprinting")
+			.addLocale(Locale.EN_US, "Sprinting").build();
+	public static final Translation SUBMERGED = Translation.Builder.start("projectrpg.event.projectrpg.submerged")
+			.addLocale(Locale.EN_US, "Being Underwater").build();
+	public static final Translation SWIMMING = Translation.Builder.start("projectrpg.event.projectrpg.swimming")
+			.addLocale(Locale.EN_US, "Swimming").build();
+	public static final Translation DIVING = Translation.Builder.start("projectrpg.event.projectrpg.diving")
+			.addLocale(Locale.EN_US, "Diving").build();
+	public static final Translation SURFACING = Translation.Builder.start("projectrpg.event.projectrpg.surfacing")
+			.addLocale(Locale.EN_US, "Surfacing").build();
+	public static final Translation SWIM_SPRINT = Translation.Builder.start("projectrpg.event.projectrpg.swim_sprinting")
+			.addLocale(Locale.EN_US, "Swim Sprinting").build();
+	public static final Translation RIDING = Translation.Builder.start("projectrpg.event.projectrpg.riding")
+			.addLocale(Locale.EN_US, "Riding").build();
+	public static final Translation USE_ITEM = Translation.Builder.start("projectrpg.event.projectrpg.use_item")
+			.addLocale(Locale.EN_US, "Using an Item").build();
 	
 	//======PARTY SYSTEM=====
 	public static final Translation PARTY_CREATE_SUCCESS = Translation.Builder.start("projectrpg.cmd.party.create.success")

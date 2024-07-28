@@ -43,7 +43,7 @@ public class OverlaySlidePanels implements LayeredDraw.Layer {
         setExtensionValue(width);
         pGuiGraphics.blit(TEXTURE_LOCATION, anchorX, anchorY, 0, 0, 0, width, height, width, height);
         //Constrain and render the delegated content.
-        pGuiGraphics.enableScissor(anchorX+9, anchorY + 9, anchorX + width - 18, anchorY + height - 18);
+        pGuiGraphics.enableScissor(anchorX+9, anchorY + 9, anchorX + width - 10, anchorY + height - 10);
         provider.render(pGuiGraphics, anchorY + 9, anchorX + 9, width, height, pDeltaTracker.getGameTimeDeltaPartialTick(true), core);
         pGuiGraphics.disableScissor();
     }

@@ -1,5 +1,6 @@
 package rpg.project.lib.builtins.vanilla;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -16,7 +17,7 @@ public class VanillaProgressionPanel implements SidePanelContentProvider {
     private final List<MutableComponent> gainList = new ArrayList<>();
     public static final VanillaProgressionPanel INSTANCE = new VanillaProgressionPanel();
     private VanillaProgressionPanel() {
-        gainList.add(LangProvider.PROGRESSION_SIDE_PANEL_HEADER.asComponent());
+        gainList.add(LangProvider.PROGRESSION_SIDE_PANEL_HEADER.asComponent().withStyle(ChatFormatting.BLUE));
     }
 
     public void addLine(MutableComponent component) {
@@ -27,7 +28,7 @@ public class VanillaProgressionPanel implements SidePanelContentProvider {
     @Override
     public void render(GuiGraphics pGuiGraphics, int top, int left, int width, int height, float pPartialTick, Hub core) {
         for (int i = 0; i < gainList.size(); i++) {
-            pGuiGraphics.drawString(mc.font, gainList.get(i), left, top + (i * 12), 0xFFFFFF);
+            pGuiGraphics.drawScrollingString(mc.font, gainList.get(i), left, width - left, top + (i * 12), 0xFFFFFF);
         }
     }
 }
