@@ -42,8 +42,11 @@ public class DataLoader {
 		core.getLoader().ITEM_LOADER.postProcess(event.getRegistryAccess());
 		core.getLoader().BLOCK_LOADER.postProcess(event.getRegistryAccess());
 		core.getLoader().ENTITY_LOADER.postProcess(event.getRegistryAccess());
-		//core.getLoader().DIMENSION_LOADER.postProcess();
+		//core.getLoader().DIMENSION_LOADER.postProcess();  If a standard registry emerges, uncomment
+		//core.getLoader().PLAYER_LOADER.postProcess(); do not uncomment.  this has no registry for post-processing.
 		core.getLoader().BIOME_LOADER.postProcess(event.getRegistryAccess());
+		core.getLoader().ENCHANTMENT_LOADER.postProcess(event.getRegistryAccess());
+		core.getLoader().EFFECT_LOADER.postProcess(event.getRegistryAccess());
 		core.getLoader().EVENT_LOADER.postProcess(event.getRegistryAccess());
 	}
 	
@@ -58,7 +61,7 @@ public class DataLoader {
 		case ENCHANTMENT -> ENCHANTMENT_LOADER.data.putAll(data);
 		case EFFECT -> EFFECT_LOADER.data.putAll(data);
 		case EVENT -> EVENT_LOADER.data.putAll(data);
-		default -> {}}
+		}
 		printData(data);
 	}
 //	
@@ -73,7 +76,7 @@ public class DataLoader {
 		case EFFECT -> EFFECT_LOADER;
 		case EVENT -> EVENT_LOADER;
 		case PLAYER -> PLAYER_LOADER;
-		default -> null;};
+		};
 	}
 	
 	public static final ExecutableListener RELOADER = new ExecutableListener(() -> {

@@ -14,7 +14,7 @@ import rpg.project.lib.internal.setup.datagen.LangProvider;
 import rpg.project.lib.internal.util.Reference;
 
 public record VanillaProgressionSync(int xp, ResourceLocation eventID) implements CustomPacketPayload {
-    public static final Type<VanillaProgressionSync> TYPE = new Type(Reference.resource("s2c_sync_config"));
+    public static final Type<VanillaProgressionSync> TYPE = new Type<>(Reference.resource("s2c_sync_config"));
     @Override public Type<VanillaProgressionSync> type() {return TYPE;}
 
     public static final StreamCodec<FriendlyByteBuf, VanillaProgressionSync> STREAM_CODEC = StreamCodec.composite(

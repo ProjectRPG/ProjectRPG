@@ -1,5 +1,6 @@
 package rpg.project.lib.internal.network;
 
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -8,6 +9,7 @@ import net.neoforged.fml.LogicalSide;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.builtins.vanilla.network.VanillaProgressionSync;
 import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.config.readers.DataLoader;
@@ -23,7 +25,9 @@ public class Networking {
 
 		registrar
 		//CLIENT BOUND PACKETS
-		.playToClient(VanillaProgressionSync.TYPE, VanillaProgressionSync.STREAM_CODEC, VanillaProgressionSync::handle);
+		.playToClient(VanillaProgressionSync.TYPE, VanillaProgressionSync.STREAM_CODEC, VanillaProgressionSync::handle)
+		.playToClient(CP_SyncData.TYPE, CP_SyncData.STREAM_CODEC, CP_SyncData::handle)
+		.playToClient(CP_ClearData.TYPE, StreamCodec.unit(new CP_ClearData()), CP_ClearData::handle);
 		//CLIENT BOUND PACKETS
 		
 		//SERVER BOUND PACKETS
@@ -32,15 +36,17 @@ public class Networking {
 	}
 	
 	public static void registerDataSyncPackets() {
-//		DataLoader.RELOADER.subscribeAsSyncable(() -> new CP_ClearData());
-//		Core.get(LogicalSide.SERVER).getLoader().ITEM_LOADER.subscribeAsSyncable((o) -> new CP_SyncData(ObjectType.ITEM, o));
-//		Core.get(LogicalSide.SERVER).getLoader().BLOCK_LOADER.subscribeAsSyncable((o) -> new CP_SyncData(ObjectType.BLOCK, o));
-//		Core.get(LogicalSide.SERVER).getLoader().ENTITY_LOADER.subscribeAsSyncable((o) -> new CP_SyncData(ObjectType.ENTITY, o));
-//		Core.get(LogicalSide.SERVER).getLoader().BIOME_LOADER.subscribeAsSyncable((o) -> new CP_SyncData(ObjectType.BIOME, o));
-//		Core.get(LogicalSide.SERVER).getLoader().DIMENSION_LOADER.subscribeAsSyncable((o) -> new CP_SyncData(ObjectType.DIMENSION, o));
-//		Core.get(LogicalSide.SERVER).getLoader().ENCHANTMENT_LOADER.subscribeAsSyncable(o -> new CP_SyncData(ObjectType.ENCHANTMENT, o));
-//		Core.get(LogicalSide.SERVER).getLoader().EFFECT_LOADER.subscribeAsSyncable(o -> new CP_SyncData(ObjectType.EFFECT, o));
-//		Core.get(LogicalSide.SERVER).getLoader().PLAYER_LOADER.subscribeAsSyncable(o -> new CP_SyncData(ObjectType.PLAYER, o));
+		DataLoader.RELOADER.subscribeAsSyncable(CP_ClearData::new);
+		DataLoader loader = Core.get(LogicalSide.SERVER).getLoader();
+		loader.ITEM_LOADER.subscribeAsSyncable((o) -> new CP_SyncData(ObjectType.ITEM, o));
+		loader.BLOCK_LOADER.subscribeAsSyncable((o) -> new CP_SyncData(ObjectType.BLOCK, o));
+		loader.ENTITY_LOADER.subscribeAsSyncable((o) -> new CP_SyncData(ObjectType.ENTITY, o));
+		loader.BIOME_LOADER.subscribeAsSyncable((o) -> new CP_SyncData(ObjectType.BIOME, o));
+		loader.DIMENSION_LOADER.subscribeAsSyncable((o) -> new CP_SyncData(ObjectType.DIMENSION, o));
+		loader.ENCHANTMENT_LOADER.subscribeAsSyncable(o -> new CP_SyncData(ObjectType.ENCHANTMENT, o));
+		loader.EFFECT_LOADER.subscribeAsSyncable(o -> new CP_SyncData(ObjectType.EFFECT, o));
+		loader.PLAYER_LOADER.subscribeAsSyncable(o -> new CP_SyncData(ObjectType.PLAYER, o));
+		loader.EVENT_LOADER.subscribeAsSyncable(o -> new CP_SyncData(ObjectType.EVENT, o));
 	}
 
 	public static void sendToClient(CustomPacketPayload packet, ServerPlayer player) {

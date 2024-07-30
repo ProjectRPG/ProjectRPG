@@ -6,12 +6,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.stream.Stream;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.StringRepresentable;
+import net.neoforged.neoforge.common.util.NeoForgeExtraCodecs;
+import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
@@ -57,6 +66,9 @@ public record MainSystemConfig(
 					f.orElse(List.of())
 					)))
 			);
+	public static final StreamCodec<FriendlyByteBuf, MainSystemConfig> STREAM_CODEC = StreamCodec.of(
+			(buf, obj) -> buf.writeNbt(CODEC.encodeStart(NbtOps.INSTANCE, obj).result().orElse(new CompoundTag())),
+			pBuffer -> CODEC.parse(NbtOps.INSTANCE, pBuffer.readNbt(NbtAccounter.unlimitedHeap())).result().orElse(new MainSystemConfig()));
 
 	@Override
 	public MergeableData combine(MergeableData two) {
