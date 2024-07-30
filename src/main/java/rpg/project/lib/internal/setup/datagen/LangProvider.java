@@ -157,6 +157,8 @@ public class LangProvider extends LanguageProvider {
 			.addLocale(Locale.EN_US, "Lvl:%s for %ss").build();
 	public static final Translation ATTRIBUTE_DESC = Translation.Builder.start("ability.projectrpg.attribute")
 			.addLocale(Locale.EN_US, "Player Attribute").build();
+	public static final Translation COMMAND_DESC = Translation.Builder.start("ability.projectrpg.command")
+			.addLocale(Locale.EN_US, "Execute Command/Function").build();
 
 	//========KEY BINDS=========
 	public static final Translation KEYBIND_CATEGORY = Translation.Builder.start("category.projectrpg")

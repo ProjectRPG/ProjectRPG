@@ -6,7 +6,9 @@
        "attribute": "minecraft:generic.max_health",
        "per_level": 1,
        "max_boost": 100,
-       "multiplicative":  false}
+       "multiplicative":  false},
+      {"type": "projectrpg:command",
+       "command": "give @s minecraft:netherite_ingot"}
     ]}
   ]
 }

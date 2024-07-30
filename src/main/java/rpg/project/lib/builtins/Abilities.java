@@ -15,6 +15,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -150,7 +151,24 @@ public class Abilities {
 			.setStatus((player, compoundTag, context) -> List.of())
 			.build();
 
-	public static final Ability COMMAND = Ability.begin().build();
+	private static final String CMD = "command";
+	private static final String FNC = "function";
+	public static final Ability COMMAND = Ability.begin()
+			.setStart((p, nbt, context) -> {
+				if (p instanceof ServerPlayer player ) {
+					if (nbt.contains(FNC)) {
+						player.getServer().getFunctions().execute(
+								player.getServer().getFunctions().get(ResourceLocation.parse(nbt.getString(FNC))).get(),
+								player.createCommandSourceStack().withSuppressedOutput().withMaximumPermission(2));
+					} else if (nbt.contains(CMD)) {
+						player.getServer().getCommands().performPrefixedCommand(
+								player.createCommandSourceStack().withSuppressedOutput().withMaximumPermission(2),
+								nbt.getString(CMD));
+					}
+				}
+			})
+			.setDescription(LangProvider.COMMAND_DESC.asComponent())
+			.setStatus((player, nbt, context) -> List.of()).build();
 
 	public static final Ability DAMAGE_REDUCE = Ability.begin().build();
 
