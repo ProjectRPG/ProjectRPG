@@ -52,4 +52,24 @@ public interface ProgressionDataType extends SubSystemConfig{
 	 * @return a new instance after modification
 	 */
 	ProgressionDataType modify(Modification operator, ProgressionDataType with);
+
+	/**<p>Progression, conceptually, is the incremental stepping from one state of
+	 * progress to another.  Whether your implementation is numeric and continuous
+	 * by nature or not, the RPG experience mandates that player experience a
+	 * progressive adventure from start through completion.  It is up to your implementation
+	 * to decide how to represent the position in that continuum numerically.
+	 * <p>The following list gives examples of implementations based on hypothetical
+	 * data types <ul>
+	 * <li>"levels" can be returned literally</li>
+	 * <li>"unlocks" (boolean values) can be zero or one</li>
+	 * <li>"quests" (complex multi-factor unlocks) can be represented as 1-100 as decimal shifted percentages</li>
+	 * </ul><p>Ultimately, you will be responsible for providing your users with an explanation of
+	 * how your system is represented numerically for them to use in their configurations.
+	 * <p>
+	 * It is strongly recommended you overwrite this javadoc with your implementation details
+	 * when overriding this method.
+	 *
+	 * @return a numeric representation of the progression.
+	 */
+	long getProgressAsNumber();
 }

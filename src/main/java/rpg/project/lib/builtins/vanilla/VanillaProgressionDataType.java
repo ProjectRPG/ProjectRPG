@@ -72,5 +72,13 @@ public record VanillaProgressionDataType() implements SubSystemConfigType{
 				case REPLACE -> with;
 			};
 		}
+
+		/**Depending on context, this may return the raw XP value or the whole player level.
+		 * @return the raw XP value of the player
+		 */
+		@Override
+		public long getProgressAsNumber() {
+			return exp();
+		}
 	}
 }
