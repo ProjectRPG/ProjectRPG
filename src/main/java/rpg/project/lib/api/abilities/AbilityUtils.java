@@ -31,6 +31,8 @@ public class AbilityUtils {
     public static final String MODULUS = "per_x_level";
     public static final String CHANCE = "chance";
     public static final String COOLDOWN = "cooldown";
+    public static final String MULTIPLICATIVE = "multiplicative";
+    public static final String BASE = "base";
     /**Sets how long this ability should tick for before stopping*/
     public static final String DURATION = "duration";
     public static final String REDUCTION = "reduce";

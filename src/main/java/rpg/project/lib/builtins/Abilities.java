@@ -1,18 +1,25 @@
 package rpg.project.lib.builtins;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.ItemAbilities;
@@ -21,6 +28,8 @@ import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.abilities.AbilityFunction;
 import rpg.project.lib.api.abilities.AbilityUtils;
 import rpg.project.lib.api.enums.RegistrationSide;
+import rpg.project.lib.api.events.ProgressionAdvanceEvent;
+import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.setup.datagen.LangProvider;
 import rpg.project.lib.internal.util.Reference;
 import rpg.project.lib.internal.util.TagBuilder;
@@ -29,6 +38,10 @@ public class Abilities {
 	public static void init() {
 		AbilityUtils.registerAbility(Reference.resource("break_speed"), BREAK_SPEED, RegistrationSide.BOTH);
 		AbilityUtils.registerAbility(Reference.resource("effect"), EFFECT, RegistrationSide.SERVER);
+		AbilityUtils.registerAbility(Reference.resource("attribute"), ATTRIBUTE, RegistrationSide.SERVER);
+		AbilityUtils.registerAbility(Reference.resource("command"), COMMAND, RegistrationSide.SERVER);
+		AbilityUtils.registerAbility(Reference.resource("damage_boost"), DAMAGE_BOOST, RegistrationSide.SERVER);
+		AbilityUtils.registerAbility(Reference.resource("damage_reduce"), DAMAGE_REDUCE, RegistrationSide.SERVER);
 	}
 
 	private static final Set<ItemAbility> DIG_ACTIONS = Set.of(ItemAbilities.PICKAXE_DIG, ItemAbilities.AXE_DIG,
@@ -76,8 +89,7 @@ public class Abilities {
 	
 	public static AbilityFunction EFFECT_SETTER = (player, nbt, context) -> {
 		Optional<Holder.Reference<MobEffect>> effectHolder = BuiltInRegistries.MOB_EFFECT.getHolder(ResourceLocation.parse(nbt.getString("effect")));
-		if (effectHolder.isPresent()) {
-			Holder<MobEffect> effect = effectHolder.get();
+		effectHolder.ifPresent(effect -> {
 			int configDuration = nbt.getInt(AbilityUtils.DURATION);
 			int duration = player.hasEffect(effect) && player.getEffect(effect).getDuration() > configDuration
 					? player.getEffect(effect).getDuration() 
@@ -87,7 +99,7 @@ public class Abilities {
 			boolean ambient = nbt.getBoolean(AbilityUtils.AMBIENT);
 			boolean visible = nbt.getBoolean(AbilityUtils.VISIBLE);
 			player.addEffect(new MobEffectInstance(effect, perLevel * duration, amplifier, ambient, visible));
-		}
+		});
 	};
 	
 	public static final Ability EFFECT = Ability.begin()
@@ -104,4 +116,43 @@ public class Abilities {
 					LangProvider.PERK_EFFECT_STATUS_1.asComponent(Component.translatable(BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(nbt.getString("effect"))).getDescriptionId())),
 					LangProvider.PERK_EFFECT_STATUS_2.asComponent(nbt.getInt(AbilityUtils.MODIFIER), nbt.getInt(AbilityUtils.DURATION))))
 			.build();
+
+	private static final Map<String, Holder.Reference<Attribute>> attributeCache = new HashMap<>();
+	private static Holder.Reference<Attribute> getAttribute(CompoundTag nbt, RegistryAccess access) {
+		return attributeCache.computeIfAbsent(nbt.getString(AbilityUtils.ATTRIBUTE),
+				name -> access.registryOrThrow(Registries.ATTRIBUTE).getHolder(ResourceLocation.parse(name)).orElse(null));
+	}
+
+	public static final Ability ATTRIBUTE = Ability.begin()
+			.addDefaults(TagBuilder.start()
+					.withString(AbilityUtils.ATTRIBUTE, "null:null")
+					.withDouble(AbilityUtils.PER_LEVEL, 0d)
+					.withDouble(AbilityUtils.MAX_BOOST, 0d)
+					.withString(AbilityUtils.CONTAINER_NAME, "exp")
+					.withBool(AbilityUtils.MULTIPLICATIVE, true).build())
+			.setStart(((player, settings, context) -> {
+				double perLevel = settings.getDouble(AbilityUtils.PER_LEVEL);
+				double maxBoost = settings.getDouble(AbilityUtils.MAX_BOOST);
+				String container = settings.getString(AbilityUtils.CONTAINER_NAME);
+				long progress = Core.get(player.level()).getProgression().getProgress(player.getUUID(), container).getProgressAsNumber();
+				AttributeInstance instance = player.getAttribute(getAttribute(settings, player.level().registryAccess()));
+				if (instance == null) return;
+				double boost = Math.min(perLevel * progress, maxBoost) + settings.getDouble(AbilityUtils.BASE);
+				AttributeModifier.Operation operation = settings.getBoolean(AbilityUtils.MULTIPLICATIVE) ? AttributeModifier.Operation.ADD_MULTIPLIED_BASE :  AttributeModifier.Operation.ADD_VALUE;
+
+				ResourceLocation attributeID = Reference.resource("ability/"+settings.getString(AbilityUtils.ATTRIBUTE).replace(':','_')+"/"+container);
+				AttributeModifier modifier = new AttributeModifier(attributeID, boost, operation);
+				if (instance.hasModifier(attributeID))
+					instance.removeModifier(attributeID);
+				instance.addPermanentModifier(modifier);
+			}))
+			.setDescription(LangProvider.ATTRIBUTE_DESC.asComponent())
+			.setStatus((player, compoundTag, context) -> List.of())
+			.build();
+
+	public static final Ability COMMAND = Ability.begin().build();
+
+	public static final Ability DAMAGE_REDUCE = Ability.begin().build();
+
+	public static final Ability DAMAGE_BOOST = Ability.begin().build();
 }

@@ -425,8 +425,6 @@ public class EventFactories {
 				(e, c) -> {}
 		));
 	}
-//	HIT_BLOCK("dexterity", null),
-//	ACTIVATE_BLOCK("dexterity", null),
 
 	//Events that don't exist and require hacks to work
 //	ENCHANT

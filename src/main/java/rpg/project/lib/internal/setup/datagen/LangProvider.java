@@ -147,14 +147,16 @@ public class LangProvider extends LanguageProvider {
 			.addLocale(Locale.EN_US, "You have added %s to the %s party.").build();
 	
 	//=======ABILITIES=======
-	public static final Translation PERK_EFFECT = Translation.Builder.start("perk.pmmo.effect")
+	public static final Translation PERK_EFFECT = Translation.Builder.start("ability.projectrpg.effect")
 			.addLocale(Locale.EN_US, "Status Effect").build();
-	public static final Translation PERK_EFFECT_DESC = Translation.Builder.start("perk.pmmo.effect.description")
+	public static final Translation PERK_EFFECT_DESC = Translation.Builder.start("ability.projectrpg.effect.description")
 			.addLocale(Locale.EN_US, "Grants the player an effect. If the player already has the effect, it pauses the cooldown").build();
-	public static final Translation PERK_EFFECT_STATUS_1 = Translation.Builder.start("perk.pmmo.effect.status1")
+	public static final Translation PERK_EFFECT_STATUS_1 = Translation.Builder.start("ability.projectrpg.effect.status1")
 			.addLocale(Locale.EN_US, "Effect: %s").build();
-	public static final Translation PERK_EFFECT_STATUS_2 = Translation.Builder.start("perk.pmmo.effect.status2")
+	public static final Translation PERK_EFFECT_STATUS_2 = Translation.Builder.start("ability.projectrpg.effect.status2")
 			.addLocale(Locale.EN_US, "Lvl:%s for %ss").build();
+	public static final Translation ATTRIBUTE_DESC = Translation.Builder.start("ability.projectrpg.attribute")
+			.addLocale(Locale.EN_US, "Player Attribute").build();
 
 	//========KEY BINDS=========
 	public static final Translation KEYBIND_CATEGORY = Translation.Builder.start("category.projectrpg")
