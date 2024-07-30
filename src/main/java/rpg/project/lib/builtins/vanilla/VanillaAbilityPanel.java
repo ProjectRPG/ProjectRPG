@@ -28,7 +28,7 @@ public class VanillaAbilityPanel implements SidePanelContentProvider {
     @Override
     public void render(GuiGraphics pGuiGraphics, int top, int left, int width, int height, float pPartialTick, Hub core) {
         for (int i = 0; i < gainList.size(); i++) {
-            pGuiGraphics.drawString(mc.font, gainList.get(i), left, top + (i * 12), 0xFFFFFF);
+            pGuiGraphics.drawScrollingString(mc.font, gainList.get(i), left, width - left, top + (i * 12), 0xFFFFFF);
         }
     }
 }
