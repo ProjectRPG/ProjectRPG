@@ -37,16 +37,7 @@ public class Networking {
 	
 	public static void registerDataSyncPackets() {
 		DataLoader.RELOADER.subscribeAsSyncable(CP_ClearData::new);
-		DataLoader loader = Core.get(LogicalSide.SERVER).getLoader();
-		loader.ITEM_LOADER.subscribeAsSyncable((o) -> new CP_SyncData(ObjectType.ITEM, o));
-		loader.BLOCK_LOADER.subscribeAsSyncable((o) -> new CP_SyncData(ObjectType.BLOCK, o));
-		loader.ENTITY_LOADER.subscribeAsSyncable((o) -> new CP_SyncData(ObjectType.ENTITY, o));
-		loader.BIOME_LOADER.subscribeAsSyncable((o) -> new CP_SyncData(ObjectType.BIOME, o));
-		loader.DIMENSION_LOADER.subscribeAsSyncable((o) -> new CP_SyncData(ObjectType.DIMENSION, o));
-		loader.ENCHANTMENT_LOADER.subscribeAsSyncable(o -> new CP_SyncData(ObjectType.ENCHANTMENT, o));
-		loader.EFFECT_LOADER.subscribeAsSyncable(o -> new CP_SyncData(ObjectType.EFFECT, o));
-		loader.PLAYER_LOADER.subscribeAsSyncable(o -> new CP_SyncData(ObjectType.PLAYER, o));
-		loader.EVENT_LOADER.subscribeAsSyncable(o -> new CP_SyncData(ObjectType.EVENT, o));
+		Core.get(LogicalSide.SERVER).getLoader().all().forEach(listener -> listener.subscribeAsSyncable((o) -> new CP_SyncData(ObjectType.ITEM, o)));
 	}
 
 	public static void sendToClient(CustomPacketPayload packet, ServerPlayer player) {

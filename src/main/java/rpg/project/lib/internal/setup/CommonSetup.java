@@ -83,14 +83,6 @@ public class CommonSetup {
 	@SubscribeEvent
 	public static void onAddReloadListeners(AddReloadListenerEvent event) {
 		event.addListener(DataLoader.RELOADER);
-		event.addListener(Core.get(LogicalSide.SERVER).getLoader().ITEM_LOADER);
-		event.addListener(Core.get(LogicalSide.SERVER).getLoader().BLOCK_LOADER);
-		event.addListener(Core.get(LogicalSide.SERVER).getLoader().ENTITY_LOADER);
-		event.addListener(Core.get(LogicalSide.SERVER).getLoader().BIOME_LOADER);
-		event.addListener(Core.get(LogicalSide.SERVER).getLoader().DIMENSION_LOADER);
-		event.addListener(Core.get(LogicalSide.SERVER).getLoader().PLAYER_LOADER);
-		event.addListener(Core.get(LogicalSide.SERVER).getLoader().ENCHANTMENT_LOADER);
-		event.addListener(Core.get(LogicalSide.SERVER).getLoader().EFFECT_LOADER);
-		event.addListener(Core.get(LogicalSide.SERVER).getLoader().EVENT_LOADER);
+		Core.get(LogicalSide.SERVER).getLoader().all().forEach(event::addListener);
 	}
 }

@@ -264,6 +264,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	}
 	
 	public void postProcess(RegistryAccess registryAccess) {
+		if (registry == null) return;
 		Registry<V> activeRegistry = registryAccess.registryOrThrow(registry);
 		MsLoggy.DEBUG.log(LOG_CODE.DATA, "Begin PostProcessing for {}", folderName);
 		for (Map.Entry<ResourceLocation, MainSystemConfig> dataRaw : new HashMap<>(this.data).entrySet()) {

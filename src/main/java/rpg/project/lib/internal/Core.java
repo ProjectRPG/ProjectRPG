@@ -105,7 +105,7 @@ public class Core implements Hub {
 	@Override
 	public List<SubSystemConfig> getFeatureData(ObjectType type, ResourceLocation objectID, ResourceLocation eventID) {
 		MergeableCodecDataManager<?> loader = getLoader().getLoader(type);
-		MainSystemConfig eventData = (MainSystemConfig) getLoader().EVENT_LOADER.getData(eventID).combine(loader.getData(objectID));
+		MainSystemConfig eventData = (MainSystemConfig) getLoader().getLoader(ObjectType.EVENT).getData(eventID).combine(loader.getData(objectID));
 		return eventData.features();
 	}
 }
