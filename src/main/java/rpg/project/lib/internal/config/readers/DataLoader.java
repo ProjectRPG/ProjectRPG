@@ -1,5 +1,6 @@
 package rpg.project.lib.internal.config.readers;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
@@ -40,9 +41,7 @@ public class DataLoader {
 	private final EnumMap<ObjectType, MergeableCodecDataManager<?>> loaders = new EnumMap<>(ObjectType.class);
 
 	public DataLoader() {
-		for (ObjectType type : ObjectType.values()) {
-			loaders.put(type, type.createLoader());
-		}
+		Arrays.stream(ObjectType.values()).forEach(type -> loaders.put(type, type.createLoader()));
 	}
 	
 	@SubscribeEvent

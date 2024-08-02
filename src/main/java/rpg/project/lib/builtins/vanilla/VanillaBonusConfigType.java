@@ -9,6 +9,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.data.MergeableData;
@@ -23,6 +24,10 @@ public record VanillaBonusConfigType() implements SubSystemConfigType {
 	public MapCodec<SubSystemConfig> getCodec() {
 		return VanillaBonusConfig.CODEC;
 	}
+
+	@Override
+	public SubSystemConfig getDefault(RegistryAccess access) {return new VanillaBonusConfig(Map.of("container_name", List.of()));}
+
 
 	public record VanillaBonusConfig(Map<String, List<SubSystemConfig>> values) implements SubSystemConfig {
 		public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(

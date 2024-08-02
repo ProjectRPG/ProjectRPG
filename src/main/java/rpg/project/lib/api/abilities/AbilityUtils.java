@@ -93,7 +93,7 @@ public class AbilityUtils {
      */
     public static void registerAbilitySystem(ResourceLocation id, SubSystemConfigType config, Supplier<AbilitySystem> system) {
     	CommonSetup.abilitySupplier = () ->{
-    		SubSystemCodecRegistry.registerSubSystem(id, config);
+    		SubSystemCodecRegistry.registerSubSystem(id, config, SubSystemCodecRegistry.SystemType.ABILITY);
     		return system.get();
     	};    	
     }

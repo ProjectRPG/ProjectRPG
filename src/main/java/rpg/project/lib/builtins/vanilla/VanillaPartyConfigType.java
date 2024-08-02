@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
@@ -19,6 +20,10 @@ public record VanillaPartyConfigType() implements SubSystemConfigType{
 	public MapCodec<SubSystemConfig> getCodec() {
 		return VanillaPartyConfig.CODEC;
 	}
+
+	@Override
+	public SubSystemConfig getDefault(RegistryAccess access) {return new VanillaPartyConfig();}
+
 
 	public record VanillaPartyConfig() implements SubSystemConfig {
 		

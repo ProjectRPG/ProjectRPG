@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
@@ -18,6 +19,10 @@ public record VanillaProgressionDataType() implements SubSystemConfigType{
 	public MapCodec<SubSystemConfig> getCodec() {
 		return VanillaProgressionData.CODEC;
 	}
+
+	@Override
+	public SubSystemConfig getDefault(RegistryAccess access) {return new VanillaProgressionData(0);}
+
 
 	public record VanillaProgressionData(int exp) implements ProgressionDataType {
 		public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(

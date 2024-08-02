@@ -1,6 +1,8 @@
 package rpg.project.lib.internal.registry;
 
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
@@ -33,6 +35,15 @@ public class GateRegistry{
 	}
 	
 	private static final HashMultimap<Type, GateSystem> registeredSystems = HashMultimap.create();
+
+	/**Internal method to obtain a copy of the value set for registered gate types;
+	 *
+	 * @param type the gate type being queried
+	 * @return a new collection of the systems.
+	 */
+	public static Set<GateSystem> getSystems(Type type) {
+		return new HashSet<>(registeredSystems.get(type));
+	}
 
 	/**Returns an event-specific result for this event.  This is used
 	 * by {@link EventRegistry} to inform event systems whether to 

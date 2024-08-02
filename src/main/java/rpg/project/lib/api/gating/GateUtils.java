@@ -44,7 +44,7 @@ public class GateUtils {
 	 * @param system the system instance itself
 	 */
 	public static void registerEventGate(ResourceLocation id, SubSystemConfigType config, GateSystem system) {
-		SubSystemCodecRegistry.registerSubSystem(id, config);
+		SubSystemCodecRegistry.registerSubSystem(id, config, SubSystemCodecRegistry.SystemType.GATE);
 		GateRegistry.register(system, Type.EVENT);
 	}
 	
@@ -57,7 +57,7 @@ public class GateUtils {
 	 * @param system the system instance itself
 	 */
 	public static void registerProgressGate(ResourceLocation id, SubSystemConfigType config, GateSystem system) {
-		SubSystemCodecRegistry.registerSubSystem(id, config);
+		SubSystemCodecRegistry.registerSubSystem(id, config, SubSystemCodecRegistry.SystemType.PROGRESSION);
 		GateRegistry.register(system, Type.PROGRESS);
 	}
 
@@ -70,7 +70,7 @@ public class GateUtils {
 	 * @param system the system instance itself
 	 */
 	public static void registerFeatureGate(ResourceLocation id, SubSystemConfigType config, GateSystem system) {
-		SubSystemCodecRegistry.registerSubSystem(id, config);
+		SubSystemCodecRegistry.registerSubSystem(id, config, SubSystemCodecRegistry.SystemType.FEATURE);
 		GateRegistry.register(system, Type.FEATURE);
 	}
 
@@ -87,7 +87,7 @@ public class GateUtils {
 	 * @param system the system instance itself
 	 */
 	public static void registerAbilityGate(ResourceLocation id, SubSystemConfigType config, GateSystem system) {
-		SubSystemCodecRegistry.registerSubSystem(id, config);
+		SubSystemCodecRegistry.registerSubSystem(id, config, SubSystemCodecRegistry.SystemType.ABILITY);
 		GateRegistry.register(system, Type.ABILITY);
 	}
 }

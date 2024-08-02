@@ -17,7 +17,7 @@ public class ProgressionAddonRegistry {
 		Preconditions.checkNotNull(configID);
 		Preconditions.checkNotNull(configType);
 		Preconditions.checkNotNull(addon);
-		SubSystemCodecRegistry.registerSubSystem(configID, configType);
+		SubSystemCodecRegistry.registerSubSystem(configID, configType, SubSystemCodecRegistry.SystemType.PROGRESSION);
 		registeredAddons.add(addon);
 	}
 	

@@ -18,11 +18,13 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.fml.LogicalSide;
 import rpg.project.lib.internal.Core;
+import rpg.project.lib.internal.config.writers.DatapackGenerator;
 import rpg.project.lib.internal.setup.datagen.LangProvider;
 
 public class CmdRoot {	
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(Commands.literal("rpg")
+				.then(getGenDataNode())
 				.then(getPartyNode())
 				.then(getProgressNode()));
 	}
@@ -136,5 +138,9 @@ public class CmdRoot {
 							return 0;
 						}))));
 				
+	}
+
+	private static LiteralArgumentBuilder<CommandSourceStack> getGenDataNode() {
+		return Commands.literal("genData").executes(ctx -> DatapackGenerator.generatePack(ctx.getSource().getServer()));
 	}
 }

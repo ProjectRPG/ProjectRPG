@@ -48,12 +48,20 @@ public class AbilityRegistry {
     public List<MutableComponent> getStatusLines(ResourceLocation id, Player player, CompoundTag settings, EventContext context) {
         return abilities.getOrDefault(id, Ability.empty()).status().apply(player, settings, context);
     }
+
+    public List<CompoundTag> getDefaults() {
+        return abilities.entrySet().stream().map(entry -> {
+            var nbt = entry.getValue().propertyDefaults().copy();
+            nbt.putString(AbilityUtils.TYPE, entry.getKey().toString());
+            return nbt;
+        }).toList();
+    }
     
     public void executeAbility(ResourceLocation abilityID, Player player, CompoundTag dataIn, EventContext context) {
         if (player == null) return;
 
         Ability ability = abilities.getOrDefault(abilityID, Ability.empty());
-        CompoundTag config = ability.propertyDefaults().merge(dataIn);
+        CompoundTag config = ability.propertyDefaults().copy().merge(dataIn);
         ability.start(player, config, context);
         tickTracker.add(new TickSchedule(ability, player, config, context, new AtomicInteger(0)));
         

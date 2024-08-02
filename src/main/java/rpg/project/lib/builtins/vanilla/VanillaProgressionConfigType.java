@@ -8,7 +8,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
+import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
@@ -22,6 +24,11 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 	public MapCodec<SubSystemConfig> getCodec() {
 		return VanillaProgressionConfig.CODEC;
 	}
+
+	@Override
+	public SubSystemConfig getDefault(RegistryAccess access) {return new VanillaProgressionConfig(access.registryOrThrow(APIUtils.GAMEPLAY_EVENTS).keySet()
+			.stream().collect(Collectors.toMap(id -> id, id -> 0)));}
+
 
 	public record VanillaProgressionConfig(Map<ResourceLocation, Integer> eventToXp) implements SubSystemConfig {
 		

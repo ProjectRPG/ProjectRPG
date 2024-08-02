@@ -48,7 +48,7 @@ public class APIUtils {
 	 */
 	public static void registerPartySystem(ResourceLocation id, SubSystemConfigType config, Supplier<PartySystem> system) {
 		CommonSetup.partySupplier = () -> {
-			SubSystemCodecRegistry.registerSubSystem(id, config);
+			SubSystemCodecRegistry.registerSubSystem(id, config, SubSystemCodecRegistry.SystemType.PARTY);
 			return system.get();
 		};
 	}
@@ -62,7 +62,7 @@ public class APIUtils {
 	 * @param sides the side this feature should be configured on.
 	 */
 	public static void registerFeature(Feature feature, SubSystemConfigType config, RegistrationSide sides) {
-		SubSystemCodecRegistry.registerSubSystem(feature.featureID(), config);
+		SubSystemCodecRegistry.registerSubSystem(feature.featureID(), config, SubSystemCodecRegistry.SystemType.FEATURE);
 		if (sides == RegistrationSide.BOTH || sides == RegistrationSide.SERVER)
 			Core.get(LogicalSide.SERVER).getFeatures().register(feature);
 		if (sides == RegistrationSide.BOTH || sides == RegistrationSide.CLIENT)

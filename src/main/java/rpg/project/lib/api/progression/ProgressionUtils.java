@@ -29,8 +29,8 @@ public class ProgressionUtils {
 			SubSystemConfigType systemDataType,
 			Supplier<ProgressionSystem<?>> system) {
 		CommonSetup.progressionSupplier = () -> {
-			SubSystemCodecRegistry.registerSubSystem(systemConfigId, systemConfig);
-			SubSystemCodecRegistry.registerSubSystem(systemDataTypeId, systemDataType);
+			SubSystemCodecRegistry.registerSubSystem(systemConfigId, systemConfig, SubSystemCodecRegistry.SystemType.PROGRESSION);
+			SubSystemCodecRegistry.registerSubSystem(systemDataTypeId, systemDataType, SubSystemCodecRegistry.SystemType.PROGRESSION);
 			return system.get();
 		};
 	}

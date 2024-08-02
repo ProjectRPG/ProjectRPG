@@ -8,11 +8,15 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.fml.LogicalSide;
 import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
+import rpg.project.lib.internal.Core;
+import rpg.project.lib.internal.registry.AbilityRegistry;
 
 public record VanillaAbilityConfigType() implements SubSystemConfigType {
 	public static final ResourceLocation ID = ResourceLocation.withDefaultNamespace("abilities");
@@ -22,6 +26,10 @@ public record VanillaAbilityConfigType() implements SubSystemConfigType {
 	public MapCodec<SubSystemConfig> getCodec() {
 		return VanillaAbilityConfig.CODEC;
 	}
+
+	@Override
+	public SubSystemConfig getDefault(RegistryAccess access) {return new VanillaAbilityConfig(Core.get(LogicalSide.SERVER).getAbilities().getDefaults());}
+
 
 	public record VanillaAbilityConfig(List<CompoundTag> data) implements SubSystemConfig {
 		public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(

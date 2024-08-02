@@ -40,16 +40,16 @@ import rpg.project.lib.internal.util.Reference;
 @EventBusSubscriber(modid=Reference.MODID, bus= EventBusSubscriber.Bus.GAME)
 public class CommonSetup {
 	public static Supplier<PartySystem> partySupplier = () -> {
-		SubSystemCodecRegistry.registerSubSystem(VanillaPartyConfigType.ID, VanillaPartyConfigType.IMPL);
+		SubSystemCodecRegistry.registerSubSystem(VanillaPartyConfigType.ID, VanillaPartyConfigType.IMPL, SubSystemCodecRegistry.SystemType.PARTY);
 		return new VanillaPartySystem();
 	};
 	public static Supplier<ProgressionSystem<?>> progressionSupplier = () -> {
-		SubSystemCodecRegistry.registerSubSystem(VanillaProgressionConfigType.ID, VanillaProgressionConfigType.IMPL);
-		SubSystemCodecRegistry.registerSubSystem(VanillaProgressionDataType.ID, VanillaProgressionDataType.IMPL);
+		SubSystemCodecRegistry.registerSubSystem(VanillaProgressionConfigType.ID, VanillaProgressionConfigType.IMPL, SubSystemCodecRegistry.SystemType.PROGRESSION);
+		SubSystemCodecRegistry.registerSubSystem(VanillaProgressionDataType.ID, VanillaProgressionDataType.IMPL, SubSystemCodecRegistry.SystemType.PROGRESSION_DATA);
 		return new VanillaProgressionSystem();
 	};
 	public static Supplier<AbilitySystem> abilitySupplier = () -> {
-		SubSystemCodecRegistry.registerSubSystem(VanillaAbilityConfigType.ID, VanillaAbilityConfigType.IMPL);
+		SubSystemCodecRegistry.registerSubSystem(VanillaAbilityConfigType.ID, VanillaAbilityConfigType.IMPL, SubSystemCodecRegistry.SystemType.ABILITY);
 		return new VanillaAbilitySystem();
 	};
 
