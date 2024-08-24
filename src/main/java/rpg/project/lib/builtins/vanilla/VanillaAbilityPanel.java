@@ -21,13 +21,14 @@ public class VanillaAbilityPanel implements SidePanelContentProvider {
 
     public void addLine(MutableComponent component) {
         gainList.add(component);
-        if (gainList.size() > 12)
+        if (gainList.size() > 20)
             gainList.remove(1);
     }
 
     @Override
-    public void render(GuiGraphics pGuiGraphics, int top, int left, int width, int height, float pPartialTick, Hub core) {
-        for (int i = 0; i < gainList.size(); i++) {
+    public void render(GuiGraphics pGuiGraphics, int top, int left, int width, int height, double scale, float pPartialTick, Hub core) {
+        int limit = scale == 1d ? 20 : 10;
+        for (int i = 0; i < gainList.size() && i < limit; i++) {
             pGuiGraphics.drawScrollingString(mc.font, gainList.get(i), left, width - left, top + (i * 12), 0xFFFFFF);
         }
     }

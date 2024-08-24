@@ -1,6 +1,7 @@
 package rpg.project.lib.internal.client.overlays;
 
 import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.resources.ResourceLocation;
@@ -40,11 +41,13 @@ public class OverlaySlidePanels implements LayeredDraw.Layer {
         final int anchorY = (int)(pGuiGraphics.guiHeight() * ratioY);
         final int height = (int)(pGuiGraphics.guiHeight() * ratioHeight);
         final int width = (int)(pGuiGraphics.guiWidth() * ratioWidth);
+        final double scale = Minecraft.getInstance().getWindow().getGuiScale();
+        final int offset = scale == 1d ? 20 : 10;
         setExtensionValue(width);
         pGuiGraphics.blit(TEXTURE_LOCATION, anchorX, anchorY, 0, 0, 0, width, height, width, height);
         //Constrain and render the delegated content.
-        pGuiGraphics.enableScissor(anchorX+9, anchorY + 9, anchorX + width - 10, anchorY + height - 10);
-        provider.render(pGuiGraphics, anchorY + 9, anchorX + 9, width, height, pDeltaTracker.getGameTimeDeltaPartialTick(true), core);
+        pGuiGraphics.enableScissor(anchorX + offset, anchorY + offset, anchorX + width - offset, anchorY + height - offset);
+        provider.render(pGuiGraphics, anchorY + offset, anchorX + offset, width, height, scale, pDeltaTracker.getGameTimeDeltaPartialTick(true), core);
         pGuiGraphics.disableScissor();
     }
 
