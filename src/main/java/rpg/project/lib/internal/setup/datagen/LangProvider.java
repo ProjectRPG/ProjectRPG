@@ -167,6 +167,8 @@ public class LangProvider extends LanguageProvider {
 			.addLocale(Locale.EN_US, "Opens or closes the left-side menu").build();
 	public static final Translation KEYBIND_SHOW_ABILITIES = Translation.Builder.start("key.projectrpg.showabilities")
 			.addLocale(Locale.EN_US, "Opens or closes the right-side menu").build();
+	public static final Translation GLOSSARY_OPEN = Translation.Builder.start("key.projectrpg.openglossary")
+			.addLocale(Locale.EN_US, "Opens the Glossary menu").build();
 
 	//=======VANILLA SYSTEM TRANSLATIONS================
 	public static final Translation ABILITY_SIDE_PANEL_HEADER = Translation.Builder.start("vanilla.ability.panel.header")

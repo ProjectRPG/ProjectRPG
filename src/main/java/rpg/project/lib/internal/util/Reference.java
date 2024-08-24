@@ -8,4 +8,5 @@ public class Reference {
 	public static ResourceLocation resource(String path) {
 		return ResourceLocation.fromNamespaceAndPath(MODID, path);
 	}
+	public static ResourceLocation mc(String path) {return ResourceLocation.withDefaultNamespace(path);}
 }

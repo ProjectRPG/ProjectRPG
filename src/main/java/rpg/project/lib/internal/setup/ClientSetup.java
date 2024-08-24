@@ -22,9 +22,11 @@ public class ClientSetup {
 
     public static final KeyMapping LEFT_MENU = new KeyMapping(LangProvider.KEYBIND_SHOW_PROGRESSION.key(), GLFW.GLFW_KEY_LEFT_ALT, LangProvider.KEYBIND_CATEGORY.key());
     public static final KeyMapping RIGHT_MENU = new KeyMapping(LangProvider.KEYBIND_SHOW_ABILITIES.key(), GLFW.GLFW_KEY_RIGHT_ALT, LangProvider.KEYBIND_CATEGORY.key());
+    public static final KeyMapping GLOSSARY = new KeyMapping(LangProvider.GLOSSARY_OPEN.key(), GLFW.GLFW_KEY_P, LangProvider.KEYBIND_CATEGORY.key());
     @SubscribeEvent
     public static void init(RegisterKeyMappingsEvent event) {
         event.register(LEFT_MENU);
         event.register(RIGHT_MENU);
+        event.register(GLOSSARY);
     }
 }
