@@ -21,6 +21,7 @@ import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEnchantItemEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -421,6 +422,16 @@ public class EventFactories {
 				LivingEntityUseItemEvent.Finish.class,
 				context -> true,
 				event -> EventContext.build(RegistryUtil.getId(event.getItem()), EventContext.ITEMSTACK, event.getItem(), orNull(event.getEntity()), event.getEntity().level()).create(),
+				(e, c) -> {},
+				(e, c) -> {}
+		));
+		VALUES.add(new EventListenerSpecification<>(
+				Reference.resource("enchant_item"),
+				EventPriority.LOWEST,
+				PlayerEnchantItemEvent.class,
+				context -> true,
+				event -> EventContext.build(RegistryUtil.getId(event.getEnchantedItem()), EventContext.ITEMSTACK, event.getEnchantedItem(), event.getEntity(), event.getEntity().level())
+						.withParam(LootContextParams.ENCHANTMENT_LEVEL, event.getEnchantments().stream().mapToInt(instance -> instance.level).max().orElse(0)).create(),
 				(e, c) -> {},
 				(e, c) -> {}
 		));
