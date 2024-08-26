@@ -57,9 +57,9 @@ public class DropDownComponent<T extends DropDownComponent.SelectionEntry<?>> ex
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         if (selected != null)
-            selected.render(graphics, getX(), getY(), width, false, getFGColor(), alpha);
+            selected.render(graphics, getX(), getY(), getX() + width - 20, false, getFGColor(), alpha);
         else
-            graphics.drawString(font, title, getX() + 6, getY() + (height - 8) / 2, getFGColor() | Mth.ceil(alpha * 255.0F) << 24);
+            graphics.drawScrollingString(font, title, getX() + 6, getX() + width - 20, getY() + (height - 8) / 2, getFGColor() | Mth.ceil(alpha * 255.0F) << 24);
 
         if (extended) {
             graphics.pose().pushPose();
@@ -136,16 +136,16 @@ public class DropDownComponent<T extends DropDownComponent.SelectionEntry<?>> ex
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double delta, double other) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         int maxY = getY() + ENTRY_HEIGHT * Math.min(entries.size() + 1, 5);
         if (extended && mouseX >= getX() && mouseX <= getX() + width && mouseY > getY() + ENTRY_HEIGHT && mouseY < maxY) {
-            if (delta <= 0 && scrollOffset < entries.size() - 4)
+            if (scrollY <= 0 && scrollOffset < entries.size() - 4)
                 scrollOffset++;
-            else if (delta > 0 && scrollOffset > 0)
+            else if (scrollY > 0 && scrollOffset > 0)
                 scrollOffset--;
             return true;
         }
-        return super.mouseScrolled(mouseX, mouseY, delta, other);
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
     @Override
@@ -193,8 +193,8 @@ public class DropDownComponent<T extends DropDownComponent.SelectionEntry<?>> ex
             if (hovered)
                 graphics.fill(RenderType.gui(), x, y, x + width, y + ENTRY_HEIGHT, 0xFFA0A0A0);
 
-            FormattedCharSequence text = Language.getInstance().getVisualOrder(FormattedText.composite(font.substrByWidth(message, width - 12)));
-            graphics.drawString(font, text, x + 6, y + 6, fgColor | Mth.ceil(alpha * 255.0F) << 24);
+//            FormattedCharSequence text = Language.getInstance().getVisualOrder(FormattedText.composite(font.substrByWidth(message, width - 12)));
+            graphics.drawScrollingString(font, message, x + 6, width, y + 6, fgColor | Mth.ceil(alpha * 255.0F) << 24);
         }
 
         @Override

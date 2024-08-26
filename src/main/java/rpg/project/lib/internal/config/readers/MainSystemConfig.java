@@ -153,6 +153,13 @@ public record MainSystemConfig(
 
 	@Override
 	public boolean isUnconfigured() {
-		return false;
+		return this.tagValues().isEmpty()
+				&& this.gates().entrySet().stream()
+					.filter(entry -> !entry.getValue().stream()
+							.filter(config -> !isUnconfigured()).toList().isEmpty())
+					.toList().isEmpty()
+				&& this.progression().stream().filter(config -> !config.isUnconfigured()).toList().isEmpty()
+				&& this.abilities().stream().filter(config -> !config.isUnconfigured()).toList().isEmpty()
+				&& this.features().stream().filter(config -> !config.isUnconfigured()).toList().isEmpty();
 	}
 }

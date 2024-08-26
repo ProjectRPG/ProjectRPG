@@ -46,7 +46,7 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 
 		@Override
 		public boolean isUnconfigured() {
-			return this.eventToXp().isEmpty();
+			return this.eventToXp().values().stream().max(Integer::compareTo).get() == 0;
 		}
 
 		@Override
