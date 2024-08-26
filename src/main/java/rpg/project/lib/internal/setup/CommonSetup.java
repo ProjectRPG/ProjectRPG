@@ -31,6 +31,7 @@ import rpg.project.lib.builtins.vanilla.VanillaProgressionSystem;
 import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.commands.CmdRoot;
 import rpg.project.lib.internal.config.readers.DataLoader;
+import rpg.project.lib.internal.network.Networking;
 import rpg.project.lib.internal.registry.EventRegistry;
 import rpg.project.lib.internal.registry.SubSystemCodecRegistry;
 import rpg.project.lib.internal.setup.datagen.LangProvider;
@@ -68,6 +69,7 @@ public class CommonSetup {
 	public static void init(final FMLCommonSetupEvent event) {
 		event.enqueueWork(() -> EventRegistry.EVENTS.getRegistry().get().stream().forEach(EventRegistry::registerListener));
 		Abilities.init();
+		Networking.registerDataSyncPackets();
 	}
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
