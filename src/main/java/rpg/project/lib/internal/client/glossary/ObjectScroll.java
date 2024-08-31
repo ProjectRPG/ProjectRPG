@@ -1,12 +1,15 @@
 package rpg.project.lib.internal.client.glossary;
 
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.RegistryAccess;
@@ -31,37 +34,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ObjectScroll extends ScrollPanel {
-    List<Panel> panelList = new ArrayList<>();
+public class ObjectScroll extends ObjectSelectionList<ObjectScroll.Panel> {
     Font font = Minecraft.getInstance().font;
 
     public ObjectScroll(int width, int height, int top, int left) {
-        super(Minecraft.getInstance(), width, height, top, left);
+        super(Minecraft.getInstance(), width, height, top, 20);
+        this.setX(left);
         filter(null, null, null);
     }
 
     @Override
-    protected int getContentHeight() {
-        return 20 * panelList.size();
-    }
-
+    public int getRowWidth() {return this.width;}
     @Override
-    protected void drawPanel(GuiGraphics guiGraphics, int entryRight, int relativeY, Tesselator tess, int mouseX, int mouseY) {
-        for (int i = 0; i < panelList.size(); i++) {
-            Panel panel = panelList.get(i);
-            if (panel.renderer != null)
-                panel.renderer.render(guiGraphics, entryRight - width, relativeY + (i * 20));
-            guiGraphics.drawScrollingString(font, panel.text, entryRight - width + 20, entryRight, relativeY + (i * 20) + 2, 0xFFFFFF);
-        }
-    }
-
-    //TODO add hover, click, and scroll behavior overrides
+    protected int getDefaultScrollbarPosition() {return this.getRowLeft() + this.width - 6;}
 
     @Override
     public NarrationPriority narrationPriority() {return NarrationPriority.NONE;}
-
-    @Override
-    public void updateNarration(NarrationElementOutput pNarrationElementOutput) {}
 
     private static <T> boolean validObject(ObjectType type, ResourceLocation eventFilter, String searchFilter, ResourceLocation objectID, String name, Core core) {
         if (eventFilter == null && (searchFilter == null || searchFilter.isEmpty())) return true;
@@ -78,81 +66,96 @@ public class ObjectScroll extends ScrollPanel {
     }
 
     public void filter(ObjectType typeFilter, ResourceLocation eventFilter, String searchFilter) {
-        panelList.clear();
+        this.clearEntries();
         RegistryAccess reg = Minecraft.getInstance().level.registryAccess();
         Core core = Core.get(LogicalSide.CLIENT);
-        //TODO generate content based on filters
+
         if (typeFilter == null || typeFilter == ObjectType.ITEM) {
             reg.registryOrThrow(Registries.ITEM).entrySet().stream()
                     .filter(item -> validObject(ObjectType.ITEM, eventFilter, searchFilter, item.getKey().location(), item.getValue().getDefaultInstance().getDisplayName().getString(), core))
-                    .forEach(item -> panelList.add(new Panel(item.getValue().getDefaultInstance())));
+                    .forEach(item -> this.addEntry(new Panel(item.getValue().getDefaultInstance())));
         }
         if (typeFilter == null || typeFilter == ObjectType.BLOCK) {
             reg.registryOrThrow(Registries.BLOCK).entrySet().stream()
                     .filter(entry -> validObject(ObjectType.BLOCK, eventFilter, searchFilter, entry.getKey().location(), entry.getValue().getName().getString(), core))
-                    .forEach(block -> panelList.add(new Panel(block.getValue())));
+                    .forEach(block -> this.addEntry(new Panel(block.getValue())));
         }
         if (typeFilter == null || typeFilter == ObjectType.ENTITY) {
             reg.registryOrThrow(Registries.ENTITY_TYPE).entrySet().stream()
                     .filter(entry -> validObject(ObjectType.ENTITY, eventFilter, searchFilter, entry.getKey().location(), entry.getValue().getDescription().getString(), core))
-                    .forEach(entity -> panelList.add(new Panel(entity.getValue())));
+                    .forEach(entity -> this.addEntry(new Panel(entity.getValue())));
         }
         if (typeFilter == null || typeFilter == ObjectType.DIMENSION) {
             Minecraft.getInstance().getConnection().levels().stream()
                     .filter(level -> validObject(ObjectType.DIMENSION, eventFilter, searchFilter, level.location(), level.location().toString(), core))
-                    .forEach(key -> panelList.add(new Panel(Component.literal(key.location().toString()))));
+                    .forEach(key -> this.addEntry(new Panel(Component.literal(key.location().toString()), ObjectType.DIMENSION)));
         }
         if (typeFilter == null || typeFilter == ObjectType.BIOME) {
             reg.registryOrThrow(Registries.BIOME).entrySet().stream()
                     .filter(entry -> validObject(ObjectType.BIOME, eventFilter, searchFilter, entry.getKey().location(), entry.getKey().location().toString(), core))
-                    .forEach(entry -> panelList.add(new Panel(Component.literal(entry.getKey().location().toString()))));
+                    .forEach(entry -> this.addEntry(new Panel(Component.literal(entry.getKey().location().toString()), ObjectType.BIOME)));
         }
         if (typeFilter == null || typeFilter == ObjectType.ENCHANTMENT) {
             reg.registryOrThrow(Registries.ENCHANTMENT).entrySet().stream()
                     .filter(entry -> validObject(ObjectType.ENCHANTMENT, eventFilter, searchFilter, entry.getKey().location(), entry.getValue().description().getString(), core))
-                    .forEach(entry -> panelList.add(new Panel(entry.getValue().description())));
+                    .forEach(entry -> this.addEntry(new Panel(entry.getValue().description(), ObjectType.ENCHANTMENT)));
         }
         if (typeFilter == null || typeFilter == ObjectType.EFFECT) {
             reg.registryOrThrow(Registries.MOB_EFFECT).entrySet().stream()
                     .filter(entry -> validObject(ObjectType.EFFECT, eventFilter, searchFilter, entry.getKey().location(), entry.getValue().getDisplayName().getString(), core))
-                    .forEach(entry -> panelList.add(new Panel(entry.getValue().getDisplayName())));
+                    .forEach(entry -> this.addEntry(new Panel(entry.getValue().getDisplayName(), ObjectType.EFFECT)));
         }
         if (typeFilter == null || typeFilter == ObjectType.EVENT) {
             reg.registryOrThrow(APIUtils.GAMEPLAY_EVENTS).entrySet().stream()
                     .filter(entry -> validObject(ObjectType.EVENT, eventFilter, searchFilter, entry.getKey().location(), entry.getKey().location().toString(), core))
-                    .forEach(entry -> panelList.add(new Panel(Component.literal(entry.getKey().location().toString()))));
+                    .forEach(entry -> this.addEntry(new Panel(Component.literal(entry.getKey().location().toString()), ObjectType.EVENT)));
         }
         if (typeFilter == null || typeFilter == ObjectType.PLAYER) {
             if (validObject(ObjectType.ENTITY, eventFilter, searchFilter, ResourceLocation.withDefaultNamespace("player"), Minecraft.getInstance().player.getDisplayName().getString(), core))
-                panelList.add(new Panel(Minecraft.getInstance().player));
+                this.addEntry(new Panel(Minecraft.getInstance().player));
         }
     }
 
-    private class Panel {
+    public class Panel extends ObjectSelectionList.Entry<Panel>{
         public PanelRenderer renderer;
-        public Component text;
+        public final Component text;
+        public final ObjectType type;
 
-        public Panel(Component text) {
+        public Panel(Component text, ObjectType type) {
             this.text = text;
+            this.type = type;
         }
         public Panel(ItemStack stack) {
             this.text = stack.getDisplayName();
             this.renderer = (graphics, x, y) -> graphics.renderItem(stack, x, y);
+            this.type = ObjectType.ITEM;
         }
         public Panel(Block block) {
             this.text = block.getName();
             this.renderer = (graphics, x, y) -> graphics.renderItem(block.asItem().getDefaultInstance(), x, y);
-
+            this.type = ObjectType.BLOCK;
         }
         public Panel(EntityType<?> entity) {
             Entity renderEntity = entity.create(Minecraft.getInstance().level);
             this.text = renderEntity == null ? entity.getDescription() : renderEntity.getDisplayName();
+            this.type = ObjectType.ENTITY;
             if (renderEntity instanceof LivingEntity livingEntity)
                 this.renderer = (graphics, x, y) -> InventoryScreen.renderEntityInInventoryFollowsAngle(graphics, x, y, x+16, y+16, Math.max(1, 10 / Math.max(1, (int) livingEntity.getBoundingBox().getSize())), 0, 0f, 0f, livingEntity);
         }
         public Panel(LocalPlayer player) {
             this.text = player.getDisplayName();
+            this.type = ObjectType.ENTITY;
             this.renderer = (graphics, x, y) -> InventoryScreen.renderEntityInInventoryFollowsAngle(graphics, x, y, x+16, y+16, Math.max(1, 10 / Math.max(1, (int) player.getBoundingBox().getSize())), 0, 0f, 0f, player);
+        }
+
+        @Override
+        public Component getNarration() {return text;}
+
+        @Override
+        public void render(GuiGraphics pGuiGraphics, int pIndex, int pTop, int pLeft, int pWidth, int pHeight, int pMouseX, int pMouseY, boolean pHovering, float pPartialTick) {
+            if (renderer != null)
+                renderer.render(pGuiGraphics, pLeft, pTop);
+            pGuiGraphics.drawScrollingString(font, text, pLeft + 20, pLeft+pWidth - 6, pTop + 2, 0xFFFFFF);
         }
     }
 

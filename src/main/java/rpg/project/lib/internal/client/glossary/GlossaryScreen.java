@@ -3,6 +3,7 @@ package rpg.project.lib.internal.client.glossary;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.tabs.Tab;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -14,7 +15,7 @@ import rpg.project.lib.internal.Core;
 import java.util.Arrays;
 
 public class GlossaryScreen extends Screen {
-    private static final ResourceLocation INWORLD_MENU_BACKGROUND = ResourceLocation.withDefaultNamespace("textures/gui/inworld_menu_background.png");
+    public static final ResourceLocation INWORLD_MENU_BACKGROUND = ResourceLocation.withDefaultNamespace("textures/gui/inworld_menu_background.png");
 
     private DropDownComponent categoryFilterBox;
     private DropDownComponent eventFilterBox;
