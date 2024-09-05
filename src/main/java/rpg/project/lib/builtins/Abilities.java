@@ -127,6 +127,7 @@ public class Abilities {
 	public static final Ability ATTRIBUTE = Ability.begin()
 			.addDefaults(TagBuilder.start()
 					.withString(AbilityUtils.ATTRIBUTE, "null:null")
+					.withDouble(AbilityUtils.BASE, 0d)
 					.withDouble(AbilityUtils.PER_LEVEL, 0d)
 					.withDouble(AbilityUtils.MAX_BOOST, 0d)
 					.withString(AbilityUtils.CONTAINER_NAME, "exp")
@@ -138,7 +139,7 @@ public class Abilities {
 				long progress = Core.get(player.level()).getProgression().getProgress(player.getUUID(), container).getProgressAsNumber();
 				AttributeInstance instance = player.getAttribute(getAttribute(settings, player.level().registryAccess()));
 				if (instance == null) return;
-				double boost = Math.min(perLevel * progress, maxBoost) + settings.getDouble(AbilityUtils.BASE);
+				double boost = Math.min((perLevel * (double)progress) + settings.getDouble(AbilityUtils.BASE), maxBoost);
 				AttributeModifier.Operation operation = settings.getBoolean(AbilityUtils.MULTIPLICATIVE) ? AttributeModifier.Operation.ADD_MULTIPLIED_BASE :  AttributeModifier.Operation.ADD_VALUE;
 
 				ResourceLocation attributeID = Reference.resource("ability/"+settings.getString(AbilityUtils.ATTRIBUTE).replace(':','_')+"/"+container);

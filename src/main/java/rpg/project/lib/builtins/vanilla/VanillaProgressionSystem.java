@@ -65,7 +65,7 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 		ServerPlayer player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(playerID);
 		if (player == null)
 			return new VanillaProgressionData(0);
-		return new VanillaProgressionData(player.getScore());
+		return new VanillaProgressionData(player.experienceLevel);
 	}
 
 	@Override
