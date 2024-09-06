@@ -12,10 +12,13 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -23,16 +26,20 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
 import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.abilities.AbilityFunction;
 import rpg.project.lib.api.abilities.AbilityUtils;
 import rpg.project.lib.api.enums.RegistrationSide;
+import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.ProgressionAdvanceEvent;
 import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.setup.datagen.LangProvider;
 import rpg.project.lib.internal.util.Reference;
+import rpg.project.lib.internal.util.RegistryUtil;
 import rpg.project.lib.internal.util.TagBuilder;
 
 public class Abilities {
@@ -41,8 +48,7 @@ public class Abilities {
 		AbilityUtils.registerAbility(Reference.resource("effect"), EFFECT, RegistrationSide.SERVER);
 		AbilityUtils.registerAbility(Reference.resource("attribute"), ATTRIBUTE, RegistrationSide.SERVER);
 		AbilityUtils.registerAbility(Reference.resource("command"), COMMAND, RegistrationSide.SERVER);
-		AbilityUtils.registerAbility(Reference.resource("damage_boost"), DAMAGE_BOOST, RegistrationSide.SERVER);
-		AbilityUtils.registerAbility(Reference.resource("damage_reduce"), DAMAGE_REDUCE, RegistrationSide.SERVER);
+		AbilityUtils.registerAbility(Reference.resource("modify"), MODIFY_VALUE, RegistrationSide.BOTH);
 	}
 
 	private static final Set<ItemAbility> DIG_ACTIONS = Set.of(ItemAbilities.PICKAXE_DIG, ItemAbilities.AXE_DIG,
@@ -171,7 +177,31 @@ public class Abilities {
 			.setDescription(LangProvider.COMMAND_DESC.asComponent())
 			.setStatus((player, nbt, context) -> List.of()).build();
 
-	public static final Ability DAMAGE_REDUCE = Ability.begin().build();
+	//Can be used to reduce damage as well as increase jump amount
+	public static final Ability MODIFY_VALUE = Ability.begin()
+			.addDefaults(TagBuilder.start()
+					.withFloat(AbilityUtils.PER_LEVEL, 0f)
+					.withFloat(AbilityUtils.BASE, 0f)
+					.withFloat(AbilityUtils.MAX_BOOST, Float.MAX_VALUE)
+					.withString(AbilityUtils.CONTAINER_NAME, "exp")
+					.withList(AbilityUtils.DAMAGE_TYPES, new ListTag()).build())
+			.setStart(((player, settings, context) -> {
+				if (context.hasParam(EventContext.CHANGE_AMOUNT)
+						&& (settings.getList(AbilityUtils.DAMAGE_TYPES, StringTag.TAG_STRING).isEmpty()
+						|| (context.hasParam(LootContextParams.DAMAGE_SOURCE)
+							&& tagContains(settings, AbilityUtils.DAMAGE_TYPES, context, LootContextParams.DAMAGE_SOURCE)))) {
+					float change = context.getParam(EventContext.CHANGE_AMOUNT);
+					String container = settings.getString(AbilityUtils.CONTAINER_NAME);
+					long progressLevel = Core.get(context.getLevel()).getProgression().getProgress(player.getUUID(), container).getProgressAsNumber();
+					change += settings.getFloat(AbilityUtils.BASE) + (settings.getFloat(AbilityUtils.PER_LEVEL) * (float)progressLevel);
+					context.setParam(EventContext.CHANGE_AMOUNT, change);
+				}
+			})).build();
 
-	public static final Ability DAMAGE_BOOST = Ability.begin().build();
+	private static boolean tagContains(CompoundTag tag, String key, EventContext context, LootContextParam<DamageSource> param) {
+		ListTag list = tag.getList(key, StringTag.TAG_STRING);
+		DamageSource source = context.getParam(param);
+		StringTag strTag = StringTag.valueOf(RegistryUtil.getId(source.typeHolder()).toString());
+		return list.contains(strTag);
+	}
 }

@@ -47,6 +47,7 @@ public class AbilityUtils {
     
     public static final String DAMAGE_IN = "damageIn";
     public static final String DAMAGE_OUT ="damage";
+    public static final String DAMAGE_TYPES = "damage_types";
     
     public static final String ATTRIBUTE = "attribute";
     public static final String JUMP_OUT = "jump_boost_output";

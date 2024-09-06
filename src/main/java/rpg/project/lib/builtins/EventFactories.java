@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.ICancellableEvent;
@@ -215,9 +216,12 @@ public class EventFactories {
 				LivingEvent.LivingJumpEvent.class,
 				context -> !context.getActor().isSprinting() && !context.getActor().isCrouching(),
 				event -> EventContext.self(orNull(event.getEntity()), event.getEntity().level())
-						.withParam(EventContext.CHANGE_AMOUNT, event.getEntity().getJumpPower()).create(),
+						.withDynamicParam(EventContext.CHANGE_AMOUNT, 0f).create(),
 				(e, c) -> {},
-				(e, c) -> {}
+				(e, c) -> {
+					c.getActor().addDeltaMovement(new Vec3(0, c.getParam(EventContext.CHANGE_AMOUNT), 0));
+					c.getActor().hurtMarked = true;
+				}
 		));
 		VALUES.add(new EventListenerSpecification<>(
 				Reference.resource("sprint_jump"),
@@ -225,9 +229,12 @@ public class EventFactories {
 				LivingEvent.LivingJumpEvent.class,
 				context -> context.getActor().isSprinting(),
 				event -> EventContext.self(orNull(event.getEntity()), event.getEntity().level())
-						.withParam(EventContext.CHANGE_AMOUNT, event.getEntity().getJumpPower()).create(),
+						.withDynamicParam(EventContext.CHANGE_AMOUNT, 0f).create(),
 				(e, c) -> {},
-				(e, c) -> {}
+				(e, c) -> {
+					c.getActor().addDeltaMovement(new Vec3(0, c.getParam(EventContext.CHANGE_AMOUNT), 0));
+					c.getActor().hurtMarked = true;
+				}
 		));
 		VALUES.add(new EventListenerSpecification<>(
 				Reference.resource("crouch_jump"),
@@ -235,9 +242,12 @@ public class EventFactories {
 				LivingEvent.LivingJumpEvent.class,
 				context -> context.getActor().isCrouching(),
 				event -> EventContext.self(orNull(event.getEntity()), event.getEntity().level())
-						.withParam(EventContext.CHANGE_AMOUNT, event.getEntity().getJumpPower()).create(),
+						.withDynamicParam(EventContext.CHANGE_AMOUNT, 0f).create(),
 				(e, c) -> {},
-				(e, c) -> {}
+				(e, c) -> {
+					c.getActor().addDeltaMovement(new Vec3(0, c.getParam(EventContext.CHANGE_AMOUNT), 0));
+					c.getActor().hurtMarked = true;
+				}
 		));
 		VALUES.add(new EventListenerSpecification<>(
 			Reference.resource("player_attack_entity"),
@@ -260,11 +270,22 @@ public class EventFactories {
 			(e, c) -> e.setNewDamage(c.getParam(EventContext.CHANGE_AMOUNT))
 		));
 		VALUES.add(new EventListenerSpecification<>(
-			Reference.resource("damage_player"),
+			Reference.resource("entity_damage_player"),
 			EventPriority.LOWEST,
 			LivingDamageEvent.Pre.class,
 			context -> context.getParam(LootContextParams.DAMAGE_SOURCE).getEntity() != null,
 			event -> EventContext.build(event.getSource().getEntity() == null ? Reference.resource("null") : RegistryUtil.getId(event.getSource().getEntity()), LootContextParams.THIS_ENTITY, event.getSource().getEntity(), orNull(event.getEntity()), event.getEntity().level())
+					.withParam(LootContextParams.DAMAGE_SOURCE, event.getSource())
+					.withDynamicParam(EventContext.CHANGE_AMOUNT, event.getNewDamage()).create(),
+			(e, c) -> e.setNewDamage(0),
+			(e, c) -> e.setNewDamage(c.getParam(EventContext.CHANGE_AMOUNT))
+		));
+		VALUES.add(new EventListenerSpecification<>(
+			Reference.resource("damage_player"),
+			EventPriority.LOWEST,
+			LivingDamageEvent.Pre.class,
+			context -> true,
+			event -> EventContext.self(orNull(event.getEntity()), event.getEntity().level())
 					.withParam(LootContextParams.DAMAGE_SOURCE, event.getSource())
 					.withDynamicParam(EventContext.CHANGE_AMOUNT, event.getNewDamage()).create(),
 			(e, c) -> e.setNewDamage(0),

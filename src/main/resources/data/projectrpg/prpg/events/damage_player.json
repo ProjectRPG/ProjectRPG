@@ -1,0 +1,8 @@
+{"replace":true,
+ "copyTo":["projectrpg:submerged"],
+ "abilities": [
+   {"type": "minecraft:abilities", "configurations": [
+     {"type": "projectrpg:modify", "per_level": -0.01, "damage_types": ["minecraft:fall"]}
+   ]}
+ ]
+}
