@@ -1,9 +1,13 @@
 package rpg.project.lib.internal.registry;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.Event;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.abilities.AbilityUtils;
@@ -11,6 +15,12 @@ import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.EventListenerSpecification;
 import rpg.project.lib.api.events.EventListenerSpecification.CancellationType;
 import rpg.project.lib.api.events.EventProvider;
+import rpg.project.lib.api.events.conditions.EventCondition;
+import rpg.project.lib.api.events.conditions.EventConditionAnd;
+import rpg.project.lib.api.events.conditions.EventConditionAny;
+import rpg.project.lib.api.events.conditions.EventConditionEntityMatches;
+import rpg.project.lib.api.events.conditions.EventConditionNot;
+import rpg.project.lib.api.events.conditions.EventConditionType;
 import rpg.project.lib.api.feature.Feature;
 import rpg.project.lib.builtins.EventFactories;
 import rpg.project.lib.internal.Core;
@@ -74,9 +84,18 @@ public class EventRegistry {
 	}
 
 	public static final DeferredRegister<EventProvider<?>> EVENTS = DeferredRegister.create(APIUtils.GAMEPLAY_EVENTS, Reference.MODID);
+	public static final DeferredRegister<EventConditionType> CONDITIONS = DeferredRegister.create(APIUtils.EVENT_CONDITIONS, Reference.MODID);
+
+	public static final DeferredHolder<EventConditionType, EventConditionType> ALL_OF = condition("and", EventConditionAnd.CODEC);
+	public static final DeferredHolder<EventConditionType, EventConditionType> ANY_OF = condition("any", EventConditionAny.CODEC);
+	public static final DeferredHolder<EventConditionType, EventConditionType> NOT = condition("not", EventConditionNot.CODEC);
+	public static final DeferredHolder<EventConditionType, EventConditionType> ENTITY_MATCHES = condition("entity_matches", EventConditionEntityMatches.CODEC);
 
 	static {
 		EventFactories.registerEvents(EVENTS);
 	}
 
+	private static DeferredHolder<EventConditionType, EventConditionType> condition(String name, MapCodec<? extends EventCondition> codec) {
+		return CONDITIONS.register(name, () -> new EventConditionType(codec));
+	}
 }
