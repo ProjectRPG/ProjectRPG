@@ -11,11 +11,12 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.neoforged.neoforge.registries.RegisterEvent;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.abilities.AbilitySystem;
 import rpg.project.lib.api.party.PartySystem;
@@ -55,26 +56,23 @@ public class CommonSetup {
 	};
 
 	/**Registered to MOD BUS in mod constructor*/
-	public static void gatherData(GatherDataEvent event) {
+	public static void gatherData(GatherDataEvent.Client event) {
 		DataGenerator generator = event.getGenerator();
 		PackOutput packOutput = generator.getPackOutput();
-		
-		if (event.includeClient()) {
-			for (Locale locale : LangProvider.Locale.values()) {
-				generator.addProvider(true, new LangProvider(packOutput, locale));
-			}
+
+		for (Locale locale : LangProvider.Locale.values()) {
+			generator.addProvider(true, new LangProvider(packOutput, locale));
 		}
 	}
 	
 	public static void init(final FMLCommonSetupEvent event) {
 		event.enqueueWork(() -> EventRegistry.EVENTS.getRegistry().get().stream().forEach(EventRegistry::registerListener));
-		Abilities.init();
 		Networking.registerDataSyncPackets();
 	}
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
     public static void tickPerks(LevelTickEvent.Pre event) {
-        Core.get(event.getLevel()).getAbilities().executeAbilityTicks(event);
+        Core.get(event.getLevel()).executeAbilityTicks(event);
     }
 	
 	@SubscribeEvent
@@ -83,8 +81,8 @@ public class CommonSetup {
 	}
 	
 	@SubscribeEvent
-	public static void onAddReloadListeners(AddReloadListenerEvent event) {
-		event.addListener(DataLoader.RELOADER);
-		Core.get(LogicalSide.SERVER).getLoader().all().forEach(event::addListener);
+	public static void onAddReloadListeners(AddServerReloadListenersEvent event) {
+		event.addListener(Reference.resource("reloader"), DataLoader.RELOADER);
+		Core.get(LogicalSide.SERVER).getLoader().all().forEach(listener -> event.addListener(Reference.resource(listener.folderName), listener));
 	}
 }

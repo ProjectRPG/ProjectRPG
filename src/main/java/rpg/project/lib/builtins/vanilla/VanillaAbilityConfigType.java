@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -12,11 +11,11 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.LogicalSide;
+import rpg.project.lib.api.abilities.AbilityUtils;
 import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.internal.Core;
-import rpg.project.lib.internal.registry.AbilityRegistry;
 
 public record VanillaAbilityConfigType() implements SubSystemConfigType {
 	public static final ResourceLocation ID = ResourceLocation.withDefaultNamespace("abilities");
@@ -28,7 +27,7 @@ public record VanillaAbilityConfigType() implements SubSystemConfigType {
 	}
 
 	@Override
-	public SubSystemConfig getDefault(RegistryAccess access) {return new VanillaAbilityConfig(Core.get(LogicalSide.SERVER).getAbilities().getDefaults());}
+	public SubSystemConfig getDefault(RegistryAccess access) {return new VanillaAbilityConfig(AbilityUtils.get(access).getDefaults());}
 
 
 	public record VanillaAbilityConfig(List<CompoundTag> data) implements SubSystemConfig {

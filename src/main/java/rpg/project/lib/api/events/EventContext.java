@@ -6,13 +6,13 @@ import java.util.Map;
 import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import org.jetbrains.annotations.Nullable;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.data.DataObject;
@@ -30,40 +30,40 @@ public class EventContext{
 	private final Pair<ObjectType, ResourceLocation> subjectObject;
 	/**Populated by {@link ContextBuilder} as immutable properties of the context.  Values added to this map are
 	 * expected to never change and that doing so would create instability in the event sequence.*/
-	private final Map<LootContextParam<?>, Object> contextParams;
+	private final Map<ContextKey<?>, Object> contextParams;
 	/**May be populated with initial values via {@link ContextBuilder}, however this map contains mutable values
-	 * that subsystems can add and modify with {@link #setParam(LootContextParam, Object)}.
+	 * that subsystems can add and modify with {@link #setParam(ContextKey, Object)}.
 	 * Values in this map are typically used for event callbacks where the event exposes properties to a subsystem
 	 * expecting to then re-consume that value at some point in the event.
-	 * <h4>Note: {@link LootContextParam} keys in {@link #contextParams} will always be returned instead of the same
+	 * <h4>Note: {@link ContextKey} keys in {@link #contextParams} will always be returned instead of the same
 	 * key in this map.  Therefore, it is important to use unique keys in event implementations with similar values.</h4>*/
-	private final Map<LootContextParam<?>, Object> dynamicParams;
+	private final Map<ContextKey<?>, Object> dynamicParams;
 
-	protected EventContext(Pair<ObjectType, ResourceLocation> subjectObject, Map<LootContextParam<?>, Object> contextParams, Map<LootContextParam<?>, Object> dynamicParams) {
+	protected EventContext(Pair<ObjectType, ResourceLocation> subjectObject, Map<ContextKey<?>, Object> contextParams, Map<ContextKey<?>, Object> dynamicParams) {
 		this.subjectObject = subjectObject;
 		this.contextParams = contextParams;
 		this.dynamicParams = dynamicParams;
 	}
-	public static final LootContextParam<Player> PLAYER = new LootContextParam<>(Reference.resource("actor"));
-	public static final LootContextParam<LevelAccessor> LEVEL = new LootContextParam<>(Reference.resource("event_level"));
-	public static final LootContextParam<ItemStack> ITEMSTACK = new LootContextParam<>(Reference.resource("itemstack"));
-	public static final LootContextParam<Integer> BREATH_CHANGE = new LootContextParam<>(Reference.resource("breath_change"));
-	public static final LootContextParam<AgeableMob> BABY = new LootContextParam<>(Reference.resource("baby"));
-	public static final LootContextParam<Mob> PARENT_A = new LootContextParam<>(Reference.resource("parent_a"));
-	public static final LootContextParam<Mob> PARENT_B = new LootContextParam<>(Reference.resource("parent_b"));
-	public static final LootContextParam<MobEffectInstance> MOB_EFFECT = new LootContextParam<>(Reference.resource("mob_effect"));
-	public static final LootContextParam<Boolean> CANCELLED = new LootContextParam<>(Reference.resource("event_cancelled"));
-	public static final LootContextParam<Float> CHANGE_AMOUNT = new LootContextParam<>(Reference.resource("amount_changed"));
-	public static final LootContextParam<Float> MAGNITUDE = new LootContextParam<>(Reference.resource("magnitude"));
+	public static final ContextKey<Player> PLAYER = new ContextKey<>(Reference.resource("actor"));
+	public static final ContextKey<LevelAccessor> LEVEL = new ContextKey<>(Reference.resource("event_level"));
+	public static final ContextKey<ItemStack> ITEMSTACK = new ContextKey<>(Reference.resource("itemstack"));
+	public static final ContextKey<Integer> BREATH_CHANGE = new ContextKey<>(Reference.resource("breath_change"));
+	public static final ContextKey<AgeableMob> BABY = new ContextKey<>(Reference.resource("baby"));
+	public static final ContextKey<Mob> PARENT_A = new ContextKey<>(Reference.resource("parent_a"));
+	public static final ContextKey<Mob> PARENT_B = new ContextKey<>(Reference.resource("parent_b"));
+	public static final ContextKey<MobEffectInstance> MOB_EFFECT = new ContextKey<>(Reference.resource("mob_effect"));
+	public static final ContextKey<Boolean> CANCELLED = new ContextKey<>(Reference.resource("event_cancelled"));
+	public static final ContextKey<Float> CHANGE_AMOUNT = new ContextKey<>(Reference.resource("amount_changed"));
+	public static final ContextKey<Float> MAGNITUDE = new ContextKey<>(Reference.resource("magnitude"));
 
 	public ObjectType getSubjectType() {return subjectObject.getFirst();}
 	public ResourceLocation getSubjectID() {return subjectObject.getSecond();}
 
-	public boolean hasParam(LootContextParam<?> param) {
+	public boolean hasParam(ContextKey<?> param) {
 		return contextParams.containsKey(param) || dynamicParams.containsKey(param);
 	}
 
-	/**Return the value associated with the {@link LootContextParam} key.  If a key is associated with
+	/**Return the value associated with the {@link ContextKey} key.  If a key is associated with
 	 * both an immutable value and a mutable value, the immutable one will be returned, else if no value
 	 * is present, null is returned.
 	 *
@@ -73,7 +73,7 @@ public class EventContext{
 	 */
 	@Nullable
 	@SuppressWarnings("unchecked") //public setters enforce key-value type parity
-	public <T> T getParam(LootContextParam<T> param) {
+	public <T> T getParam(ContextKey<T> param) {
 		return (T) (contextParams.containsKey(param)
                         ? contextParams.get(param)
                         : dynamicParams.get(param));
@@ -85,7 +85,7 @@ public class EventContext{
 	 * @param value the value being added/updated
 	 * @param <T> the object class of the value
 	 */
-	public <T> void setParam(LootContextParam<T> key, T value) {
+	public <T> void setParam(ContextKey<T> key, T value) {
 		dynamicParams.put(key, value);
 	}
 
@@ -113,7 +113,7 @@ public class EventContext{
 	 * @return a new {@link ContextBuilder}
 	 * @param <T> the object class of the subject object.
 	 */
-	public static <T> ContextBuilder build(ResourceLocation subjectID, LootContextParam<T> subjectParam, T subject, Player actor, LevelAccessor level) {
+	public static <T> ContextBuilder build(ResourceLocation subjectID, ContextKey<T> subjectParam, T subject, Player actor, LevelAccessor level) {
 		return new ContextBuilder(subjectID, subjectParam, subject)
 				.withParam(PLAYER, actor)
 				.withParam(LEVEL, level);
@@ -143,9 +143,9 @@ public class EventContext{
 
 	public static class ContextBuilder {
 		private final Pair<ObjectType, ResourceLocation> subjectReference;
-		private final Map<LootContextParam<?>, Object> contextParams = new HashMap<>();
-		private final Map<LootContextParam<?>, Object> dynamicParams = new HashMap<>();
-		protected <T> ContextBuilder(ResourceLocation subjectID, LootContextParam<T> subjectParam, T subject) {
+		private final Map<ContextKey<?>, Object> contextParams = new HashMap<>();
+		private final Map<ContextKey<?>, Object> dynamicParams = new HashMap<>();
+		protected <T> ContextBuilder(ResourceLocation subjectID, ContextKey<T> subjectParam, T subject) {
 			this.subjectReference = Pair.of(getType(subject), subjectID);
 			contextParams.put(subjectParam, subject);
 		}
@@ -157,7 +157,7 @@ public class EventContext{
 		 * @return this {@link ContextBuilder}
 		 * @param <T> the object class for the value
 		 */
-		public <T> ContextBuilder withParam(LootContextParam<T> paramKey, T param) {
+		public <T> ContextBuilder withParam(ContextKey<T> paramKey, T param) {
 			contextParams.put(paramKey, param);
 			return this;
 		}
@@ -170,7 +170,7 @@ public class EventContext{
 		 * @return this {@link ContextBuilder}
 		 * @param <T> the object class for the value
 		 */
-		public <T> ContextBuilder withDynamicParam(LootContextParam<T> paramKey, T param) {
+		public <T> ContextBuilder withDynamicParam(ContextKey<T> paramKey, T param) {
 			dynamicParams.put(paramKey, param);
 			return this;
 		}

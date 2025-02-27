@@ -1,20 +1,21 @@
 package rpg.project.lib.api;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import net.minecraft.resources.ResourceLocation;
-import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.abilities.AbilitySystem;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
+import rpg.project.lib.api.events.EventContext;
+import rpg.project.lib.api.feature.Feature;
 import rpg.project.lib.api.gating.GateUtils.Type;
 import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.api.progression.ProgressionAddon;
 import rpg.project.lib.api.progression.ProgressionSystem;
-import rpg.project.lib.internal.registry.AbilityRegistry;
-import rpg.project.lib.internal.registry.FeatureRegistry;
+import rpg.project.lib.internal.registry.SubSystemCodecRegistry;
 
 /**Implementations of this provide access to shared
  * features of the library.  Project RPG provides an
@@ -91,9 +92,21 @@ public interface Hub {
 	/**@return the active {@link AbilitySystem} implementation for this instance
 	 */
 	AbilitySystem getAbility();
-	/**@return the registry containing {@link Ability} types from all addons
+
+	/**
+	 *
+	 * @param core
+	 * @param eventID
+	 * @param context
+	 * @return
 	 */
-	AbilityRegistry getAbilities();
-	/**@return the registry containing all the {@link rpg.project.lib.api.feature.Feature}s from all addons.*/
-	FeatureRegistry getFeatures();
+	default List<Feature> getFeaturesForContext(ResourceLocation eventID, EventContext context) {
+		List<Feature> validFeatures = new ArrayList<>();
+		for (SubSystemConfig config : this.getFeatureData(context.getSubjectType(), context.getSubjectID(), eventID)) {
+			ResourceLocation featureID = SubSystemCodecRegistry.lookup(config.getType());
+			Feature feature = context.getLevel().registryAccess().lookupOrThrow(APIUtils.FEATURE).getValue(featureID);
+			if (feature.isValidContext().test(eventID, context)) validFeatures.add(feature);
+		}
+		return validFeatures;
+	}
 }

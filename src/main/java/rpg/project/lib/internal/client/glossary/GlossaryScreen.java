@@ -45,7 +45,7 @@ public class GlossaryScreen extends Screen {
         categoryFilterBox.setEntries(Arrays.stream(ObjectType.values())
                 .map(value -> new DropDownComponent.SelectionEntry<ObjectType>(Component.literal(value.name()), value))
                 .toList());
-        eventFilterBox.setEntries(Minecraft.getInstance().level.registryAccess().registryOrThrow(APIUtils.GAMEPLAY_EVENTS).keySet().stream()
+        eventFilterBox.setEntries(Minecraft.getInstance().level.registryAccess().lookupOrThrow(APIUtils.GAMEPLAY_EVENTS).keySet().stream()
                 .map(rl -> new DropDownComponent.SelectionEntry<>(Component.literal(rl.toString()), rl))
                 .toList());
         searchBox = new EditBox(this.font, eventFilterBox.getX(), eventFilterBox.getY() + 42, filterSectionWidth, 20, Component.translatable("gui.recipebook.search_hint"));

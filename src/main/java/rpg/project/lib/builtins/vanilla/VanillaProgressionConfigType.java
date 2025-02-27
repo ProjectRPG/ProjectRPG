@@ -26,7 +26,7 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 	}
 
 	@Override
-	public SubSystemConfig getDefault(RegistryAccess access) {return new VanillaProgressionConfig(access.registryOrThrow(APIUtils.GAMEPLAY_EVENTS).keySet()
+	public SubSystemConfig getDefault(RegistryAccess access) {return new VanillaProgressionConfig(access.lookupOrThrow(APIUtils.GAMEPLAY_EVENTS).keySet()
 			.stream().collect(Collectors.toMap(id -> id, id -> 0)));}
 
 

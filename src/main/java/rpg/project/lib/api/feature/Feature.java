@@ -3,7 +3,6 @@ package rpg.project.lib.api.feature;
 import net.minecraft.resources.ResourceLocation;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.events.EventContext;
-import rpg.project.lib.internal.registry.FeatureRegistry;
 
 import java.util.function.BiPredicate;
 
@@ -24,8 +23,8 @@ import java.util.function.BiPredicate;
  * @param featureID the id used in configurations to reference this feature
  * @param execution consumes state information and executes feature behavior when invoked
  * @param isValidContext determines if the feature can execute when invoked.  This is tested when features are queried
-*         by the {@link FeatureRegistry} and determines if this should be passed back to the event handlers.  The event
- *        ID and context are provided.
+*         by the event and determines if this should be passed back to the event handlers.  The event
+ *        ID and context are provided.  Sidedness test should be conducted here.
  */
 public record Feature(ResourceLocation featureID, FeatureFunction execution, BiPredicate<ResourceLocation, EventContext> isValidContext) {
 }

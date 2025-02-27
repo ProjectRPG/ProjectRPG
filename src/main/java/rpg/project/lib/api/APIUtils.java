@@ -6,15 +6,16 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.LogicalSide;
-import rpg.project.lib.api.data.SubSystemConfig;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.api.enums.RegistrationSide;
-import rpg.project.lib.api.events.EventListenerSpecification;
 import rpg.project.lib.api.events.EventProvider;
 import rpg.project.lib.api.feature.Feature;
 import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.internal.Core;
-import rpg.project.lib.internal.registry.FeatureRegistry;
+//import rpg.project.lib.internal.config.scripting.NodeConsumer;
+//import rpg.project.lib.internal.config.scripting.TargetSelector;
 import rpg.project.lib.internal.registry.SubSystemCodecRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
 import rpg.project.lib.internal.util.Reference;
@@ -26,7 +27,16 @@ public class APIUtils {
 	 * to register custom events.  Custom events can be referenced by other addons' configurations to apply their
 	 * system implementation behavior to your event specification.*/
 	public static final ResourceKey<Registry<EventProvider<?>>> GAMEPLAY_EVENTS = ResourceKey.createRegistryKey(Reference.resource("gameplay_events"));
-	
+	public static final ResourceKey<Registry<Feature>> FEATURE = ResourceKey.createRegistryKey(Reference.resource("feature"));
+	public static final ResourceKey<Registry<Ability>> ABILITY = ResourceKey.createRegistryKey(Reference.resource("ability"));
+//	public static final ResourceKey<Registry<NodeConsumer>> FUNCTION = ResourceKey.createRegistryKey(Reference.resource("function"));
+//	public static final ResourceKey<Registry<TargetSelector>> TARGETOR = ResourceKey.createRegistryKey(Reference.resource("targetor"));
+
+	public static final DeferredRegister<Feature> FEATURES = DeferredRegister.create(FEATURE, Reference.MODID);
+	public static final DeferredRegister<Ability> ABILITIES = DeferredRegister.create(ABILITY, Reference.MODID);
+//	public static final DeferredRegister<NodeConsumer> FUNCTIONS = DeferredRegister.create(FUNCTION, Reference.MODID);
+//	public static final DeferredRegister<TargetSelector> TARGETORS = DeferredRegister.create(TARGETOR, Reference.MODID);
+
 	public static Codec<SubSystemConfigType> getDispatchCodec() {
 		return SubSystemCodecRegistry.CODEC;
 	}
@@ -53,19 +63,15 @@ public class APIUtils {
 		};
 	}
 
-	/**Registers a feature for configurations to use.  {@link RegistrationSide} allows
-	 * for registration of sided features.  For features that should be on both sides,
-	 * but with different behavior, register each side's implementation separately.
+	/**Registers a feature's config specification for configurations to use.
 	 *
-	 * @param feature the feature specification being registered
+	 * To register the feature itself, use a deferred register and the registry key
+	 * of {@link APIUtils#FEATURE}.
+	 *
+	 * @param featureId the ID of the feature specification being registered
 	 * @param config the config type used to read this feature from data
-	 * @param sides the side this feature should be configured on.
 	 */
-	public static void registerFeature(Feature feature, SubSystemConfigType config, RegistrationSide sides) {
-		SubSystemCodecRegistry.registerSubSystem(feature.featureID(), config, SubSystemCodecRegistry.SystemType.FEATURE);
-		if (sides == RegistrationSide.BOTH || sides == RegistrationSide.SERVER)
-			Core.get(LogicalSide.SERVER).getFeatures().register(feature);
-		if (sides == RegistrationSide.BOTH || sides == RegistrationSide.CLIENT)
-			Core.get(LogicalSide.CLIENT).getFeatures().register(feature);
+	public static void registerFeature(ResourceLocation featureId, SubSystemConfigType config) {
+		SubSystemCodecRegistry.registerSubSystem(featureId, config, SubSystemCodecRegistry.SystemType.FEATURE);
 	}
 }

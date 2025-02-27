@@ -42,7 +42,7 @@ public class EventRegistry {
 		if (eventCancellationStatus != CancellationType.NONE)
 			spec.cancellationCallback().accept(event, eventCancellationStatus);
 
-		for (Feature feature : core.getFeatures().getFeaturesForContext(core, eventID, context)) {
+		for (Feature feature : core.getFeaturesForContext(eventID, context)) {
 			float gating = GateRegistry.isFeaturePermitted(core, eventID, context, feature);
 			if (gating != GateRegistry.HARD_FAIL)
 				feature.execution().execute(core, eventID, context, gating);
@@ -54,7 +54,7 @@ public class EventRegistry {
 			float gating = GateRegistry.isAbilityPermitted(context.getActor(), core, eventID, context, abilityID);
 			if (gating != GateRegistry.HARD_FAIL) {
 				context.setParam(AbilityUtils.REDUCE, gating);
-				core.getAbilities().executeAbility(abilityID, context.getActor(), config, context);
+				core.executeAbility(abilityID, context.getActor(), config, context);
 			}
 		}
 		
