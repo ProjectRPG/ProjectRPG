@@ -1,6 +1,7 @@
 package rpg.project.lib.builtins;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -158,7 +159,8 @@ public class EventFactories {
 				Reference.resource("consume"),
 				EventPriority.LOWEST,
 				LivingEntityUseItemEvent.Finish.class,
-				context -> context.getParam(EventContext.ITEMSTACK).getFoodProperties(context.getActor()) != null,
+				//TODO test that FOOD does not have a default value that would create a never-null scenario
+				context -> context.getParam(EventContext.ITEMSTACK).get(DataComponents.FOOD) != null,
 				event -> EventContext.build(RegistryUtil.getId(event.getItem()), EventContext.ITEMSTACK, event.getItem(), orNull(event.getEntity()), event.getEntity().level()).create(),
 				(e,v) -> {},
 				(e,v) -> {}

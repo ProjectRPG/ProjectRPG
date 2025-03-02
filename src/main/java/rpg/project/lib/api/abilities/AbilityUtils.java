@@ -1,15 +1,23 @@
 package rpg.project.lib.api.abilities;
 
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.List;
 import java.util.function.Supplier;
 
-import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
+import net.minecraft.util.context.ContextKey;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.fml.LogicalSide;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.api.enums.RegistrationSide;
+import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.registry.SubSystemCodecRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
@@ -36,14 +44,14 @@ public class AbilityUtils {
     /**Sets how long this ability should tick for before stopping*/
     public static final String DURATION = "duration";
     public static final String REDUCTION = "reduce";
-    public static final LootContextParam<Float> REDUCE = new LootContextParam<>(Reference.resource(REDUCTION));
+    public static final ContextKey<Float> REDUCE = new ContextKey<>(Reference.resource(REDUCTION));
     
     public static final String BLOCK_POS = "block_pos";
     public static final String CONTAINER_NAME = "progress_type";
     public static final String PROGRESS_LEVEL = "progress";
     
-    public static final LootContextParam<Float> BREAK_SPEED_INPUT_VALUE =  new LootContextParam<>(Reference.resource("speed_in"));
-    public static final LootContextParam<Float> BREAK_SPEED_OUTPUT_VALUE = new LootContextParam<>(Reference.resource("speed"));
+    public static final ContextKey<Float> BREAK_SPEED_INPUT_VALUE =  new ContextKey<>(Reference.resource("speed_in"));
+    public static final ContextKey<Float> BREAK_SPEED_OUTPUT_VALUE = new ContextKey<>(Reference.resource("speed"));
     
     public static final String DAMAGE_IN = "damageIn";
     public static final String DAMAGE_OUT ="damage";
@@ -63,39 +71,37 @@ public class AbilityUtils {
     
     public static final String EFFECTS = "effects";
     
-    /**Called during common setup, this method is used to register custom abilities
-     * to PMMO so that players can use them in their configurations.  It is
-     * strongly recommended that you document your abilities so that users have a
-     * full understanding of how to use it. This includes inputs and outputs,
-     * reasonable triggers, and sidedness.
-     *
-     * @param abilityID a custom id for your ability that can be used in abilities.json to reference this ability
-     * @param side the logical sides this ability should execute on.  Your implementation should factor in sidedness to avoid crashes.
-     */
-    public static void registerAbility(@NonNull ResourceLocation abilityID, @NonNull Ability ability, @NonNull RegistrationSide side) {
-        switch (side) {
-            case SERVER -> {
-                Core.get(LogicalSide.SERVER).getAbilities().registerAbility(abilityID, ability);
-                Core.get(LogicalSide.CLIENT).getAbilities().registerClientClone(abilityID, ability);
-            }
-            case CLIENT -> Core.get(LogicalSide.CLIENT).getAbilities().registerAbility(abilityID, ability);
-            case BOTH -> {
-                Core.get(LogicalSide.SERVER).getAbilities().registerAbility(abilityID, ability);
-                Core.get(LogicalSide.CLIENT).getAbilities().registerAbility(abilityID, ability);
-            }
-        }
-    }
-    
     /**Sets the ability system for the ecosystem.  Only one system can be active.
-     * 
-     * @param id the system configuration ID used to specify the format of configuration settings
-     * @param config the configuration specification used by this system.
+     *
      * @param system supplies a new instance of the AbilitySystem to be registered.
      */
-    public static void registerAbilitySystem(ResourceLocation id, SubSystemConfigType config, Supplier<AbilitySystem> system) {
-    	CommonSetup.abilitySupplier = () ->{
-    		SubSystemCodecRegistry.registerSubSystem(id, config, SubSystemCodecRegistry.SystemType.ABILITY);
-    		return system.get();
-    	};    	
+    public static void registerAbilitySystem(Supplier<AbilitySystem> system) {
+    	CommonSetup.abilitySupplier = system;
+    }
+
+    public static AbilityGetter get(RegistryAccess access) {
+        return new AbilityGetter(access.lookupOrThrow(APIUtils.ABILITY));
+    }
+
+    public record AbilityGetter(Registry<Ability> registry) {
+        public MutableComponent getDescription(ResourceLocation id) {
+            return registry().getOptional(id).orElse(Ability.empty()).description();
+        }
+
+        public List<MutableComponent> getStatusLines(ResourceLocation id, Player player, CompoundTag settings, EventContext context) {
+            return registry().getOptional(id).orElse(Ability.empty()).status().apply(player, settings, context);
+        }
+
+        public List<CompoundTag> getDefaults() {
+            return registry().entrySet().stream().map(entry -> {
+                var nbt = entry.getValue().propertyDefaults().copy();
+                nbt.putString(AbilityUtils.TYPE, entry.getKey().location().toString());
+                return nbt;
+            }).toList();
+        }
+
+        public Ability getAbility(ResourceLocation id) {
+            return registry().getOptional(id).orElse(Ability.empty());
+        }
     }
 }

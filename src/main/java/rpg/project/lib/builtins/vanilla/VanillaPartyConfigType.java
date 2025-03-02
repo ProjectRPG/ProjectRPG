@@ -1,5 +1,6 @@
 package rpg.project.lib.builtins.vanilla;
 
+import java.util.EnumSet;
 import java.util.Optional;
 
 import com.mojang.serialization.Codec;
@@ -8,6 +9,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
+import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
@@ -17,12 +19,19 @@ public record VanillaPartyConfigType() implements SubSystemConfigType{
 	public static final VanillaPartyConfigType IMPL = new VanillaPartyConfigType();
 
 	@Override
+	public ResourceLocation getId() {return ID;}
+	@Override
 	public MapCodec<SubSystemConfig> getCodec() {
 		return VanillaPartyConfig.CODEC;
 	}
 
 	@Override
 	public SubSystemConfig getDefault(RegistryAccess access) {return new VanillaPartyConfig();}
+
+	@Override
+	public EnumSet<APIUtils.SystemType> applicableSystemTypes() {
+		return EnumSet.of(APIUtils.SystemType.PARTY);
+	}
 
 
 	public record VanillaPartyConfig() implements SubSystemConfig {

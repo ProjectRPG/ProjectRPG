@@ -1,5 +1,6 @@
 package rpg.project.lib.builtins.vanilla;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,13 +22,20 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 	public static final VanillaProgressionConfigType IMPL = new VanillaProgressionConfigType();
 
 	@Override
+	public ResourceLocation getId() {return ID;}
+	@Override
 	public MapCodec<SubSystemConfig> getCodec() {
 		return VanillaProgressionConfig.CODEC;
 	}
 
 	@Override
-	public SubSystemConfig getDefault(RegistryAccess access) {return new VanillaProgressionConfig(access.registryOrThrow(APIUtils.GAMEPLAY_EVENTS).keySet()
+	public SubSystemConfig getDefault(RegistryAccess access) {return new VanillaProgressionConfig(access.lookupOrThrow(APIUtils.GAMEPLAY_EVENTS).keySet()
 			.stream().collect(Collectors.toMap(id -> id, id -> 0)));}
+
+	@Override
+	public EnumSet<APIUtils.SystemType> applicableSystemTypes() {
+		return EnumSet.of(APIUtils.SystemType.PROGRESSION);
+	}
 
 
 	public record VanillaProgressionConfig(Map<ResourceLocation, Integer> eventToXp) implements SubSystemConfig {

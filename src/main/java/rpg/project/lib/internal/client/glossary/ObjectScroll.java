@@ -18,6 +18,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -46,7 +47,7 @@ public class ObjectScroll extends ObjectSelectionList<ObjectScroll.Panel> {
     @Override
     public int getRowWidth() {return this.width;}
     @Override
-    protected int getDefaultScrollbarPosition() {return this.getRowLeft() + this.width - 6;}
+    protected int scrollBarX() {return this.getRowLeft() + this.width - 6;}
 
     @Override
     public NarrationPriority narrationPriority() {return NarrationPriority.NONE;}
@@ -71,17 +72,17 @@ public class ObjectScroll extends ObjectSelectionList<ObjectScroll.Panel> {
         Core core = Core.get(LogicalSide.CLIENT);
 
         if (typeFilter == null || typeFilter == ObjectType.ITEM) {
-            reg.registryOrThrow(Registries.ITEM).entrySet().stream()
+            reg.lookupOrThrow(Registries.ITEM).entrySet().stream()
                     .filter(item -> validObject(ObjectType.ITEM, eventFilter, searchFilter, item.getKey().location(), item.getValue().getDefaultInstance().getDisplayName().getString(), core))
                     .forEach(item -> this.addEntry(new Panel(item.getValue().getDefaultInstance())));
         }
         if (typeFilter == null || typeFilter == ObjectType.BLOCK) {
-            reg.registryOrThrow(Registries.BLOCK).entrySet().stream()
+            reg.lookupOrThrow(Registries.BLOCK).entrySet().stream()
                     .filter(entry -> validObject(ObjectType.BLOCK, eventFilter, searchFilter, entry.getKey().location(), entry.getValue().getName().getString(), core))
                     .forEach(block -> this.addEntry(new Panel(block.getValue())));
         }
         if (typeFilter == null || typeFilter == ObjectType.ENTITY) {
-            reg.registryOrThrow(Registries.ENTITY_TYPE).entrySet().stream()
+            reg.lookupOrThrow(Registries.ENTITY_TYPE).entrySet().stream()
                     .filter(entry -> validObject(ObjectType.ENTITY, eventFilter, searchFilter, entry.getKey().location(), entry.getValue().getDescription().getString(), core))
                     .forEach(entity -> this.addEntry(new Panel(entity.getValue())));
         }
@@ -91,22 +92,22 @@ public class ObjectScroll extends ObjectSelectionList<ObjectScroll.Panel> {
                     .forEach(key -> this.addEntry(new Panel(Component.literal(key.location().toString()), ObjectType.DIMENSION)));
         }
         if (typeFilter == null || typeFilter == ObjectType.BIOME) {
-            reg.registryOrThrow(Registries.BIOME).entrySet().stream()
+            reg.lookupOrThrow(Registries.BIOME).entrySet().stream()
                     .filter(entry -> validObject(ObjectType.BIOME, eventFilter, searchFilter, entry.getKey().location(), entry.getKey().location().toString(), core))
                     .forEach(entry -> this.addEntry(new Panel(Component.literal(entry.getKey().location().toString()), ObjectType.BIOME)));
         }
         if (typeFilter == null || typeFilter == ObjectType.ENCHANTMENT) {
-            reg.registryOrThrow(Registries.ENCHANTMENT).entrySet().stream()
+            reg.lookupOrThrow(Registries.ENCHANTMENT).entrySet().stream()
                     .filter(entry -> validObject(ObjectType.ENCHANTMENT, eventFilter, searchFilter, entry.getKey().location(), entry.getValue().description().getString(), core))
                     .forEach(entry -> this.addEntry(new Panel(entry.getValue().description(), ObjectType.ENCHANTMENT)));
         }
         if (typeFilter == null || typeFilter == ObjectType.EFFECT) {
-            reg.registryOrThrow(Registries.MOB_EFFECT).entrySet().stream()
+            reg.lookupOrThrow(Registries.MOB_EFFECT).entrySet().stream()
                     .filter(entry -> validObject(ObjectType.EFFECT, eventFilter, searchFilter, entry.getKey().location(), entry.getValue().getDisplayName().getString(), core))
                     .forEach(entry -> this.addEntry(new Panel(entry.getValue().getDisplayName(), ObjectType.EFFECT)));
         }
         if (typeFilter == null || typeFilter == ObjectType.EVENT) {
-            reg.registryOrThrow(APIUtils.GAMEPLAY_EVENTS).entrySet().stream()
+            reg.lookupOrThrow(APIUtils.GAMEPLAY_EVENTS).entrySet().stream()
                     .filter(entry -> validObject(ObjectType.EVENT, eventFilter, searchFilter, entry.getKey().location(), entry.getKey().location().toString(), core))
                     .forEach(entry -> this.addEntry(new Panel(Component.literal(entry.getKey().location().toString()), ObjectType.EVENT)));
         }
@@ -136,7 +137,7 @@ public class ObjectScroll extends ObjectSelectionList<ObjectScroll.Panel> {
             this.type = ObjectType.BLOCK;
         }
         public Panel(EntityType<?> entity) {
-            Entity renderEntity = entity.create(Minecraft.getInstance().level);
+            Entity renderEntity = entity.create(Minecraft.getInstance().level, EntitySpawnReason.NATURAL);
             this.text = renderEntity == null ? entity.getDescription() : renderEntity.getDisplayName();
             this.type = ObjectType.ENTITY;
             if (renderEntity instanceof LivingEntity livingEntity)

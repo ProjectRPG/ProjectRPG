@@ -1,5 +1,6 @@
 package rpg.project.lib.builtins.vanilla;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,12 +22,19 @@ public record VanillaBonusConfigType() implements SubSystemConfigType {
 	public static final VanillaBonusConfigType IMPL = new VanillaBonusConfigType();
 
 	@Override
+	public ResourceLocation getId() {return ID;}
+	@Override
 	public MapCodec<SubSystemConfig> getCodec() {
 		return VanillaBonusConfig.CODEC;
 	}
 
 	@Override
 	public SubSystemConfig getDefault(RegistryAccess access) {return new VanillaBonusConfig(Map.of("container_name", List.of()));}
+
+	@Override
+	public EnumSet<APIUtils.SystemType> applicableSystemTypes() {
+		return EnumSet.of(APIUtils.SystemType.PROGRESSION);
+	}
 
 
 	public record VanillaBonusConfig(Map<String, List<SubSystemConfig>> values) implements SubSystemConfig {

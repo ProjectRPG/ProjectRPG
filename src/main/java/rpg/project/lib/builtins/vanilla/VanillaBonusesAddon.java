@@ -7,7 +7,6 @@ import java.util.List;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.data.ObjectType;
@@ -23,15 +22,15 @@ public class VanillaBonusesAddon implements ProgressionAddon{
 	public ProgressionDataType modifyProgression(Hub core, EventContext context, ProgressionDataType dataIn) {
 		VanillaBonusConfig dimConfig = (VanillaBonusConfig) core
 				.getProgressionData(
-						VanillaBonusConfigType.IMPL, 
-						ObjectType.DIMENSION, 
+						VanillaBonusConfigType.IMPL,
+						ObjectType.DIMENSION,
 						RegistryUtil.getDimension(context.getLevel()))
 				.orElse(null);
-		
+
 		VanillaBonusConfig biomeConfig = (VanillaBonusConfig) core
 				.getProgressionData(
-						VanillaBonusConfigType.IMPL, 
-						ObjectType.BIOME, 
+						VanillaBonusConfigType.IMPL,
+						ObjectType.BIOME,
 						RegistryUtil.getId(context.getLevel().getBiome(context.getParam(LootContextParams.THIS_ENTITY).blockPosition())))
 				.orElse(null);
 		

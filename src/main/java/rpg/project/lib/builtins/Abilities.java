@@ -18,6 +18,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -26,10 +27,10 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
+import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.abilities.AbilityFunction;
 import rpg.project.lib.api.abilities.AbilityUtils;
@@ -37,24 +38,26 @@ import rpg.project.lib.api.enums.RegistrationSide;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.ProgressionAdvanceEvent;
 import rpg.project.lib.internal.Core;
+import rpg.project.lib.internal.setup.CommonSetup;
 import rpg.project.lib.internal.setup.datagen.LangProvider;
 import rpg.project.lib.internal.util.Reference;
 import rpg.project.lib.internal.util.RegistryUtil;
 import rpg.project.lib.internal.util.TagBuilder;
+import rpg.project.lib.internal.util.TagUtils;
 
 public class Abilities {
 	public static void init() {
-		AbilityUtils.registerAbility(Reference.resource("break_speed"), BREAK_SPEED, RegistrationSide.BOTH);
-		AbilityUtils.registerAbility(Reference.resource("effect"), EFFECT, RegistrationSide.SERVER);
-		AbilityUtils.registerAbility(Reference.resource("attribute"), ATTRIBUTE, RegistrationSide.SERVER);
-		AbilityUtils.registerAbility(Reference.resource("command"), COMMAND, RegistrationSide.SERVER);
-		AbilityUtils.registerAbility(Reference.resource("modify"), MODIFY_VALUE, RegistrationSide.BOTH);
+		CommonSetup.ABILITIES.register("break_speed", () -> BREAK_SPEED);
+		CommonSetup.ABILITIES.register("effect", () -> EFFECT);
+		CommonSetup.ABILITIES.register("attribute", () -> ATTRIBUTE);
+		CommonSetup.ABILITIES.register("command", () -> COMMAND);
+		CommonSetup.ABILITIES.register("modify", () -> MODIFY_VALUE);
 	}
 
 	private static final Set<ItemAbility> DIG_ACTIONS = Set.of(ItemAbilities.PICKAXE_DIG, ItemAbilities.AXE_DIG,
 			ItemAbilities.SHOVEL_DIG, ItemAbilities.HOE_DIG, ItemAbilities.SHEARS_DIG, ItemAbilities.SWORD_DIG);
 	
-	private static final Ability BREAK_SPEED = Ability.begin().addDefaults(getBreakSpeedDefaults()).setStart((player, settings, context) -> {
+	private static final Ability BREAK_SPEED = Ability.begin(RegistrationSide.BOTH).addDefaults(getBreakSpeedDefaults()).setStart((player, settings, context) -> {
 		float speedIn = context.hasParam(AbilityUtils.BREAK_SPEED_INPUT_VALUE)
 				? context.getParam(AbilityUtils.BREAK_SPEED_INPUT_VALUE)
 				: player.getMainHandItem().getDestroySpeed(Blocks.OBSIDIAN.defaultBlockState());
@@ -95,7 +98,7 @@ public class Abilities {
 	}
 	
 	public static AbilityFunction EFFECT_SETTER = (player, nbt, context) -> {
-		Optional<Holder.Reference<MobEffect>> effectHolder = BuiltInRegistries.MOB_EFFECT.getHolder(ResourceLocation.parse(nbt.getString("effect")));
+		Optional<Holder.Reference<MobEffect>> effectHolder = BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(nbt.getString("effect")));
 		effectHolder.ifPresent(effect -> {
 			int configDuration = nbt.getInt(AbilityUtils.DURATION);
 			int duration = player.hasEffect(effect) && player.getEffect(effect).getDuration() > configDuration
@@ -109,7 +112,7 @@ public class Abilities {
 		});
 	};
 	
-	public static final Ability EFFECT = Ability.begin()
+	public static final Ability EFFECT = Ability.begin(RegistrationSide.SERVER)
 			.addDefaults(TagBuilder.start().withString("effect", "modid:effect")
 					.withInt(AbilityUtils.DURATION, 100)
 					.withInt(AbilityUtils.PER_LEVEL, 1)
@@ -120,17 +123,17 @@ public class Abilities {
 			.setTick((player, nbt, context, ticks) -> EFFECT_SETTER.start(player, nbt, context))
 			.setDescription(LangProvider.PERK_EFFECT_DESC.asComponent())
 			.setStatus((player, nbt, context) -> List.of(
-					LangProvider.PERK_EFFECT_STATUS_1.asComponent(Component.translatable(BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(nbt.getString("effect"))).getDescriptionId())),
+					LangProvider.PERK_EFFECT_STATUS_1.asComponent(Component.translatable(BuiltInRegistries.MOB_EFFECT.getValue(ResourceLocation.parse(nbt.getString("effect"))).getDescriptionId())),
 					LangProvider.PERK_EFFECT_STATUS_2.asComponent(nbt.getInt(AbilityUtils.MODIFIER), nbt.getInt(AbilityUtils.DURATION))))
 			.build();
 
 	private static final Map<String, Holder.Reference<Attribute>> attributeCache = new HashMap<>();
 	private static Holder.Reference<Attribute> getAttribute(CompoundTag nbt, RegistryAccess access) {
 		return attributeCache.computeIfAbsent(nbt.getString(AbilityUtils.ATTRIBUTE),
-				name -> access.registryOrThrow(Registries.ATTRIBUTE).getHolder(ResourceLocation.parse(name)).orElse(null));
+				name -> access.lookupOrThrow(Registries.ATTRIBUTE).get(ResourceLocation.parse(name)).orElse(null));
 	}
 
-	public static final Ability ATTRIBUTE = Ability.begin()
+	public static final Ability ATTRIBUTE = Ability.begin(RegistrationSide.SERVER)
 			.addDefaults(TagBuilder.start()
 					.withString(AbilityUtils.ATTRIBUTE, "null:null")
 					.withDouble(AbilityUtils.BASE, 0d)
@@ -160,7 +163,7 @@ public class Abilities {
 
 	private static final String CMD = "command";
 	private static final String FNC = "function";
-	public static final Ability COMMAND = Ability.begin()
+	public static final Ability COMMAND = Ability.begin(RegistrationSide.SERVER)
 			.setStart((p, nbt, context) -> {
 				if (p instanceof ServerPlayer player ) {
 					if (nbt.contains(FNC)) {
@@ -178,7 +181,7 @@ public class Abilities {
 			.setStatus((player, nbt, context) -> List.of()).build();
 
 	//Can be used to reduce damage as well as increase jump amount
-	public static final Ability MODIFY_VALUE = Ability.begin()
+	public static final Ability MODIFY_VALUE = Ability.begin(RegistrationSide.BOTH)
 			.addDefaults(TagBuilder.start()
 					.withFloat(AbilityUtils.PER_LEVEL, 0f)
 					.withFloat(AbilityUtils.BASE, 0f)
@@ -198,7 +201,7 @@ public class Abilities {
 				}
 			})).build();
 
-	private static boolean tagContains(CompoundTag tag, String key, EventContext context, LootContextParam<DamageSource> param) {
+	private static boolean tagContains(CompoundTag tag, String key, EventContext context, ContextKey<DamageSource> param) {
 		ListTag list = tag.getList(key, StringTag.TAG_STRING);
 		DamageSource source = context.getParam(param);
 		StringTag strTag = StringTag.valueOf(RegistryUtil.getId(source.typeHolder()).toString());

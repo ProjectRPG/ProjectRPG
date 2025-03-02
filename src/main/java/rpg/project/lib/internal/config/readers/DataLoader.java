@@ -47,7 +47,7 @@ public class DataLoader {
 	@SubscribeEvent
 	public static void onTagLoad(TagsUpdatedEvent event) {
 		Core core = Core.get(event.getUpdateCause() == TagsUpdatedEvent.UpdateCause.CLIENT_PACKET_RECEIVED ? LogicalSide.CLIENT : LogicalSide.SERVER);
-		core.getLoader().all().forEach(loader -> loader.postProcess(event.getRegistryAccess()));
+		core.getLoader().all().forEach(loader -> loader.postProcess(event.getLookupProvider()));
 	}
 	
 	public void applyData(ObjectType type, Map<ResourceLocation, MainSystemConfig> data) {

@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -81,7 +82,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	/** Mutable, non-null map containing whatever data was loaded last time server datapacks were loaded */
 	protected Map<ResourceLocation, MainSystemConfig> data = new HashMap<>();
 	
-	private final String folderName;
+	public final String folderName;
 	private final Logger logger;
 	private final Codec<MainSystemConfig> codec = MainSystemConfig.CODEC;
 	private final Function<List<MainSystemConfig>, MainSystemConfig> merger;
@@ -263,9 +264,8 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 		this.data.putAll(overrideSettings);
 	}
 	
-	public void postProcess(RegistryAccess registryAccess) {
+	public void postProcess(HolderLookup.Provider lookup) {
 		if (registry == null) return;
-		Registry<V> activeRegistry = registryAccess.registryOrThrow(registry);
 		MsLoggy.DEBUG.log(LOG_CODE.DATA, "Begin PostProcessing for {}", folderName);
 		for (Map.Entry<ResourceLocation, MainSystemConfig> dataRaw : new HashMap<>(this.data).entrySet()) {
 			MainSystemConfig dataValue = dataRaw.getValue();
@@ -275,15 +275,15 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 			for (String str : dataValue.tagValues()) {
 				MsLoggy.INFO.log(LOG_CODE.DATA, "Applying Setting to Tag: {}", str);
 				if (str.startsWith("#")) {
-					activeRegistry.getTag(TagKey.create(registry, ResourceLocation.parse(str.substring(1))))
+					lookup.lookupOrThrow(registry).get(TagKey.create(registry, ResourceLocation.parse(str.substring(1))))
 					.ifPresent(holder -> tags.addAll(holder.stream()
 							.map(h -> h.unwrapKey().get().location())
 							.collect(Collectors.toSet())));
 				}
 				else if (str.endsWith(":*")) {
-					tags.addAll(activeRegistry.keySet()
-							.stream()
-							.filter(key -> key.getNamespace().equals(str.replace(":*", "")))
+					tags.addAll(lookup.lookupOrThrow(registry).listTagIds()
+							.filter(key -> key.location().getNamespace().equals(str.replace(":*", "")))
+							.map(TagKey::location)
 							.toList());
 				}
 				else

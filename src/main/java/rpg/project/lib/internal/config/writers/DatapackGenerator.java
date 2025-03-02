@@ -45,14 +45,14 @@ public class DatapackGenerator {
     public static List<String> namespaceFilter = new ArrayList<>();
 
     private enum Category {
-        ITEM(ObjectType.ITEM, server -> server.registryAccess().registryOrThrow(Registries.ITEM).keySet()),
-        BLOCK(ObjectType.BLOCK, server -> server.registryAccess().registryOrThrow(Registries.BLOCK).keySet()),
-        ENTITY(ObjectType.ENTITY, server -> server.registryAccess().registryOrThrow(Registries.ENTITY_TYPE).keySet()),
-        ENCHANT(ObjectType.ENCHANTMENT, server -> server.registryAccess().registryOrThrow(Registries.ENCHANTMENT).keySet()),
-        DIMENSION(ObjectType.DIMENSION, server -> server.registryAccess().registryOrThrow(Registries.DIMENSION_TYPE).keySet()),
-        BIOME(ObjectType.BIOME, server -> server.registryAccess().registryOrThrow(Registries.BIOME).keySet()),
-        EFFECT(ObjectType.EFFECT, server -> server.registryAccess().registryOrThrow(Registries.MOB_EFFECT).keySet()),
-        EVENT(ObjectType.EVENT, server -> server.registryAccess().registryOrThrow(APIUtils.GAMEPLAY_EVENTS).keySet());
+        ITEM(ObjectType.ITEM, server -> server.registryAccess().lookupOrThrow(Registries.ITEM).keySet()),
+        BLOCK(ObjectType.BLOCK, server -> server.registryAccess().lookupOrThrow(Registries.BLOCK).keySet()),
+        ENTITY(ObjectType.ENTITY, server -> server.registryAccess().lookupOrThrow(Registries.ENTITY_TYPE).keySet()),
+        ENCHANT(ObjectType.ENCHANTMENT, server -> server.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).keySet()),
+        DIMENSION(ObjectType.DIMENSION, server -> server.registryAccess().lookupOrThrow(Registries.DIMENSION_TYPE).keySet()),
+        BIOME(ObjectType.BIOME, server -> server.registryAccess().lookupOrThrow(Registries.BIOME).keySet()),
+        EFFECT(ObjectType.EFFECT, server -> server.registryAccess().lookupOrThrow(Registries.MOB_EFFECT).keySet()),
+        EVENT(ObjectType.EVENT, server -> server.registryAccess().lookupOrThrow(APIUtils.GAMEPLAY_EVENTS).keySet());
 
         public ObjectType type;
         public Function<MinecraftServer, Set<ResourceLocation>> provider;
@@ -64,10 +64,10 @@ public class DatapackGenerator {
 
     public static String getDefaultConfig(RegistryAccess access) {
         return gson.toJson(MainSystemConfig.CODEC.encodeStart(JsonOps.INSTANCE, new MainSystemConfig(false, List.of(),
-                Arrays.stream(GateUtils.Type.values()).collect(Collectors.toMap(t -> t, type -> SubSystemCodecRegistry.getDefaults(SubSystemCodecRegistry.SystemType.GATE, access))),
-                SubSystemCodecRegistry.getDefaults(SubSystemCodecRegistry.SystemType.PROGRESSION, access),
-                SubSystemCodecRegistry.getDefaults(SubSystemCodecRegistry.SystemType.ABILITY, access),
-                SubSystemCodecRegistry.getDefaults(SubSystemCodecRegistry.SystemType.FEATURE, access)
+                Arrays.stream(GateUtils.Type.values()).collect(Collectors.toMap(t -> t, type -> SubSystemCodecRegistry.getDefaults(APIUtils.SystemType.GATE, access))),
+                SubSystemCodecRegistry.getDefaults(APIUtils.SystemType.PROGRESSION, access),
+                SubSystemCodecRegistry.getDefaults(APIUtils.SystemType.ABILITY, access),
+                SubSystemCodecRegistry.getDefaults(APIUtils.SystemType.FEATURE, access)
         )).result().orElse(gson.toJsonTree("{}")));
     }
 
