@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import rpg.project.lib.api.Hub;
@@ -15,34 +16,21 @@ import rpg.project.lib.api.events.EventListenerSpecification.CancellationType;
 import rpg.project.lib.api.feature.Feature;
 import rpg.project.lib.api.gating.GateSystem;
 import rpg.project.lib.api.gating.GateUtils.Type;
+import rpg.project.lib.internal.setup.CommonSetup;
 
 /**This class stores and supplies a runtime map of all 
  * {@link GateSystem} implementations.*/
 public class GateRegistry{
 	public static final float HARD_PASS = 1f;
 	public static final float HARD_FAIL = 0f;
-	/**==INTERNAL USE ONLY==
-	 * This is meant only to be called by API methods in a way that 
-	 * checks the type safety of the {@link GateSystem} sub-type 
-	 * before invoking this.
-	 * 
-	 * @param system a GateSystem implementation
-	 * @param type the applicable gating type for the system.
-	 */
-	public static void register(GateSystem system, Type type) {
-		Preconditions.checkNotNull(system);
-		registeredSystems.put(type, system);
-	}
-	
-	private static final HashMultimap<Type, GateSystem> registeredSystems = HashMultimap.create();
 
 	/**Internal method to obtain a copy of the value set for registered gate types;
 	 *
 	 * @param type the gate type being queried
 	 * @return a new collection of the systems.
 	 */
-	public static Set<GateSystem> getSystems(Type type) {
-		return new HashSet<>(registeredSystems.get(type));
+	private static Set<GateSystem> getSystems(Type type, RegistryAccess access) {
+		return new HashSet<>(access.lookupOrThrow(type.key).stream().toList());
 	}
 
 	/**Returns an event-specific result for this event.  This is used
@@ -57,10 +45,11 @@ public class GateRegistry{
 	 * @return the cancellation result
 	 */
 	public static CancellationType isEventPermitted(Hub core, ResourceLocation event, EventContext context) {
-		if (registeredSystems.get(Type.EVENT).isEmpty())
+		var systems = getSystems(Type.EVENT, context.getLevel().registryAccess());
+		if (systems.isEmpty())
 			return CancellationType.NONE;
 		return CancellationType.resolve(
-				registeredSystems.get(Type.EVENT).stream()
+				systems.stream()
 				.map(system -> system.getCancellationResult(context, core, event, null))
 				.collect(Collectors.toSet()));
 	}
@@ -78,9 +67,10 @@ public class GateRegistry{
 	 * @return whether progression can be committed or not.
 	 */
 	public static float isProgressionPermitted(Hub core, ResourceLocation event, EventContext context, String container) {
-		if (registeredSystems.get(Type.PROGRESS).isEmpty())
+		var systems = getSystems(Type.PROGRESS, context.getLevel().registryAccess());
+		if (systems.isEmpty())
 			return HARD_PASS;
-		return registeredSystems.get(Type.PROGRESS).stream()
+		return systems.stream()
 				.map(system -> system.isActionPermitted(context, core, event, container))
 				.min(Comparator.naturalOrder())
 				.orElse(HARD_PASS);
@@ -97,9 +87,10 @@ public class GateRegistry{
 	 * @return whether a feature is allowed to perform its function
 	 */
 	public static float isFeaturePermitted(Hub core, ResourceLocation event, EventContext context, Feature featureReference) {
-		if (registeredSystems.get(Type.FEATURE).isEmpty())
+		var systems = getSystems(Type.FEATURE, context.getLevel().registryAccess());
+		if (systems.isEmpty())
 			return HARD_PASS;
-		return registeredSystems.get(Type.FEATURE).stream()
+		return systems.stream()
 				.map(system -> system.isActionPermitted(context, core, event, featureReference.featureID().toString()))
 				.min(Comparator.naturalOrder())
 				.orElse(HARD_PASS);
@@ -118,9 +109,10 @@ public class GateRegistry{
 	 * @return whether an ability is allowed to perform its function
 	 */
 	public static float isAbilityPermitted(Player player, Hub core, ResourceLocation event, EventContext context, ResourceLocation ability) {
-		if (registeredSystems.get(Type.ABILITY).isEmpty())
+		var systems = getSystems(Type.ABILITY, context.getLevel().registryAccess());
+		if (systems.isEmpty())
 			return HARD_PASS;
-		return registeredSystems.get(Type.ABILITY).stream()
+		return systems.stream()
 				.map(system -> system.isActionPermitted(context, core, event, ability.toString()))
 				.min(Comparator.naturalOrder())
 				.orElse(HARD_PASS);

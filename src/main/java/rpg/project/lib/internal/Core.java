@@ -29,7 +29,6 @@ import rpg.project.lib.api.progression.ProgressionSystem;
 import rpg.project.lib.internal.config.readers.DataLoader;
 import rpg.project.lib.internal.config.readers.MainSystemConfig;
 import rpg.project.lib.internal.config.readers.MergeableCodecDataManager;
-import rpg.project.lib.internal.registry.ProgressionAddonRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
 import rpg.project.lib.internal.util.Functions;
 
@@ -69,7 +68,7 @@ public class Core implements Hub {
 	public ProgressionSystem<?> getProgression() {return progress;}
 	@Override
 	public List<ProgressionAddon> getProgressionAddons() {
-		return ProgressionAddonRegistry.getAddons();
+		return CommonSetup.PROGRESSION_ADDONS.getRegistry().get().stream().toList();
 	}
 	@Override
 	public AbilitySystem getAbility() {return abilitySys;}

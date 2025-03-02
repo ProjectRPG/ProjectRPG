@@ -16,11 +16,19 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import rpg.project.lib.api.APIUtils;
+import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.abilities.AbilitySystem;
+import rpg.project.lib.api.data.SubSystemConfigType;
+import rpg.project.lib.api.feature.Feature;
+import rpg.project.lib.api.gating.GateSystem;
+import rpg.project.lib.api.gating.GateUtils;
 import rpg.project.lib.api.party.PartySystem;
+import rpg.project.lib.api.progression.ProgressionAddon;
 import rpg.project.lib.api.progression.ProgressionSystem;
+import rpg.project.lib.api.progression.ProgressionUtils;
 import rpg.project.lib.builtins.Abilities;
 import rpg.project.lib.builtins.vanilla.VanillaAbilityConfigType;
 import rpg.project.lib.builtins.vanilla.VanillaAbilitySystem;
@@ -41,19 +49,18 @@ import rpg.project.lib.internal.util.Reference;
 
 @EventBusSubscriber(modid=Reference.MODID, bus= EventBusSubscriber.Bus.GAME)
 public class CommonSetup {
-	public static Supplier<PartySystem> partySupplier = () -> {
-		SubSystemCodecRegistry.registerSubSystem(VanillaPartyConfigType.ID, VanillaPartyConfigType.IMPL, SubSystemCodecRegistry.SystemType.PARTY);
-		return new VanillaPartySystem();
-	};
-	public static Supplier<ProgressionSystem<?>> progressionSupplier = () -> {
-		SubSystemCodecRegistry.registerSubSystem(VanillaProgressionConfigType.ID, VanillaProgressionConfigType.IMPL, SubSystemCodecRegistry.SystemType.PROGRESSION);
-		SubSystemCodecRegistry.registerSubSystem(VanillaProgressionDataType.ID, VanillaProgressionDataType.IMPL, SubSystemCodecRegistry.SystemType.PROGRESSION_DATA);
-		return new VanillaProgressionSystem();
-	};
-	public static Supplier<AbilitySystem> abilitySupplier = () -> {
-		SubSystemCodecRegistry.registerSubSystem(VanillaAbilityConfigType.ID, VanillaAbilityConfigType.IMPL, SubSystemCodecRegistry.SystemType.ABILITY);
-		return new VanillaAbilitySystem();
-	};
+	public static final DeferredRegister<SubSystemConfigType> CODECS = DeferredRegister.create(APIUtils.SUBSYSTEM_CODECS, Reference.MODID);
+	public static final DeferredRegister<Feature> FEATURES = DeferredRegister.create(APIUtils.FEATURE, Reference.MODID);
+	public static final DeferredRegister<Ability> ABILITIES = DeferredRegister.create(APIUtils.ABILITY, Reference.MODID);
+	public static final DeferredRegister<GateSystem> GATES_EVENTS = DeferredRegister.create(GateUtils.GATES_EVENTS, Reference.MODID);
+	public static final DeferredRegister<GateSystem> GATES_PROGRESS = DeferredRegister.create(GateUtils.GATES_PROGRESS, Reference.MODID);
+	public static final DeferredRegister<GateSystem> GATES_FEATURES = DeferredRegister.create(GateUtils.GATES_FEATURES, Reference.MODID);
+	public static final DeferredRegister<GateSystem> GATES_ABILITIES = DeferredRegister.create(GateUtils.GATES_ABILITIES, Reference.MODID);
+	public static final DeferredRegister<ProgressionAddon> PROGRESSION_ADDONS = DeferredRegister.create(ProgressionUtils.PROGRESSION_ADDON, Reference.MODID);
+
+	public static Supplier<PartySystem> partySupplier = () -> new VanillaPartySystem();
+	public static Supplier<ProgressionSystem<?>> progressionSupplier = () -> new VanillaProgressionSystem();
+	public static Supplier<AbilitySystem> abilitySupplier = () -> new VanillaAbilitySystem();
 
 	/**Registered to MOD BUS in mod constructor*/
 	public static void gatherData(GatherDataEvent.Client event) {

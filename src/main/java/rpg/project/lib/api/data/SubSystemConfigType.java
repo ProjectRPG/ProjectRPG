@@ -3,11 +3,16 @@ package rpg.project.lib.api.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceLocation;
+import rpg.project.lib.api.APIUtils;
+
+import java.util.EnumSet;
 
 /**A type identifier used to reference and reverse-get
  * a configuration object.
  */
 public interface SubSystemConfigType {
+	ResourceLocation getId();
 	/**@return the codec used to parse the associated config object
 	 */
 	MapCodec<SubSystemConfig> getCodec();
@@ -28,4 +33,6 @@ public interface SubSystemConfigType {
 	 * @return a default implementation conforming to the above parameters.
 	 */
 	SubSystemConfig getDefault(RegistryAccess access);
+
+	EnumSet<APIUtils.SystemType> applicableSystemTypes();
 }

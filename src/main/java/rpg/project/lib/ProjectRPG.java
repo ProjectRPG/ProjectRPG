@@ -4,8 +4,8 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.builtins.Abilities;
+import rpg.project.lib.builtins.vanilla.VanillaCodecs;
 import rpg.project.lib.internal.config.Config;
 import rpg.project.lib.internal.network.Networking;
 import rpg.project.lib.internal.registry.EventRegistry;
@@ -22,11 +22,24 @@ public class ProjectRPG {
 
 		EventRegistry.EVENTS.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
     	EventRegistry.EVENTS.register(bus);
-		APIUtils.FEATURES.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
-		APIUtils.FEATURES.register(bus);
-		APIUtils.ABILITIES.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
-		APIUtils.ABILITIES.register(bus);
+		CommonSetup.CODECS.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
+		CommonSetup.CODECS.register(bus);
+		VanillaCodecs.init(bus);
+		CommonSetup.FEATURES.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
+		CommonSetup.FEATURES.register(bus);
+		CommonSetup.ABILITIES.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
+		CommonSetup.ABILITIES.register(bus);
 		Abilities.init();
+		CommonSetup.GATES_EVENTS.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
+		CommonSetup.GATES_EVENTS.register(bus);
+		CommonSetup.GATES_PROGRESS.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
+		CommonSetup.GATES_PROGRESS.register(bus);
+		CommonSetup.GATES_FEATURES.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
+		CommonSetup.GATES_FEATURES.register(bus);
+		CommonSetup.GATES_ABILITIES.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
+		CommonSetup.GATES_ABILITIES.register(bus);
+		CommonSetup.PROGRESSION_ADDONS.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
+		CommonSetup.PROGRESSION_ADDONS.register(bus);
     	
     	//MOD BUS event listeners
     	bus.addListener(CommonSetup::init);

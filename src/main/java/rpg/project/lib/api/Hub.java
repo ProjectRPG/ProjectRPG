@@ -16,6 +16,7 @@ import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.api.progression.ProgressionAddon;
 import rpg.project.lib.api.progression.ProgressionSystem;
 import rpg.project.lib.internal.registry.SubSystemCodecRegistry;
+import rpg.project.lib.internal.setup.CommonSetup;
 
 /**Implementations of this provide access to shared
  * features of the library.  Project RPG provides an
@@ -103,7 +104,7 @@ public interface Hub {
 	default List<Feature> getFeaturesForContext(ResourceLocation eventID, EventContext context) {
 		List<Feature> validFeatures = new ArrayList<>();
 		for (SubSystemConfig config : this.getFeatureData(context.getSubjectType(), context.getSubjectID(), eventID)) {
-			ResourceLocation featureID = SubSystemCodecRegistry.lookup(config.getType());
+			ResourceLocation featureID = CommonSetup.CODECS.getRegistry().get().getKey(config.getType());
 			Feature feature = context.getLevel().registryAccess().lookupOrThrow(APIUtils.FEATURE).getValue(featureID);
 			if (feature.isValidContext().test(eventID, context)) validFeatures.add(feature);
 		}

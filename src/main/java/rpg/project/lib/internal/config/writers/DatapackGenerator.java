@@ -64,10 +64,10 @@ public class DatapackGenerator {
 
     public static String getDefaultConfig(RegistryAccess access) {
         return gson.toJson(MainSystemConfig.CODEC.encodeStart(JsonOps.INSTANCE, new MainSystemConfig(false, List.of(),
-                Arrays.stream(GateUtils.Type.values()).collect(Collectors.toMap(t -> t, type -> SubSystemCodecRegistry.getDefaults(SubSystemCodecRegistry.SystemType.GATE, access))),
-                SubSystemCodecRegistry.getDefaults(SubSystemCodecRegistry.SystemType.PROGRESSION, access),
-                SubSystemCodecRegistry.getDefaults(SubSystemCodecRegistry.SystemType.ABILITY, access),
-                SubSystemCodecRegistry.getDefaults(SubSystemCodecRegistry.SystemType.FEATURE, access)
+                Arrays.stream(GateUtils.Type.values()).collect(Collectors.toMap(t -> t, type -> SubSystemCodecRegistry.getDefaults(APIUtils.SystemType.GATE, access))),
+                SubSystemCodecRegistry.getDefaults(APIUtils.SystemType.PROGRESSION, access),
+                SubSystemCodecRegistry.getDefaults(APIUtils.SystemType.ABILITY, access),
+                SubSystemCodecRegistry.getDefaults(APIUtils.SystemType.FEATURE, access)
         )).result().orElse(gson.toJsonTree("{}")));
     }
 

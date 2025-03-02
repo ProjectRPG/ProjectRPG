@@ -38,18 +38,20 @@ import rpg.project.lib.api.enums.RegistrationSide;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.ProgressionAdvanceEvent;
 import rpg.project.lib.internal.Core;
+import rpg.project.lib.internal.setup.CommonSetup;
 import rpg.project.lib.internal.setup.datagen.LangProvider;
 import rpg.project.lib.internal.util.Reference;
 import rpg.project.lib.internal.util.RegistryUtil;
 import rpg.project.lib.internal.util.TagBuilder;
+import rpg.project.lib.internal.util.TagUtils;
 
 public class Abilities {
 	public static void init() {
-		APIUtils.ABILITIES.register("break_speed", () -> BREAK_SPEED);
-		APIUtils.ABILITIES.register("effect", () -> EFFECT);
-		APIUtils.ABILITIES.register("attribute", () -> ATTRIBUTE);
-		APIUtils.ABILITIES.register("command", () -> COMMAND);
-		APIUtils.ABILITIES.register("modify", () -> MODIFY_VALUE);
+		CommonSetup.ABILITIES.register("break_speed", () -> BREAK_SPEED);
+		CommonSetup.ABILITIES.register("effect", () -> EFFECT);
+		CommonSetup.ABILITIES.register("attribute", () -> ATTRIBUTE);
+		CommonSetup.ABILITIES.register("command", () -> COMMAND);
+		CommonSetup.ABILITIES.register("modify", () -> MODIFY_VALUE);
 	}
 
 	private static final Set<ItemAbility> DIG_ACTIONS = Set.of(ItemAbilities.PICKAXE_DIG, ItemAbilities.AXE_DIG,

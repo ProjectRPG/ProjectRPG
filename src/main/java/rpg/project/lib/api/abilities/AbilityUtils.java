@@ -72,16 +72,11 @@ public class AbilityUtils {
     public static final String EFFECTS = "effects";
     
     /**Sets the ability system for the ecosystem.  Only one system can be active.
-     * 
-     * @param id the system configuration ID used to specify the format of configuration settings
-     * @param config the configuration specification used by this system.
+     *
      * @param system supplies a new instance of the AbilitySystem to be registered.
      */
-    public static void registerAbilitySystem(ResourceLocation id, SubSystemConfigType config, Supplier<AbilitySystem> system) {
-    	CommonSetup.abilitySupplier = () ->{
-    		SubSystemCodecRegistry.registerSubSystem(id, config, SubSystemCodecRegistry.SystemType.ABILITY);
-    		return system.get();
-    	};    	
+    public static void registerAbilitySystem(Supplier<AbilitySystem> system) {
+    	CommonSetup.abilitySupplier = system;
     }
 
     public static AbilityGetter get(RegistryAccess access) {
@@ -100,7 +95,7 @@ public class AbilityUtils {
         public List<CompoundTag> getDefaults() {
             return registry().entrySet().stream().map(entry -> {
                 var nbt = entry.getValue().propertyDefaults().copy();
-                nbt.putString(AbilityUtils.TYPE, entry.getKey().toString());
+                nbt.putString(AbilityUtils.TYPE, entry.getKey().location().toString());
                 return nbt;
             }).toList();
         }
