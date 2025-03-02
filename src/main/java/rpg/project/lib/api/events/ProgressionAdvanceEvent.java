@@ -1,7 +1,7 @@
 package rpg.project.lib.api.events;
 
+import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import rpg.project.lib.api.progression.ProgressionDataType;
 import rpg.project.lib.internal.util.Reference;
@@ -16,8 +16,8 @@ public class ProgressionAdvanceEvent extends PlayerEvent {
     final ProgressionDataType prior;
     final ProgressionDataType current;
 
-    public static final LootContextParam<ProgressionDataType> PROGRESS = new LootContextParam<>(Reference.resource("progress"));
-    public static final LootContextParam<String> CONTAINER = new LootContextParam<>(Reference.resource("container"));
+    public static final ContextKey<ProgressionDataType> PROGRESS = new ContextKey<>(Reference.resource("progress"));
+    public static final ContextKey<String> CONTAINER = new ContextKey<>(Reference.resource("container"));
 
     /**
      * @param player the player progressing

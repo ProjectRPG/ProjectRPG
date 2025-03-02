@@ -6,6 +6,8 @@ import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.EventListenerSpecification.CancellationType;
 import rpg.project.lib.internal.registry.GateRegistry;
 
+import java.util.EnumSet;
+
 /**<p>A gate system controls whether specific content is
  * accessible to the player.</p>
  * <p>There are four types of gate system which are registered
@@ -56,4 +58,6 @@ public interface GateSystem {
 				? CancellationType.NONE
 				: CancellationType.EVENT;
 	}
+
+	EnumSet<GateUtils.Type> applicableGateTypes();
 }

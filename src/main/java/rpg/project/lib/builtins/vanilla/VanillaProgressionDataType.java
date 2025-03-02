@@ -6,15 +6,20 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
+import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.api.progression.ProgressionDataType;
 
+import java.util.EnumSet;
+
 public record VanillaProgressionDataType() implements SubSystemConfigType{
 	public static final ResourceLocation ID = ResourceLocation.withDefaultNamespace("exp");
 	public static final VanillaProgressionDataType IMPL = new VanillaProgressionDataType();
 
+	@Override
+	public ResourceLocation getId() {return ID;}
 	@Override
 	public MapCodec<SubSystemConfig> getCodec() {
 		return VanillaProgressionData.CODEC;
@@ -22,6 +27,11 @@ public record VanillaProgressionDataType() implements SubSystemConfigType{
 
 	@Override
 	public SubSystemConfig getDefault(RegistryAccess access) {return new VanillaProgressionData(0);}
+
+	@Override
+	public EnumSet<APIUtils.SystemType> applicableSystemTypes() {
+		return EnumSet.of(APIUtils.SystemType.PROGRESSION_DATA);
+	}
 
 
 	public record VanillaProgressionData(int exp) implements ProgressionDataType {

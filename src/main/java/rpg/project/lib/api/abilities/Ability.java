@@ -8,6 +8,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.common.util.TriPredicate;
 import org.apache.commons.lang3.function.TriFunction;
+import rpg.project.lib.api.enums.RegistrationSide;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.internal.Core;
 
@@ -42,28 +43,30 @@ import java.util.function.BiPredicate;
  * information about the ability.</p>
  */
 public record Ability(
-	/**Determines if the ability can start and if it should continue ticking.*/
-    TriPredicate<Player, CompoundTag, EventContext> conditions,
-    /**Default settings to be supplied if the configuration omits them*/
-    CompoundTag propertyDefaults,
-    /**The initial behavior of this ability.*/
-    AbilityFunction start,
-    /**continued behavior after {@link #start} that lasts for the duration
-     * set by the configuration via {@link AbilityUtils#DURATION}*/
-    TickFunction tick,
-    /**The final behavior of this ability.  This is always called when ticking
-     * completes and should be used to clean up anything the ability does not 
-     * want to persist beyond its lifespan*/
-    AbilityFunction stop,
-    /**A displayable explanation of what the ability does.*/
-    MutableComponent description,
-    /**Consumes the player and configuration setting to produce information
+        /**Determines if the ability can start and if it should continue ticking.*/
+        TriPredicate<Player, CompoundTag, EventContext> conditions,
+        /**Default settings to be supplied if the configuration omits them*/
+        CompoundTag propertyDefaults,
+        /**The initial behavior of this ability.*/
+        AbilityFunction start,
+        /**continued behavior after {@link #start} that lasts for the duration
+         * set by the configuration via {@link AbilityUtils#DURATION}*/
+        TickFunction tick,
+        /**The final behavior of this ability.  This is always called when ticking
+         * completes and should be used to clean up anything the ability does not
+         * want to persist beyond its lifespan*/
+        AbilityFunction stop,
+        /**A displayable explanation of what the ability does.*/
+        MutableComponent description,
+        /**Consumes the player and configuration setting to produce information
      * about the ability that best reflects attributes of the ability when
      * invoked.  This should be used to provide information to the player 
      * about how the ability will behave specifical for them.  For example:
      * how much an attributes will be boosted, the strength behind a manuever
      * or the quantity of some form of output.*/
-    TriFunction<Player, CompoundTag, EventContext, List<MutableComponent>> status) {
+        TriFunction<Player, CompoundTag, EventContext, List<MutableComponent>> status,
+        /**Dictates what side this perk can operate on.  */
+        RegistrationSide side) {
     
     public static class Builder {
         private TriPredicate<Player, CompoundTag, EventContext> conditions = (p, s, c) -> true;
@@ -73,8 +76,11 @@ public record Ability(
         private AbilityFunction stop = (p, s, c) -> new CompoundTag();
         private MutableComponent description = Component.empty();
         private TriFunction<Player, CompoundTag, EventContext, List<MutableComponent>> status = (p, s, c) -> List.of();
+        private final RegistrationSide side;
         
-        protected Builder() { }
+        protected Builder(RegistrationSide side) {
+            this.side = side;
+        }
         /**Sets the custom conditions for this ability.  By default,
          * all abilities use the {@link Ability#VALID_CONTEXT} as a
          * basic condition.  This method adds to those.
@@ -130,14 +136,15 @@ public record Ability(
         }
         /**@return an assembled {@link Ability}*/
         public Ability build() {
-            return new Ability(conditions, propertyDefaults, start, tick, stop, description, status);
+            return new Ability(conditions, propertyDefaults, start, tick, stop, description, status, side);
         }
     }
     
-    /**@return a new {@link Builder} instance */
-    public static Builder begin() { return new Builder(); }
+    /**@param side the logical side this perk can fire on
+     * @return a new {@link Builder} instance */
+    public static Builder begin(RegistrationSide side) { return new Builder(side); }
     /**@return a default ability with no unique behavior*/
-    public static Ability empty() { return new Builder().build(); }
+    public static Ability empty() { return new Builder(RegistrationSide.BOTH).build(); }
     
     /**Interally checks both the {@link #VALID_CONTEXT} and {@link #conditions}
      * to determine if this ability can start and whether it should continue to
@@ -186,7 +193,7 @@ public record Ability(
     /**Common conditions for all abilities.  Whether specified or not, users can provide
      * values to these settings to have any ability tested against them.*/
     public static final BiPredicate<Player, CompoundTag> VALID_CONTEXT = (player, src) -> {
-        if (src.contains(AbilityUtils.COOLDOWN) && !Core.get(player.level()).getAbilities().isAbilityCooledDown(player, src)) {
+        if (src.contains(AbilityUtils.COOLDOWN) && !Core.get(player.level()).isAbilityCooledDown(player, src)) {
             return false;
         }
         if (src.contains(AbilityUtils.CHANCE) && src.getDouble(AbilityUtils.CHANCE) < player.level().random.nextDouble()) {

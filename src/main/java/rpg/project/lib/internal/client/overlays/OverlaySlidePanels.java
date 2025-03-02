@@ -4,6 +4,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -44,7 +45,7 @@ public class OverlaySlidePanels implements LayeredDraw.Layer {
         final double scale = Minecraft.getInstance().getWindow().getGuiScale();
         final int offset = scale == 1d ? 20 : 10;
         setExtensionValue(width);
-        pGuiGraphics.blit(TEXTURE_LOCATION, anchorX, anchorY, 0, 0, 0, width, height, width, height);
+        pGuiGraphics.blit(RenderType::guiTexturedOverlay, TEXTURE_LOCATION, anchorX, anchorY, 0, 0, width, height, width, height);
         //Constrain and render the delegated content.
         pGuiGraphics.enableScissor(anchorX + offset, anchorY + offset, anchorX + width - offset, anchorY + height - offset);
         provider.render(pGuiGraphics, anchorY + offset, anchorX + offset, width, height, scale, pDeltaTracker.getGameTimeDeltaPartialTick(true), core);
