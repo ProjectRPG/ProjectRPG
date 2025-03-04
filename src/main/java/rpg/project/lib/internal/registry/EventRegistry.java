@@ -84,18 +84,8 @@ public class EventRegistry {
 	}
 
 	public static final DeferredRegister<EventProvider<?>> EVENTS = DeferredRegister.create(APIUtils.GAMEPLAY_EVENTS, Reference.MODID);
-	public static final DeferredRegister<EventConditionType> CONDITIONS = DeferredRegister.create(APIUtils.EVENT_CONDITIONS, Reference.MODID);
-
-	public static final DeferredHolder<EventConditionType, EventConditionType> ALL_OF = condition("and", EventConditionAnd.CODEC);
-	public static final DeferredHolder<EventConditionType, EventConditionType> ANY_OF = condition("any", EventConditionAny.CODEC);
-	public static final DeferredHolder<EventConditionType, EventConditionType> NOT = condition("not", EventConditionNot.CODEC);
-	public static final DeferredHolder<EventConditionType, EventConditionType> ENTITY_MATCHES = condition("entity_matches", EventConditionEntityMatches.CODEC);
 
 	static {
 		EventFactories.registerEvents(EVENTS);
-	}
-
-	private static DeferredHolder<EventConditionType, EventConditionType> condition(String name, MapCodec<? extends EventCondition> codec) {
-		return CONDITIONS.register(name, () -> new EventConditionType(codec));
 	}
 }

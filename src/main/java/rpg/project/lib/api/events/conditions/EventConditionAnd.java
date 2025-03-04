@@ -9,12 +9,12 @@ import java.util.List;
 
 public record EventConditionAnd(List<EventCondition> conditions) implements EventCondition{
     public static final MapCodec<EventConditionAnd> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            EventConditionAnd.TYPED_CODEC.listOf().fieldOf("conditions").forGetter(eca -> ((EventConditionAnd)eca).conditions())
+            EventCondition.TYPED_CODEC.listOf().fieldOf("conditions").forGetter(eca -> ((EventConditionAnd)eca).conditions())
     ).apply(instance, EventConditionAnd::new));
 
     @Override
     public EventConditionType getType() {
-        return EventRegistry.ALL_OF.get();
+        return EventCondition.ALL_OF.get();
     }
 
     @Override

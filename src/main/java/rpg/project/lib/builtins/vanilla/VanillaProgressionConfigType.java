@@ -1,8 +1,11 @@
 package rpg.project.lib.builtins.vanilla;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.mojang.serialization.Codec;
@@ -15,6 +18,8 @@ import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
+import rpg.project.lib.api.events.conditions.ConditionWrapper;
+import rpg.project.lib.api.events.conditions.EventCondition;
 import rpg.project.lib.internal.registry.EventRegistry;
 
 public record VanillaProgressionConfigType() implements SubSystemConfigType{
@@ -30,7 +35,7 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 
 	@Override
 	public SubSystemConfig getDefault(RegistryAccess access) {return new VanillaProgressionConfig(access.lookupOrThrow(APIUtils.GAMEPLAY_EVENTS).keySet()
-			.stream().collect(Collectors.toMap(id -> id, id -> 0)));}
+			.stream().collect(Collectors.toMap(id -> id, id -> new VanillaProgressionConfig.ExpData(0, Optional.empty()))));}
 
 	@Override
 	public EnumSet<APIUtils.SystemType> applicableSystemTypes() {
@@ -38,23 +43,49 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 	}
 
 
-	public record VanillaProgressionConfig(Map<ResourceLocation, Integer> eventToXp) implements SubSystemConfig {
+	public record VanillaProgressionConfig(Map<ResourceLocation, ExpData> eventToXp) implements SubSystemConfig {
+		public static class ExpData {
+			private int xp;
+			private Optional<ConditionWrapper> conditions;
+			public ExpData(int xp, Optional<ConditionWrapper> conditions) {
+				this.xp = xp;
+				this.conditions = conditions;
+			}
+			public ExpData(int xp) {this(0, Optional.empty());}
+			public int xp() {return xp;}
+			public void setXp(int xp) {this.xp = xp;}
+			public Optional<ConditionWrapper> conditions() {return conditions;}
+
+			public static final MapCodec<ExpData> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+					Codec.INT.fieldOf("xp").forGetter(ExpData::xp),
+					ConditionWrapper.CODEC.optionalFieldOf("when").forGetter(ExpData::conditions)
+			).apply(instance, ExpData::new));
+
+			public static ExpData combine(ExpData a, ExpData b) {
+				int xp = Integer.max(a.xp, b.xp);
+				List<EventCondition> conditions = new ArrayList<>();
+				a.conditions.ifPresent(wrapper -> conditions.addAll(wrapper.conditions()));
+				b.conditions.ifPresent(wrapper -> conditions.addAll(wrapper.conditions()));
+				Optional<ConditionWrapper> allConditions = conditions.isEmpty() ? Optional.empty() : Optional.of(new ConditionWrapper(conditions));
+				return new ExpData(xp, allConditions);
+			}
+		}
 		
 		public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-				Codec.unboundedMap(ResourceLocation.CODEC, Codec.INT).fieldOf("events").forGetter(ssc -> ((VanillaProgressionConfig)ssc).eventToXp())
+				Codec.unboundedMap(ResourceLocation.CODEC, ExpData.CODEC.codec()).fieldOf("events").forGetter(e -> ((VanillaProgressionConfig)e).eventToXp)
 				).apply(instance, VanillaProgressionConfig::new));
 
 		@Override
 		public MergeableData combine(MergeableData two) {
 			VanillaProgressionConfig t = (VanillaProgressionConfig) two;
 			var map = new HashMap<>(this.eventToXp());
-			t.eventToXp().forEach((key, value) -> map.merge(key, value, Integer::max));
+			t.eventToXp().forEach((key, value) -> map.merge(key, value, ExpData::combine));
 			return new VanillaProgressionConfig(map);
 		}
 
 		@Override
 		public boolean isUnconfigured() {
-			return this.eventToXp().values().stream().max(Integer::compareTo).get() == 0;
+			return this.eventToXp().values().stream().map(ExpData::xp).max(Integer::compareTo).get() == 0;
 		}
 
 		@Override
@@ -66,11 +97,5 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 		public MapCodec<SubSystemConfig> getCodec() {
 			return CODEC;
 		}
-
-		@Override
-		public SubSystemConfig getDefault() {
-			return new VanillaProgressionConfig(EventRegistry.EVENTS.getRegistry().get()
-					.keySet().stream().collect(Collectors.toMap(rl -> rl, rl -> 0)));
-		}		
 	}
 }

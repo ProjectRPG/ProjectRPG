@@ -1,5 +1,6 @@
 package rpg.project.lib.builtins.vanilla;
 
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -97,12 +98,15 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 	public List<Pair<String, Consumer<Float>>> getProgressionToBeAwarded(Hub core, ResourceLocation eventID, EventContext context) {
 		return core.getProgressionData(VanillaProgressionConfigType.IMPL, context.getSubjectType(), context.getSubjectID())
 				.map(config -> {
-					AtomicInteger xpToAward = new AtomicInteger(((VanillaProgressionConfig)config).eventToXp().getOrDefault(eventID, 0));
+					VanillaProgressionConfig.ExpData xpToAward = ((VanillaProgressionConfig)config).eventToXp().getOrDefault(eventID, new VanillaProgressionConfig.ExpData(0));
+					if (xpToAward.conditions().isPresent()
+							&& !xpToAward.conditions().get().test(context))
+						return new ArrayList<Pair<String, Consumer<Float>>>();
 					core.getProgressionAddons().forEach(addon -> {
-						xpToAward.getAndSet(((VanillaProgressionData)addon.modifyProgression(core, context, new VanillaProgressionData(xpToAward.get()))).exp());						
+						xpToAward.setXp(((VanillaProgressionData)addon.modifyProgression(core, context, new VanillaProgressionData(xpToAward.xp()))).exp());
 					});
 					List<Pair<String, Consumer<Float>>> output = List.of(Pair.of(container, gate -> {
-						int xp = (int)((float)xpToAward.get() * gate);
+						int xp = (int)((float)xpToAward.xp() * gate);
 						if (xp <= 0) return;
 						this.addXp(context.getActor().getUUID(), new VanillaProgressionData(xp));
 						if (context.getActor() instanceof ServerPlayer player)

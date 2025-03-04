@@ -10,6 +10,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import rpg.project.lib.api.events.conditions.EventCondition;
 import rpg.project.lib.builtins.Abilities;
 import rpg.project.lib.builtins.vanilla.VanillaCodecs;
 import rpg.project.lib.internal.config.Config;
@@ -28,8 +29,8 @@ public class ProjectRPG {
 
 		EventRegistry.EVENTS.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
     	EventRegistry.EVENTS.register(bus);
-		EventRegistry.CONDITIONS.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
-		EventRegistry.CONDITIONS.register(bus);
+		EventCondition.CONDITIONS.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
+		EventCondition.CONDITIONS.register(bus);
 		CommonSetup.CODECS.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
 		CommonSetup.CODECS.register(bus);
 		VanillaCodecs.init(bus);

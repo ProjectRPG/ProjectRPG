@@ -13,7 +13,7 @@ public record EventConditionNot(EventCondition condition) implements EventCondit
 
     @Override
     public EventConditionType getType() {
-        return EventRegistry.NOT.get();
+        return EventCondition.NOT.get();
     }
 
     @Override

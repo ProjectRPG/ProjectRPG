@@ -14,7 +14,7 @@ public record EventConditionAny(List<EventCondition> conditions) implements Even
 
     @Override
     public EventConditionType getType() {
-        return EventRegistry.ANY_OF.get();
+        return EventCondition.ANY_OF.get();
     }
 
     @Override
