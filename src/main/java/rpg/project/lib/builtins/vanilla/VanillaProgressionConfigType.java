@@ -35,7 +35,7 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 
 	@Override
 	public SubSystemConfig getDefault(RegistryAccess access) {return new VanillaProgressionConfig(access.lookupOrThrow(APIUtils.GAMEPLAY_EVENTS).keySet()
-			.stream().collect(Collectors.toMap(id -> id, id -> new VanillaProgressionConfig.ExpData(0, Optional.empty()))));}
+			.stream().collect(Collectors.toMap(id -> id, id -> List.of(new VanillaProgressionConfig.ExpData(0, Optional.empty())))));}
 
 	@Override
 	public EnumSet<APIUtils.SystemType> applicableSystemTypes() {
@@ -43,7 +43,7 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 	}
 
 
-	public record VanillaProgressionConfig(Map<ResourceLocation, ExpData> eventToXp) implements SubSystemConfig {
+	public record VanillaProgressionConfig(Map<ResourceLocation, List<ExpData>> eventToXp) implements SubSystemConfig {
 		public static class ExpData {
 			private int xp;
 			private Optional<ConditionWrapper> conditions;
@@ -72,20 +72,20 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 		}
 		
 		public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-				Codec.unboundedMap(ResourceLocation.CODEC, ExpData.CODEC.codec()).fieldOf("events").forGetter(e -> ((VanillaProgressionConfig)e).eventToXp)
+				Codec.unboundedMap(ResourceLocation.CODEC, ExpData.CODEC.codec().listOf()).fieldOf("events").forGetter(e -> ((VanillaProgressionConfig)e).eventToXp)
 				).apply(instance, VanillaProgressionConfig::new));
 
 		@Override
 		public MergeableData combine(MergeableData two) {
 			VanillaProgressionConfig t = (VanillaProgressionConfig) two;
 			var map = new HashMap<>(this.eventToXp());
-			t.eventToXp().forEach((key, value) -> map.merge(key, value, ExpData::combine));
+			t.eventToXp().forEach((key, value) -> map.getOrDefault(key, new ArrayList<>()).addAll(value));
 			return new VanillaProgressionConfig(map);
 		}
 
 		@Override
 		public boolean isUnconfigured() {
-			return this.eventToXp().values().stream().map(ExpData::xp).max(Integer::compareTo).get() == 0;
+			return this.eventToXp().values().stream().map(list -> list.stream().allMatch(data -> data.xp == 0)).allMatch(v -> v);
 		}
 
 		@Override

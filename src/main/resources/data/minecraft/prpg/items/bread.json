@@ -3,7 +3,7 @@
  "progression": [
     {"type":"minecraft:progression",
      "events": {
-       "projectrpg:consume":{"xp":10000}
+       "projectrpg:consume":[{"xp":10000}]
     }}
  ]
 }

@@ -3,7 +3,7 @@
  "progression": [
     {"type":"minecraft:progression",
      "events": {
-       "projectrpg:effect_added":{"xp":50}
+       "projectrpg:effect_added":[{"xp":50}]
     }}
  ]
 }

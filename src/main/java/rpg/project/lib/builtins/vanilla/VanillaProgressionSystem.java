@@ -97,21 +97,23 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 	@Override
 	public List<Pair<String, Consumer<Float>>> getProgressionToBeAwarded(Hub core, ResourceLocation eventID, EventContext context) {
 		return core.getProgressionData(VanillaProgressionConfigType.IMPL, context.getSubjectType(), context.getSubjectID())
-				.map(config -> {
-					VanillaProgressionConfig.ExpData xpToAward = ((VanillaProgressionConfig)config).eventToXp().getOrDefault(eventID, new VanillaProgressionConfig.ExpData(0));
-					if (xpToAward.conditions().isPresent()
-							&& !xpToAward.conditions().get().test(context))
-						return new ArrayList<Pair<String, Consumer<Float>>>();
-					core.getProgressionAddons().forEach(addon -> {
-						xpToAward.setXp(((VanillaProgressionData)addon.modifyProgression(core, context, new VanillaProgressionData(xpToAward.xp()))).exp());
+				.map(config -> ((VanillaProgressionConfig)config).eventToXp().getOrDefault(eventID, List.of())
+						.stream().filter(xpData -> !xpData.conditions().isPresent() || xpData.conditions().get().test(context))
+						.toList())
+				.map(xpData -> {
+					final List<Pair<String, Consumer<Float>>> output = new ArrayList<>();
+					xpData.forEach(config -> {
+						core.getProgressionAddons().forEach(addon -> {
+							config.setXp(((VanillaProgressionData)addon.modifyProgression(core, context, new VanillaProgressionData(config.xp()))).exp());
+						});
+						output.add(Pair.of(container, gate -> {
+							int xp = (int)((float)config.xp() * gate);
+							if (xp <= 0) return;
+							this.addXp(context.getActor().getUUID(), new VanillaProgressionData(xp));
+							if (context.getActor() instanceof ServerPlayer player)
+								Networking.sendToClient(new VanillaProgressionSync(xp, eventID), player);
+						}));
 					});
-					List<Pair<String, Consumer<Float>>> output = List.of(Pair.of(container, gate -> {
-						int xp = (int)((float)xpToAward.xp() * gate);
-						if (xp <= 0) return;
-						this.addXp(context.getActor().getUUID(), new VanillaProgressionData(xp));
-						if (context.getActor() instanceof ServerPlayer player)
-							Networking.sendToClient(new VanillaProgressionSync(xp, eventID), player);
-					}));
 					return output;
 				}
 			).orElse(List.of());
