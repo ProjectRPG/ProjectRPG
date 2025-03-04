@@ -61,11 +61,6 @@ public record VanillaProgressionDataType() implements SubSystemConfigType{
 		}
 
 		@Override
-		public SubSystemConfig getDefault() {
-			return new VanillaProgressionData(0);
-		}
-
-		@Override
 		public float compare(Comparison operator, ProgressionDataType with) {
 			return switch (operator) {
 				case EQUALS -> this.exp() == ((VanillaProgressionData)with).exp() ? 1f : 0f;

@@ -69,11 +69,6 @@ public class SubSystemCodecRegistry {
 
 			@Override
 			public MapCodec<SubSystemConfig> getCodec() {return CODEC;}
-
-			@Override
-			public SubSystemConfig getDefault() {
-				return new DefaultConfig();
-			}			
 		}
 	}
 }

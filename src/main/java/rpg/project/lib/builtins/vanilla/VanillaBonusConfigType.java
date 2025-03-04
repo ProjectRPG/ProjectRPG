@@ -73,10 +73,5 @@ public record VanillaBonusConfigType() implements SubSystemConfigType {
 		public MapCodec<SubSystemConfig> getCodec() {
 			return CODEC;
 		}
-
-		@Override
-		public SubSystemConfig getDefault() {
-			return new VanillaBonusConfig(new HashMap<>());
-		}
 	}
 }

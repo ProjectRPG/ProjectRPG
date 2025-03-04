@@ -66,10 +66,5 @@ public record VanillaAbilityConfigType() implements SubSystemConfigType {
 		public MapCodec<SubSystemConfig> getCodec() {
 			return CODEC;
 		}
-
-		@Override
-		public SubSystemConfig getDefault() {
-			return new VanillaAbilityConfig(List.of(new CompoundTag()));
-		}		
 	}
 }
