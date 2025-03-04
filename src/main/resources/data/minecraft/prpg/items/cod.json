@@ -3,7 +3,17 @@
  "progression": [
     {"type":"minecraft:progression",
      "events": {
-       "projectrpg:player_fish":10000
+       "projectrpg:player_fish":{
+         "xp":10000,
+         "when": {
+           "conditions": [
+             {"type": "projectrpg:entity_matches",
+              "entity": "projectrpg:actor",
+              "value": "minecraft:zombie"
+             }
+           ]
+         }
+       }
     }}
  ]
 }
