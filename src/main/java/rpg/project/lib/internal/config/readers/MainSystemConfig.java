@@ -38,6 +38,7 @@ public record MainSystemConfig(
 		) implements MergeableData{
 	
 	public MainSystemConfig() {this(false, List.of(), Map.of(), List.of(), List.of(), List.of());}
+	public static MainSystemConfig getForScripts() {return new MainSystemConfig(true, List.of(), Map.of(), List.of(), List.of(), List.of());}
 	
 	public static final Codec<MainSystemConfig> CODEC = Codec.lazyInitialized(() -> RecordCodecBuilder.create(instance -> instance.group(
 			Codec.BOOL.optionalFieldOf("replace").forGetter(msc -> Optional.of(msc.override())),

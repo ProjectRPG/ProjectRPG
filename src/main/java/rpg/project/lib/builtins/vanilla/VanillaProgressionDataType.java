@@ -13,6 +13,7 @@ import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.api.progression.ProgressionDataType;
 
 import java.util.EnumSet;
+import java.util.Map;
 
 public record VanillaProgressionDataType() implements SubSystemConfigType{
 	public static final ResourceLocation ID = ResourceLocation.withDefaultNamespace("exp");
@@ -31,6 +32,11 @@ public record VanillaProgressionDataType() implements SubSystemConfigType{
 	@Override
 	public EnumSet<APIUtils.SystemType> applicableSystemTypes() {
 		return EnumSet.of(APIUtils.SystemType.PROGRESSION_DATA);
+	}
+
+	@Override
+	public SubSystemConfig fromScript(Map<String, String> values) {
+		return new VanillaProgressionData(Integer.parseInt(values.getOrDefault("xp", "0")));
 	}
 
 

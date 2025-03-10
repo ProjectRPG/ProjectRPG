@@ -14,9 +14,11 @@ public class VanillaAbilitySystem implements AbilitySystem{
 
 	@Override
 	public List<CompoundTag> getAbilitiesForContext(Hub core, ResourceLocation eventID, EventContext context) {
-		return core.getAbilityData(VanillaAbilityConfigType.IMPL, ObjectType.EVENT, eventID)
-			.map(config -> ((VanillaAbilityConfig)config).data())
-			.orElse(List.of());
+		return ((VanillaAbilityConfig)core.getAbilityData(VanillaAbilityConfigType.IMPL, ObjectType.EVENT, eventID)
+			.orElse(new VanillaAbilityConfig(List.of()))).data().stream()
+			.filter(wrapper -> wrapper.conditions().stream().allMatch(c -> c.test(context)))
+			.map(VanillaAbilityConfig.ConditionalAbility::ability)
+			.toList();
 	}
 
 	@Override

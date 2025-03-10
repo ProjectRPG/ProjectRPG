@@ -10,6 +10,8 @@ import net.minecraft.world.entity.Entity;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.internal.registry.EventRegistry;
 
+import java.util.Map;
+
 public record EventConditionEntityMatches(ContextKey<?> param, ResourceLocation value) implements EventCondition {
     public static final MapCodec<EventConditionEntityMatches> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             ResourceLocation.CODEC.fieldOf("entity")
@@ -29,5 +31,18 @@ public record EventConditionEntityMatches(ContextKey<?> param, ResourceLocation 
             return context.getLevel().registryAccess().lookupOrThrow(Registries.ENTITY_TYPE)
                     .getKey(entity.getType()).equals(value());
         return false;
+    }
+
+    public static class EventConditionEntityMatchesType implements EventConditionType<EventConditionEntityMatches> {
+
+        @Override
+        public MapCodec<EventConditionEntityMatches> codec() {
+            return CODEC;
+        }
+
+        @Override
+        public EventConditionEntityMatches fromScripting(Map<String, String> value) {
+            return null;
+        }
     }
 }

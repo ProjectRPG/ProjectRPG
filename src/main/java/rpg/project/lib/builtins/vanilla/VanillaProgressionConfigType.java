@@ -20,6 +20,7 @@ import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.api.events.conditions.ConditionWrapper;
 import rpg.project.lib.api.events.conditions.EventCondition;
+import rpg.project.lib.api.events.conditions.EventConditionAnd;
 import rpg.project.lib.internal.registry.EventRegistry;
 
 public record VanillaProgressionConfigType() implements SubSystemConfigType{
@@ -42,6 +43,14 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 		return EnumSet.of(APIUtils.SystemType.PROGRESSION);
 	}
 
+	@Override
+	public SubSystemConfig fromScript(Map<String, String> values) {
+		ResourceLocation id = ResourceLocation.parse(values.getOrDefault("event", "invalid_event"));
+		int xp = Integer.parseInt(values.getOrDefault("xp", "0"));
+		Optional<ConditionWrapper> conditionWrapper = Optional.of(ConditionWrapper.fromScripting(values));
+		return new VanillaProgressionConfig(Map.of(id, List.of(new VanillaProgressionConfig.ExpData(xp, conditionWrapper))));
+	}
+
 
 	public record VanillaProgressionConfig(Map<ResourceLocation, List<ExpData>> eventToXp) implements SubSystemConfig {
 		public static class ExpData {
@@ -58,16 +67,13 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 
 			public static final MapCodec<ExpData> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 					Codec.INT.fieldOf("xp").forGetter(ExpData::xp),
-					ConditionWrapper.CODEC.optionalFieldOf("when").forGetter(ExpData::conditions)
+					ConditionWrapper.CODEC.optionalFieldOf("conditions").forGetter(ExpData::conditions)
 			).apply(instance, ExpData::new));
 
 			public static ExpData combine(ExpData a, ExpData b) {
 				int xp = Integer.max(a.xp, b.xp);
-				List<EventCondition> conditions = new ArrayList<>();
-				a.conditions.ifPresent(wrapper -> conditions.addAll(wrapper.conditions()));
-				b.conditions.ifPresent(wrapper -> conditions.addAll(wrapper.conditions()));
-				Optional<ConditionWrapper> allConditions = conditions.isEmpty() ? Optional.empty() : Optional.of(new ConditionWrapper(conditions));
-				return new ExpData(xp, allConditions);
+				Optional<ConditionWrapper> wrapper = a.conditions.orElse(new ConditionWrapper()).combine(b.conditions());
+				return new ExpData(xp, wrapper);
 			}
 		}
 		

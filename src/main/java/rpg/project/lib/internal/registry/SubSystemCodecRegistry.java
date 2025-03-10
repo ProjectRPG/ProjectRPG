@@ -53,6 +53,11 @@ public class SubSystemCodecRegistry {
 			return EnumSet.noneOf(APIUtils.SystemType.class);
 		}
 
+		@Override
+		public SubSystemConfig fromScript(Map<String, String> values) {
+			return new DefaultConfig();
+		}
+
 		public record DefaultConfig() implements SubSystemConfig {
 			public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 					Codec.BOOL.optionalFieldOf("placeholder").forGetter(o -> Optional.of(true))

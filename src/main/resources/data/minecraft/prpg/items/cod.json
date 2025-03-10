@@ -5,8 +5,8 @@
      "events": {
        "projectrpg:player_fish":[
          {"xp":10000,
-          "when": {
-             "conditions": [
+          "conditions": {
+             "all_of": [
                {"type": "projectrpg:not",
                 "condition":  {"type": "projectrpg:entity_matches", "entity": "projectrpg:actor", "value": "minecraft:zombie"}
                }

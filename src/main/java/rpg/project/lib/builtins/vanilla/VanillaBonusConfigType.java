@@ -36,6 +36,12 @@ public record VanillaBonusConfigType() implements SubSystemConfigType {
 		return EnumSet.of(APIUtils.SystemType.PROGRESSION);
 	}
 
+	@Override
+	public SubSystemConfig fromScript(Map<String, String> values) {
+		//TODO get bonus scripting. which should be fun since i'm not sure what this does to begin with.
+		return new VanillaBonusConfig(Map.of());
+	}
+
 
 	public record VanillaBonusConfig(Map<String, List<SubSystemConfig>> values) implements SubSystemConfig {
 		public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
