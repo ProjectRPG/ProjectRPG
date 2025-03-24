@@ -164,7 +164,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	 * @param data the object containing the specific data
 	 */
 	public void registerDefault(ResourceLocation id, MainSystemConfig data) {
-		defaultSettings.merge(id, data, (currID, currData) -> (MainSystemConfig)currData.combine(data));
+		defaultSettings.merge(id, data, (currData, newData) -> (MainSystemConfig)currData.combine(newData));
 	}
 	
 	/**Adds override data to the loader.  This data is applied on
@@ -181,7 +181,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	 * @param data the object containing the specific data
 	 */
 	public void registerOverride(ResourceLocation id, MainSystemConfig data) {
-		overrideSettings.merge(id, data, (currID, currData) -> (MainSystemConfig)currData.combine(data));
+		overrideSettings.merge(id, data, (currData, newData) -> (MainSystemConfig)currData.combine(newData));
 	}
 
 	/** Off-thread processing (can include reading files from hard drive) **/
@@ -189,7 +189,6 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	protected Map<ResourceLocation, MainSystemConfig> prepare(final ResourceManager resourceManager, final ProfilerFiller profiler)
 	{
 		final Map<ResourceLocation, List<MainSystemConfig>> map = new HashMap<>();
-		defaultSettings.forEach((id, data) -> {map.put(id, new ArrayList<>(List.of(data)));});
 
 		for (ResourceLocation resourceLocation : resourceManager.listResources(this.folderName, MergeableCodecDataManager::isStringJsonFile).keySet())
 		{
@@ -222,7 +221,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 				}
 			}			
 			
-			map.put(jsonIdentifier, unmergedRaws);
+			map.computeIfAbsent(jsonIdentifier, id -> new ArrayList<>()).addAll(unmergedRaws);
 		}
 
 		return MergeableCodecDataManager.mapValues(map, this.merger::apply);
@@ -255,8 +254,14 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	@Override
 	protected void apply(final Map<ResourceLocation, MainSystemConfig> processedData, final ResourceManager resourceManager, final ProfilerFiller profiler)
 	{
+		var debug = this.folderName;
 		MsLoggy.INFO.log(LOG_CODE.DATA, "Beginning loading of data for data loader: {}", this.folderName);
+
 		// now that we're on the main thread, we can finalize the data
+		defaultSettings.forEach((key, value) -> {
+			MsLoggy.DEBUG.log(LOG_CODE.DATA, "Loading API Default Data For: {} of: {}", key, value);
+			processedData.merge(key, value, (existing, defaulted) -> (MainSystemConfig) existing.combine(defaulted));
+		});
 		MsLoggy.DEBUG.log(LOG_CODE.DATA, processedData, "Loaded Data For: {} of: {}");
 		this.data.putAll(processedData);
 		//Apply overrides

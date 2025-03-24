@@ -111,6 +111,7 @@ public class Core implements Hub {
 
 		Ability ability = AbilityUtils.get(player.level().registryAccess()).getAbility(abilityID);
 		CompoundTag config = ability.propertyDefaults().copy().merge(dataIn);
+		this.getAbility().abilityActivationCallback(ability, config, player, context);
 		ability.start(player, config, context);
 		tickTracker.add(new TickSchedule(ability, player, config, context, new AtomicInteger(0)));
 

@@ -7,6 +7,7 @@ import rpg.project.lib.api.events.EventContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 public record ConditionWrapper(List<EventCondition> and, List<EventCondition> or) {
@@ -42,5 +43,26 @@ public record ConditionWrapper(List<EventCondition> and, List<EventCondition> or
     public boolean test(EventContext context) {
         return and.stream().allMatch(condition -> condition.test(context))
                 && (or.isEmpty() || or.stream().anyMatch(condition -> condition.test(context)));
+    }
+
+    @Override
+    public String toString() {
+        return "ConditionWrapper{" +
+                "and=" + and +
+                ", or=" + or +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ConditionWrapper that = (ConditionWrapper) o;
+        return Objects.equals(or, that.or) && Objects.equals(and, that.and);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(and, or);
     }
 }

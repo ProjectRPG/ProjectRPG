@@ -46,6 +46,9 @@ public record VanillaProgressionDataType() implements SubSystemConfigType{
 				).apply(instance, VanillaProgressionData::new));
 
 		@Override
+		public boolean isPriorityData() {return false;}
+
+		@Override
 		public MergeableData combine(MergeableData two) {
 			int greater = Math.max(exp(), ((VanillaProgressionData)two).exp());
 			return new VanillaProgressionData(greater);

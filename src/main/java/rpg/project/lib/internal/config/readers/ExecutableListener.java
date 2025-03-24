@@ -11,6 +11,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+import rpg.project.lib.internal.config.scripting.Scripting;
 
 public class ExecutableListener extends SimplePreparableReloadListener<Boolean> {
 	private final Consumer<RegistryAccess> executor;
@@ -22,12 +23,13 @@ public class ExecutableListener extends SimplePreparableReloadListener<Boolean> 
 	}
 
 	@Override
-	protected Boolean prepare(ResourceManager pResourceManager, ProfilerFiller pProfiler) {return false;}
+	protected Boolean prepare(ResourceManager pResourceManager, ProfilerFiller pProfiler) {
+		executor.accept(access);
+		return false;
+	}
 
 	@Override
-	protected void apply(Boolean pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
-		executor.accept(access);
-	}
+	protected void apply(Boolean pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {}
 
 	/**
 	 * This should be called at most once, during construction of your mod (static init of your main mod class is fine)

@@ -50,6 +50,9 @@ public record VanillaBonusConfigType() implements SubSystemConfigType {
 				).apply(instance, VanillaBonusConfig::new));
 
 		@Override
+		public boolean isPriorityData() {return false;} //TODO make not false
+
+		@Override
 		public MergeableData combine(MergeableData two) {
 			VanillaBonusConfig other = (VanillaBonusConfig) two;
 			Map<String,List<SubSystemConfig>> combined = other.values();

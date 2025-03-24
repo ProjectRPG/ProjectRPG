@@ -43,6 +43,8 @@ public record VanillaPartyConfigType() implements SubSystemConfigType{
 	public record VanillaPartyConfig() implements SubSystemConfig {
 		
 		public static final MapCodec<SubSystemConfig> CODEC = MapCodec.unit(new VanillaPartyConfig());
+		@Override
+		public boolean isPriorityData() {return false;}
 
 		@Override
 		public MergeableData combine(MergeableData two) {

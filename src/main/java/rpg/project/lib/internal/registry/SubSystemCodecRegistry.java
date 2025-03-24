@@ -64,6 +64,9 @@ public class SubSystemCodecRegistry {
 					).apply(instance, bool -> new DefaultConfig()));
 
 			@Override
+			public boolean isPriorityData() {return false;}
+
+			@Override
 			public MergeableData combine(MergeableData two) {return this;}
 
 			@Override

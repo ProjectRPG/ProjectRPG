@@ -96,27 +96,30 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 	
 	@Override
 	public List<Pair<String, Consumer<Float>>> getProgressionToBeAwarded(Hub core, ResourceLocation eventID, EventContext context) {
-		return core.getProgressionData(VanillaProgressionConfigType.IMPL, context.getSubjectType(), context.getSubjectID())
+		List<VanillaProgressionConfig.ExpData> eventConfig = core.getProgressionData(VanillaProgressionConfigType.IMPL, ObjectType.EVENT, eventID)
 				.map(config -> ((VanillaProgressionConfig)config).eventToXp().getOrDefault(eventID, List.of())
 						.stream().filter(xpData -> !xpData.conditions().isPresent() || xpData.conditions().get().test(context))
-						.toList())
-				.map(xpData -> {
-					final List<Pair<String, Consumer<Float>>> output = new ArrayList<>();
-					xpData.forEach(config -> {
-						core.getProgressionAddons().forEach(addon -> {
-							config.setXp(((VanillaProgressionData)addon.modifyProgression(core, context, new VanillaProgressionData(config.xp()))).exp());
-						});
-						output.add(Pair.of(container, gate -> {
-							int xp = (int)((float)config.xp() * gate);
-							if (xp <= 0) return;
-							this.addXp(context.getActor().getUUID(), new VanillaProgressionData(xp));
-							if (context.getActor() instanceof ServerPlayer player)
-								Networking.sendToClient(new VanillaProgressionSync(xp, eventID), player);
-						}));
-					});
-					return output;
-				}
-			).orElse(List.of());
+						.toList()).orElse(List.of());
+		List<VanillaProgressionConfig.ExpData> subjectConfig = core.getProgressionData(VanillaProgressionConfigType.IMPL, context.getSubjectType(), context.getSubjectID())
+				.map(config -> ((VanillaProgressionConfig)config).eventToXp().getOrDefault(eventID, List.of())
+						.stream().filter(xpData -> !xpData.conditions().isPresent() || xpData.conditions().get().test(context))
+						.toList()).orElse(List.of());
+		List<VanillaProgressionConfig.ExpData> compositeData = new ArrayList<>(eventConfig);
+		compositeData.addAll(subjectConfig);
+		final List<Pair<String, Consumer<Float>>> output = new ArrayList<>();
+		compositeData.forEach(config -> {
+			core.getProgressionAddons().forEach(addon -> {
+				config.setXp(((VanillaProgressionData)addon.modifyProgression(core, context, new VanillaProgressionData(config.xp()))).exp());
+			});
+			output.add(Pair.of(container, gate -> {
+				int xp = (int)((float)config.xp() * gate);
+				if (xp <= 0) return;
+				this.addXp(context.getActor().getUUID(), new VanillaProgressionData(xp));
+				if (context.getActor() instanceof ServerPlayer player)
+					Networking.sendToClient(new VanillaProgressionSync(xp, eventID), player);
+			}));
+		});
+		return output;
 	}	
 	
 	private static class OfflineProgress extends SavedData {

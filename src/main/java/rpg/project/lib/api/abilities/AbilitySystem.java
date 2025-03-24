@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.client.components.SidePanelContentProvider;
 import rpg.project.lib.api.events.EventContext;
@@ -23,6 +24,15 @@ public interface AbilitySystem {
 	 * @return a list of Ability configurations applicable, per this system.
 	 */
 	List<CompoundTag> getAbilitiesForContext(Hub core, ResourceLocation eventID, EventContext context);
+
+	/**
+	 *
+	 * @param ability
+	 * @param data
+	 * @param player
+	 * @param context
+	 */
+	void abilityActivationCallback(Ability ability, CompoundTag data, Player player, EventContext context);
 
 	/**@return a provider which supplies the side panel display for information this ability
 	 * system wants to present to the player.

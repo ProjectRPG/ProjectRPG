@@ -44,7 +44,7 @@ public class Functions {
         MainSystemConfig config = MainSystemConfig.getForScripts();
         config.gates().put(gate, List.of(subsystem.fromScript(value)));
         MainSystemConfig existing = loader.getData(id);
-        loader.registerOverride(id, (MainSystemConfig) existing.combine(config));
+        loader.registerDefault(id, (MainSystemConfig) existing.combine(config));
     }
 
     static {
@@ -59,7 +59,7 @@ public class Functions {
             MainSystemConfig config = MainSystemConfig.getForScripts();
             config.progression().add(subsystem.fromScript(value));
             MainSystemConfig existing = loader.getData(id);
-            loader.registerOverride(id, (MainSystemConfig) existing.combine(config));
+            loader.registerDefault(id, (MainSystemConfig) existing.combine(config));
         });
         KEYWORDS.put("ability", (param, id, type, value) -> {
             SubSystemConfigType subsystem = CommonSetup.CODECS.getRegistry().get().getValue(ResourceLocation.parse(param));
@@ -67,7 +67,7 @@ public class Functions {
             MainSystemConfig config = MainSystemConfig.getForScripts();
             config.abilities().add(subsystem.fromScript(value));
             MainSystemConfig existing = loader.getData(id);
-            loader.registerOverride(id, (MainSystemConfig) existing.combine(config));
+            loader.registerDefault(id, (MainSystemConfig) existing.combine(config));
         });
         KEYWORDS.put("feature", (param, id, type, value) -> {
             SubSystemConfigType subsystem = CommonSetup.CODECS.getRegistry().get().getValue(ResourceLocation.parse(param));
@@ -75,7 +75,7 @@ public class Functions {
             MainSystemConfig config = MainSystemConfig.getForScripts();
             config.features().add(subsystem.fromScript(value));
             MainSystemConfig existing = loader.getData(id);
-            loader.registerOverride(id, (MainSystemConfig) existing.combine(config));
+            loader.registerDefault(id, (MainSystemConfig) existing.combine(config));
         });
 
         TARGETORS.put("food", (param, access) -> {
