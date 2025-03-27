@@ -25,14 +25,18 @@ public interface AbilitySystem {
 	 */
 	List<CompoundTag> getAbilitiesForContext(Hub core, ResourceLocation eventID, EventContext context);
 
-	/**
+	/**Abilities have some control over when they activate.  Because of this, the {@link AbilitySystem}
+	 * does not know whether an ability it provided via {@link #getAbilitiesForContext(Hub, ResourceLocation, EventContext)}
+	 * activated or not.  This method is called in the core library's ability execution logic to provide
+	 * the AbilitySystem with this detail.
 	 *
-	 * @param ability
-	 * @param data
-	 * @param player
-	 * @param context
+	 * @param ability The ability instance that activated
+	 * @param data The configuration and context data supplied to the ability
+	 * @param player The player associated with the ability activation
+	 * @param context The context for the encapsulating event
+	 * @param eventID The event this ability activated during
 	 */
-	void abilityActivationCallback(Ability ability, CompoundTag data, Player player, EventContext context);
+	void abilityActivationCallback(Ability ability, CompoundTag data, Player player, EventContext context, ResourceLocation eventID);
 
 	/**@return a provider which supplies the side panel display for information this ability
 	 * system wants to present to the player.

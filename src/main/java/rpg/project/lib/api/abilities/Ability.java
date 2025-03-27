@@ -164,8 +164,12 @@ public record Ability(
      * @param nbt the configuration settings for this ability
      * @return the start behavior output tag
      */
-    public void start(Player player, CompoundTag nbt, EventContext context) {
-        if (canActivate(player, nbt, context)) start.start(player, nbt, context);
+    public boolean start(Player player, CompoundTag nbt, EventContext context) {
+        if (canActivate(player, nbt, context)) {
+            start.start(player, nbt, context);
+            return true;
+        }
+        return false;
     }
     
     /**If conditions are still met, executes the tick behavior of the ability

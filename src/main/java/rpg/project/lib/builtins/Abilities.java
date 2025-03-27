@@ -69,13 +69,12 @@ public class Abilities {
 		context.setParam(AbilityUtils.BREAK_SPEED_OUTPUT_VALUE, newSpeed);
 	}).setStatus((player, settings, context) -> {
 		List<MutableComponent> lines = new ArrayList<>();
-		// int skillLevel = settings.getInt(APIUtils.SKILL_LEVEL);
-		// DIG_ACTIONS.stream()
-		// .filter(action -> settings.getFloat(action.name()) > 0)
-		// .forEach(action ->
-		// lines.add(LangProvider.PERK_BREAK_SPEED_STATUS_1.asComponent(action.name(),
-		// settings.getFloat(action.name()) * (float) skillLevel)));
-		lines.add(Component.literal("TEST"));
+		 int skillLevel = settings.getInt(AbilityUtils.PROGRESS_LEVEL);
+		 DIG_ACTIONS.stream()
+		 .filter(action -> settings.getFloat(action.name()) > 0)
+		 .forEach(action ->
+		 lines.add(LangProvider.BREAK_SPEED_ABILITY_STATUS1.asComponent(action.name(),
+		 settings.getFloat(action.name()) * (float) skillLevel)));
 		return lines;
 	}).build();
 
@@ -134,6 +133,7 @@ public class Abilities {
 	}
 
 	public static final Ability ATTRIBUTE = Ability.begin(RegistrationSide.SERVER)
+			.addConditions((player, tag, context) -> getAttribute(tag, player.level().registryAccess()) != null)
 			.addDefaults(TagBuilder.start()
 					.withString(AbilityUtils.ATTRIBUTE, "null:null")
 					.withDouble(AbilityUtils.BASE, 0d)
@@ -158,12 +158,26 @@ public class Abilities {
 				instance.addPermanentModifier(modifier);
 			}))
 			.setDescription(LangProvider.ATTRIBUTE_DESC.asComponent())
-			.setStatus((player, compoundTag, context) -> List.of())
-			.build();
+			.setStatus((player, settings, context) -> {
+				double perLevel = settings.getDouble(AbilityUtils.PER_LEVEL);
+				double maxBoost = settings.getDouble(AbilityUtils.MAX_BOOST);
+				String container = settings.getString(AbilityUtils.CONTAINER_NAME);
+				long progress = Core.get(player.level()).getProgression().getProgress(player.getUUID(), container).getProgressAsNumber();
+				double boost = Math.min((perLevel * (double)progress) + settings.getDouble(AbilityUtils.BASE), maxBoost);
+				String attribute = player.level().registryAccess()
+						.lookupOrThrow(Registries.ATTRIBUTE).getValue(ResourceLocation.parse(settings.getString(AbilityUtils.ATTRIBUTE))).getDescriptionId();
+				return List.of(
+					LangProvider.ATTRIBUTE_STATUS1.asComponent(
+						Component.translatable(attribute),
+						boost
+					)
+				);
+			}).build();
 
 	private static final String CMD = "command";
 	private static final String FNC = "function";
 	public static final Ability COMMAND = Ability.begin(RegistrationSide.SERVER)
+			.addConditions((p, n, e) -> n.contains(CMD) || n.contains(FNC))
 			.setStart((p, nbt, context) -> {
 				if (p instanceof ServerPlayer player ) {
 					if (nbt.contains(FNC)) {
@@ -178,7 +192,11 @@ public class Abilities {
 				}
 			})
 			.setDescription(LangProvider.COMMAND_DESC.asComponent())
-			.setStatus((player, nbt, context) -> List.of()).build();
+			.setStatus((player, nbt, context) -> List.of(
+					LangProvider.COMMAND_STATUS_1.asComponent(
+							nbt.contains(CMD) ? LangProvider.COMMMAND_COMMAND.asComponent() : LangProvider.COMMMAND_FUNCTION.asComponent(),
+							nbt.contains(CMD) ? nbt.getString(CMD) : nbt.getString(FNC))
+			)).build();
 
 	//Can be used to reduce damage as well as increase jump amount
 	public static final Ability MODIFY_VALUE = Ability.begin(RegistrationSide.BOTH)
@@ -199,7 +217,16 @@ public class Abilities {
 					change += settings.getFloat(AbilityUtils.BASE) + (settings.getFloat(AbilityUtils.PER_LEVEL) * (float)progressLevel);
 					context.setParam(EventContext.CHANGE_AMOUNT, change);
 				}
-			})).build();
+			}))
+			.setStatus((player, settings, context) -> {
+				float change = context.getParam(EventContext.CHANGE_AMOUNT);
+				String container = settings.getString(AbilityUtils.CONTAINER_NAME);
+				long progressLevel = Core.get(context.getLevel()).getProgression().getProgress(player.getUUID(), container).getProgressAsNumber();
+				change += settings.getFloat(AbilityUtils.BASE) + (settings.getFloat(AbilityUtils.PER_LEVEL) * (float)progressLevel);
+				return List.of(
+					LangProvider.MODIFY_STATUS.asComponent(change)
+				);
+			}).build();
 
 	private static boolean tagContains(CompoundTag tag, String key, EventContext context, ContextKey<DamageSource> param) {
 		ListTag list = tag.getList(key, StringTag.TAG_STRING);

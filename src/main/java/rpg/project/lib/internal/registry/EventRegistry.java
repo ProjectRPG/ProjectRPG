@@ -64,7 +64,7 @@ public class EventRegistry {
 			float gating = GateRegistry.isAbilityPermitted(context.getActor(), core, eventID, context, abilityID);
 			if (gating != GateRegistry.HARD_FAIL) {
 				context.setParam(AbilityUtils.REDUCE, gating);
-				core.executeAbility(abilityID, context.getActor(), config, context);
+				core.executeAbility(abilityID, context.getActor(), config, context, eventID);
 			}
 		}
 		

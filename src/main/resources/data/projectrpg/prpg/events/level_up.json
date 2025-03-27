@@ -3,7 +3,7 @@
   "abilities": [
     {"type": "minecraft:abilities", "configurations": [
       {"ability": {"type": "projectrpg:attribute",
-                   "attribute": "minecraft:generic.max_health",
+                   "attribute": "minecraft:max_health",
                    "per_level": 1,
                    "max_boost": 100,
                    "multiplicative":  false}},

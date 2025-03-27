@@ -157,8 +157,24 @@ public class LangProvider extends LanguageProvider {
 			.addLocale(Locale.EN_US, "Lvl:%s for %ss").build();
 	public static final Translation ATTRIBUTE_DESC = Translation.Builder.start("ability.projectrpg.attribute")
 			.addLocale(Locale.EN_US, "Player Attribute").build();
+	public static final Translation ATTRIBUTE_STATUS1 = Translation.Builder.start("ability.projectrpg.attribute.status1")
+			.addLocale(Locale.EN_US, "%s modified by %s").build();
 	public static final Translation COMMAND_DESC = Translation.Builder.start("ability.projectrpg.command")
 			.addLocale(Locale.EN_US, "Execute Command/Function").build();
+	public static final Translation COMMAND_STATUS_1 = Translation.Builder.start("ability.projectrpg.cmd.status1")
+			.addLocale(Locale.EN_US, "%s: `%s` executed").build();
+	public static final Translation COMMMAND_COMMAND = Translation.Builder.start("ability.projectrpg.cmd.cmd")
+			.addLocale(Locale.EN_US, "Command").build();
+	public static final Translation COMMMAND_FUNCTION = Translation.Builder.start("ability.projectrpg.cmd.fnc")
+			.addLocale(Locale.EN_US, "Function").build();
+	public static final Translation MODIFY = Translation.Builder.start("ability.projectrpg.modify")
+			.addLocale(Locale.EN_US, "Modify Event").build();
+	public static final Translation MODIFY_STATUS = Translation.Builder.start("ability.projectrpg.modify.status")
+			.addLocale(Locale.EN_US, "Event output changed by %s").build();
+	public static final Translation BREAK_SPEED_ABILITY = Translation.Builder.start("ability.projectrpg.break_speed")
+			.addLocale(Locale.EN_US, "Dig Speed Boost").build();
+	public static final Translation BREAK_SPEED_ABILITY_STATUS1 = Translation.Builder.start("ability.projectrpg.break_speed.status1")
+			.addLocale(Locale.EN_US, "%s increased by %s").build();
 
 	//========KEY BINDS=========
 	public static final Translation KEYBIND_CATEGORY = Translation.Builder.start("category.projectrpg")
@@ -173,6 +189,8 @@ public class LangProvider extends LanguageProvider {
 	//=======VANILLA SYSTEM TRANSLATIONS================
 	public static final Translation ABILITY_SIDE_PANEL_HEADER = Translation.Builder.start("vanilla.ability.panel.header")
 			.addLocale(Locale.EN_US, "Recently Activated Abilities").build();
+	public static final Translation ABILITY_SIDE_PANEL_EVENT_HEADER = Translation.Builder.start("vanilla.ability.panel.eventheader")
+			.addLocale(Locale.EN_US, "%s activated for %s").build();
 	public static final Translation PROGRESSION_SIDE_PANEL_HEADER = Translation.Builder.start("vanilla.progression.panel.header")
 			.addLocale(Locale.EN_US, "Recently Gained Experience").build();
 	public static final Translation PROGRESSION_GAIN = Translation.Builder.start("vanilla.progression.panel.gain")

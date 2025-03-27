@@ -106,17 +106,18 @@ public class Core implements Hub {
 
 	//=========ABILITIES METHODS=================
 	//<editor-fold>
-	public void executeAbility(ResourceLocation abilityID, Player player, CompoundTag dataIn, EventContext context) {
+	public void executeAbility(ResourceLocation abilityID, Player player, CompoundTag dataIn, EventContext context, ResourceLocation eventID) {
 		if (player == null) return;
 
 		Ability ability = AbilityUtils.get(player.level().registryAccess()).getAbility(abilityID);
 		CompoundTag config = ability.propertyDefaults().copy().merge(dataIn);
-		this.getAbility().abilityActivationCallback(ability, config, player, context);
-		ability.start(player, config, context);
-		tickTracker.add(new TickSchedule(ability, player, config, context, new AtomicInteger(0)));
+		if (ability.start(player, config, context)) {
+			this.getAbility().abilityActivationCallback(ability, config.copy(), player, context, eventID);
+			tickTracker.add(new TickSchedule(ability, player, config, context, new AtomicInteger(0)));
 
-		if (config.contains(AbilityUtils.COOLDOWN)) {
-			coolTracker.add(new AbilityCooldown(abilityID, player, config, player.level().getGameTime()));
+			if (config.contains(AbilityUtils.COOLDOWN)) {
+				coolTracker.add(new AbilityCooldown(abilityID, player, config, player.level().getGameTime()));
+			}
 		}
 	}
 
