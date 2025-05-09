@@ -16,6 +16,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
@@ -66,7 +67,7 @@ public record VanillaAbilityConfigType() implements SubSystemConfigType {
 				.filter(entry -> !entry.getKey().startsWith("or_if"))
 				.forEach(entry -> {
 			try {
-				Tag tag = new TagParser(new StringReader(entry.getValue())).readValue();
+				Tag tag = TagParser.create(NbtOps.INSTANCE).parseFully(new StringReader(entry.getValue()));
 				outTag.put(entry.getKey(), tag);
 			}
 			catch (CommandSyntaxException e) {

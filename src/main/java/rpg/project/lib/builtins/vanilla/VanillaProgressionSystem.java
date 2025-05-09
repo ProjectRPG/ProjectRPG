@@ -5,7 +5,10 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.data.DataProvider;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
@@ -32,6 +35,7 @@ import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.client.components.SidePanelContentProvider;
 import rpg.project.lib.api.data.CodecTypes;
 import rpg.project.lib.api.data.ObjectType;
+import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.ProgressionAdvanceEvent;
@@ -96,6 +100,7 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 	
 	@Override
 	public List<Pair<String, Consumer<Float>>> getProgressionToBeAwarded(Hub core, ResourceLocation eventID, EventContext context) {
+		//TODO factor parties into the xp distribution.
 		List<VanillaProgressionConfig.ExpData> eventConfig = core.getProgressionData(VanillaProgressionConfigType.IMPL, ObjectType.EVENT, eventID)
 				.map(config -> ((VanillaProgressionConfig)config).eventToXp().getOrDefault(eventID, List.of())
 						.stream().filter(xpData -> !xpData.conditions().isPresent() || xpData.conditions().get().test(context))
@@ -124,31 +129,26 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 	
 	private static class OfflineProgress extends SavedData {
 		private final Map<UUID, VanillaProgressionData> cachedProgress;
-		
-		private static final Codec<Map<UUID, VanillaProgressionData>> CODEC = Codec.unboundedMap(CodecTypes.UUID_CODEC, VanillaProgressionData.CODEC.xmap(s -> (VanillaProgressionData)s, s -> s).codec());
-		
 		private static final String MAP_KEY = "data";
 
-		public static Factory<OfflineProgress> dataFactory() {
-			return new Factory<>(OfflineProgress::new, OfflineProgress::new, null);
-		}
-		public static OfflineProgress get() {			
+		private static final Codec<OfflineProgress> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+				Codec.unboundedMap(CodecTypes.UUID_CODEC, VanillaProgressionData.DIRECT_CODEC).fieldOf(MAP_KEY).forGetter(OfflineProgress::getProgress)
+		).apply(instance, OfflineProgress::new));
+
+		private Map<UUID, VanillaProgressionData> getProgress() {return cachedProgress;}
+
+		public static OfflineProgress get() {
 			return ServerLifecycleHooks.getCurrentServer() == null ? new OfflineProgress()
-					: ServerLifecycleHooks.getCurrentServer().overworld().getDataStorage().computeIfAbsent(dataFactory(), "prpg_vanilla_progress_data");
+					: ServerLifecycleHooks.getCurrentServer().overworld().getDataStorage().computeIfAbsent(
+							new SavedDataType<OfflineProgress>("prpg_vanilla_progress_data", OfflineProgress::new, CODEC, null));
 		}
 		
 		private OfflineProgress() {
 			cachedProgress = new HashMap<>();
 		}
-		private OfflineProgress(CompoundTag nbt, HolderLookup.Provider provider) {
-			cachedProgress = new HashMap<>(CODEC.parse(NbtOps.INSTANCE, nbt.getCompound(MAP_KEY)).resultOrPartial(err -> LogManager.getLogger().error(err)).orElse(new HashMap<>()));
+		private OfflineProgress(Map<UUID, VanillaProgressionData> cachedProgress) {
+			this.cachedProgress = new HashMap<>(cachedProgress);
 		}
-
-		@Override
-		public CompoundTag save(CompoundTag pCompoundTag, HolderLookup.Provider provider) {
-			pCompoundTag.put(MAP_KEY, CODEC.encodeStart(NbtOps.INSTANCE, cachedProgress).resultOrPartial(err -> LogManager.getLogger().error(err)).orElse(new CompoundTag()));
-			return pCompoundTag;
-		}		
 	}
 
 	public static final String PLAYERS = "players";

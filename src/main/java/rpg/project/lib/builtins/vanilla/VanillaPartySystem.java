@@ -1,9 +1,11 @@
 package rpg.project.lib.builtins.vanilla;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.Map;
 
-import com.google.common.collect.HashMultimap;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
@@ -15,7 +17,7 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import rpg.project.lib.api.party.PartySystem;
 
 public class VanillaPartySystem implements PartySystem{
-	private final HashMultimap<String, String> partyInvites = HashMultimap.create();
+	private final Map<String, List<String>> partyInvites = new HashMap<>();
 
 	@Override
 	public boolean createParty(String partyName) {
@@ -33,7 +35,7 @@ public class VanillaPartySystem implements PartySystem{
 	public boolean invitePlayer(Player executor, String invitee) {
 		PlayerTeam team = board().getPlayersTeam(executor.getUUID().toString());
 		if (team != null) {
-			partyInvites.put(team.getName(), invitee);
+			partyInvites.computeIfAbsent(team.getName(), a -> new ArrayList<>()).add(invitee);
 			return true;
 		}			
 		return false;
@@ -43,7 +45,7 @@ public class VanillaPartySystem implements PartySystem{
 	public boolean revokeInvite(Player executor, String invitee) {
 		PlayerTeam team = board().getPlayersTeam(executor.getUUID().toString());
 		if (team != null) 
-			return partyInvites.remove(team.getName(), invitee);
+			return partyInvites.getOrDefault(team.getName(), new ArrayList<>()).remove(invitee);
 		return false;
 	}
 
@@ -51,7 +53,7 @@ public class VanillaPartySystem implements PartySystem{
 	public boolean acceptInvite(Player invitee, String partyName) {
 		if (partyInvites.get(partyName).contains(invitee.getUUID().toString())) {
 			board().addPlayerToTeam(invitee.getUUID().toString(), board().getPlayerTeam(partyName));
-			partyInvites.keySet().forEach(party -> partyInvites.get(party).remove(invitee.getUUID().toString()));
+			partyInvites.keySet().forEach(party -> partyInvites.getOrDefault(party, new ArrayList<>()).remove(invitee.getUUID().toString()));
 			return true;
 		}
 		return false;
@@ -59,7 +61,7 @@ public class VanillaPartySystem implements PartySystem{
 
 	@Override
 	public boolean declineInvite(Player invitee, String partyName) {
-		return partyInvites.get(partyName).remove(invitee.getUUID().toString());
+		return partyInvites.getOrDefault(partyName, new ArrayList<>()).remove(invitee.getUUID().toString());
 	}
 
 	@Override

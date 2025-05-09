@@ -60,7 +60,7 @@ public class EventRegistry {
 				
 		//Activate event-specific abilities
 		for (CompoundTag config : core.getAbility().getAbilitiesForContext(core, eventID, context)) {
-			ResourceLocation abilityID = ResourceLocation.parse(config.getString(AbilityUtils.TYPE));
+			ResourceLocation abilityID = ResourceLocation.parse(config.getStringOr(AbilityUtils.TYPE, ""));
 			float gating = GateRegistry.isAbilityPermitted(context.getActor(), core, eventID, context, abilityID);
 			if (gating != GateRegistry.HARD_FAIL) {
 				context.setParam(AbilityUtils.REDUCE, gating);

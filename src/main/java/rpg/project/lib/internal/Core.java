@@ -123,7 +123,7 @@ public class Core implements Hub {
 
 	private record TickSchedule(Ability ability, Player player, CompoundTag src, EventContext context, AtomicInteger ticksElapsed) {
 		public boolean shouldTick() {
-			return src.contains(AbilityUtils.DURATION) && ticksElapsed.get() <= src.getInt(AbilityUtils.DURATION);
+			return src.contains(AbilityUtils.DURATION) && ticksElapsed.get() <= src.getIntOr(AbilityUtils.DURATION, 0);
 		}
 
 		public void tick() {
@@ -134,7 +134,7 @@ public class Core implements Hub {
 
 	private record AbilityCooldown(ResourceLocation abilityID, Player player, CompoundTag src, long lastUse) {
 		public boolean cooledDown(Level level) {
-			return level.getGameTime() > lastUse + src.getInt(AbilityUtils.COOLDOWN);
+			return level.getGameTime() > lastUse + src.getIntOr(AbilityUtils.COOLDOWN, 0);
 		}
 	}
 
@@ -154,7 +154,7 @@ public class Core implements Hub {
 	}
 
 	public boolean isAbilityCooledDown(Player player, CompoundTag src) {
-		ResourceLocation abilityID = ResourceLocation.parse(src.getString("ability"));
+		ResourceLocation abilityID = ResourceLocation.parse(src.getStringOr("ability", ""));
 		return coolTracker.stream().noneMatch(cd -> cd.player().equals(player) && cd.abilityID().equals(abilityID));
 	}
 	//</editor-fold>

@@ -5,9 +5,9 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.ArmorItem;
 import net.neoforged.fml.LogicalSide;
 import rpg.project.lib.api.data.NodeConsumer;
 import rpg.project.lib.api.data.ObjectType;
@@ -124,18 +124,22 @@ public class Functions {
             }
             return new TargetSelector.Selection(ObjectType.ITEM, tools);
         });
-        TARGETORS.put("armor", (param, access) -> {
+        TARGETORS.put("wearable", (param, access) -> {
             List<ResourceLocation>  tools = new ArrayList<>();
             if (param.isEmpty())
                 tools.addAll(access.lookupOrThrow(Registries.ITEM).entrySet().stream()
-                        .filter(entry -> entry.getValue() instanceof ArmorItem)
+                        .filter(entry -> entry.getValue().components().has(DataComponents.EQUIPPABLE) &&
+                                entry.getValue().components().get(DataComponents.EQUIPPABLE).slot() != EquipmentSlot.OFFHAND &&
+                                entry.getValue().components().get(DataComponents.EQUIPPABLE).slot() != EquipmentSlot.MAINHAND)
                         .map(entry -> entry.getKey().location())
                         .toList());
             else {
                 ResourceLocation tag = Reference.resource(param);
                 tools.addAll(access.lookupOrThrow(Registries.ITEM).get(TagKey.create(Registries.ITEM, tag))
                         .map(named -> named.stream()
-                                .filter(holder -> holder.value() instanceof ArmorItem)
+                                .filter(entry -> entry.value().components().has(DataComponents.EQUIPPABLE) &&
+                                        entry.value().components().get(DataComponents.EQUIPPABLE).slot() != EquipmentSlot.OFFHAND &&
+                                        entry.value().components().get(DataComponents.EQUIPPABLE).slot() != EquipmentSlot.MAINHAND)
                                 .map(holder -> holder.getKey().location()).toList())
                         .orElse(List.of()));
             }

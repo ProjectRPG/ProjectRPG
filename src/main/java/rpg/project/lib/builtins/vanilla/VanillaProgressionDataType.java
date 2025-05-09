@@ -45,6 +45,10 @@ public record VanillaProgressionDataType() implements SubSystemConfigType{
 				Codec.INT.fieldOf("value").forGetter(ssc -> ((VanillaProgressionData)ssc).exp())
 				).apply(instance, VanillaProgressionData::new));
 
+		public static final Codec<VanillaProgressionData> DIRECT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+				Codec.INT.fieldOf("value").forGetter(VanillaProgressionData::exp)
+		).apply(instance, VanillaProgressionData::new));
+
 		@Override
 		public boolean isPriorityData() {return false;}
 

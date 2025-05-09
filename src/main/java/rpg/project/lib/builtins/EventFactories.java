@@ -456,7 +456,7 @@ public class EventFactories {
 				PlayerEnchantItemEvent.class,
 				context -> true,
 				event -> EventContext.build(RegistryUtil.getId(event.getEnchantedItem()), EventContext.ITEMSTACK, event.getEnchantedItem(), event.getEntity(), event.getEntity().level())
-						.withParam(LootContextParams.ENCHANTMENT_LEVEL, event.getEnchantments().stream().mapToInt(instance -> instance.level).max().orElse(0)).create(),
+						.withParam(LootContextParams.ENCHANTMENT_LEVEL, event.getEnchantments().stream().mapToInt(instance -> instance.level()).max().orElse(0)).create(),
 				(e, c) -> {},
 				(e, c) -> {}
 		));
