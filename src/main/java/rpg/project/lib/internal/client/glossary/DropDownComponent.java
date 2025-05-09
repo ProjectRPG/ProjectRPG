@@ -50,8 +50,8 @@ public class DropDownComponent<T extends DropDownComponent.SelectionEntry<?>> ex
     @Override
     public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         //graphics.setColor(1.0F, 1.0F, 1.0F, this.alpha);
-        RenderSystem.enableBlend();
-        RenderSystem.enableDepthTest();
+//        RenderSystem.enableBlend();
+//        RenderSystem.enableDepthTest();
         ResourceLocation location = BUTTON_SPRITES.get(this.isActive(), this.isMouseOver(mouseX, mouseY));
         graphics.blitSprite(RenderType::guiTextured, location, this.getX(), this.getY(), this.getWidth(), this.getHeight()/*, 20, 4, 200, 20, 0, 66*/);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);

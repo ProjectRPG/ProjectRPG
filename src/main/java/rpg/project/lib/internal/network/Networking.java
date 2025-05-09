@@ -36,7 +36,7 @@ public class Networking {
 	}
 	
 	public static void registerDataSyncPackets() {
-		DataLoader.RELOADER.subscribeAsSyncable(CP_ClearData::new);
+		Core.get(LogicalSide.SERVER).getLoader().RELOADER.subscribeAsSyncable(CP_ClearData::new);
 		Core.get(LogicalSide.SERVER).getLoader().all().forEach(listener -> listener.subscribeAsSyncable((o) -> new CP_SyncData(ObjectType.ITEM, o)));
 	}
 

@@ -9,6 +9,14 @@ package rpg.project.lib.api.data;
  *
  */
 public interface MergeableData {
+	/**Tells other data objects being merged if this object should be considered
+	 * to have priority over its counterpart.  This property is intended to be
+	 * used within {@link #combine(MergeableData)} to discriminate data sources
+	 * that users wish to elevate their relevance for.
+	 *
+	 * @return if this object is considered high priority in the context of merges
+	 */
+	boolean isPriorityData();
 	/**Combines the current instance with the supplied instance and
 	 * returns a new object.  Neither original object are modified
 	 * by this method.

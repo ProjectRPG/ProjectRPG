@@ -1,9 +1,13 @@
 package rpg.project.lib.internal.registry;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.Event;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.abilities.AbilityUtils;
@@ -11,6 +15,12 @@ import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.EventListenerSpecification;
 import rpg.project.lib.api.events.EventListenerSpecification.CancellationType;
 import rpg.project.lib.api.events.EventProvider;
+import rpg.project.lib.api.events.conditions.EventCondition;
+import rpg.project.lib.api.events.conditions.EventConditionAnd;
+import rpg.project.lib.api.events.conditions.EventConditionAny;
+import rpg.project.lib.api.events.conditions.EventConditionEntityMatches;
+import rpg.project.lib.api.events.conditions.EventConditionNot;
+import rpg.project.lib.api.events.conditions.EventConditionType;
 import rpg.project.lib.api.feature.Feature;
 import rpg.project.lib.builtins.EventFactories;
 import rpg.project.lib.internal.Core;
@@ -50,11 +60,11 @@ public class EventRegistry {
 				
 		//Activate event-specific abilities
 		for (CompoundTag config : core.getAbility().getAbilitiesForContext(core, eventID, context)) {
-			ResourceLocation abilityID = ResourceLocation.parse(config.getString(AbilityUtils.TYPE));
+			ResourceLocation abilityID = ResourceLocation.parse(config.getStringOr(AbilityUtils.TYPE, ""));
 			float gating = GateRegistry.isAbilityPermitted(context.getActor(), core, eventID, context, abilityID);
 			if (gating != GateRegistry.HARD_FAIL) {
 				context.setParam(AbilityUtils.REDUCE, gating);
-				core.executeAbility(abilityID, context.getActor(), config, context);
+				core.executeAbility(abilityID, context.getActor(), config, context, eventID);
 			}
 		}
 		
@@ -78,5 +88,4 @@ public class EventRegistry {
 	static {
 		EventFactories.registerEvents(EVENTS);
 	}
-
 }

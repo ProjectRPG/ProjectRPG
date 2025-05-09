@@ -36,12 +36,21 @@ public record VanillaBonusConfigType() implements SubSystemConfigType {
 		return EnumSet.of(APIUtils.SystemType.PROGRESSION);
 	}
 
+	@Override
+	public SubSystemConfig fromScript(Map<String, String> values) {
+		//TODO get bonus scripting. which should be fun since i'm not sure what this does to begin with.
+		return new VanillaBonusConfig(Map.of());
+	}
+
 
 	public record VanillaBonusConfig(Map<String, List<SubSystemConfig>> values) implements SubSystemConfig {
 		public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 				Codec.unboundedMap(Codec.STRING, Codec.list(APIUtils.getDispatchCodec().dispatch("type", SubSystemConfig::getType, SubSystemConfigType::getCodec))
 					).fieldOf("bonuses").forGetter(ssc -> ((VanillaBonusConfig)ssc).values())
 				).apply(instance, VanillaBonusConfig::new));
+
+		@Override
+		public boolean isPriorityData() {return false;} //TODO make not false
 
 		@Override
 		public MergeableData combine(MergeableData two) {
@@ -72,11 +81,6 @@ public record VanillaBonusConfigType() implements SubSystemConfigType {
 		@Override
 		public MapCodec<SubSystemConfig> getCodec() {
 			return CODEC;
-		}
-
-		@Override
-		public SubSystemConfig getDefault() {
-			return new VanillaBonusConfig(new HashMap<>());
 		}
 	}
 }

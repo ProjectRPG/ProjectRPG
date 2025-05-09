@@ -67,14 +67,14 @@ public record Expression(
         String[] rawSplit = raw.split(",");
         for (String str : rawSplit) {
             if (str.startsWith("#")) {
-                ResourceLocation tagID = Reference.resource(str.substring(1));
+                ResourceLocation tagID = ResourceLocation.parse(str.substring(1));
                 ids.addAll(getMembers(true, tagID, access, type));
             }
             else if (str.endsWith(":*")) {
-                ResourceLocation namespace = Reference.resource(str.replace("*", "wildcard"));
+                ResourceLocation namespace = ResourceLocation.parse(str.replace("*", "wildcard"));
                 ids.addAll(getMembers(false, namespace, access, type));
             }
-            else ids.add(Reference.resource(str));
+            else ids.add(ResourceLocation.parse(str));
         }
         return ids;
     }

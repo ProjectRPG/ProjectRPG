@@ -29,7 +29,7 @@ public class VanillaAbilityPanel implements SidePanelContentProvider {
     public void render(GuiGraphics pGuiGraphics, int top, int left, int width, int height, double scale, float pPartialTick, Hub core) {
         int limit = scale == 1d ? 20 : 10;
         for (int i = 0; i < gainList.size() && i < limit; i++) {
-            pGuiGraphics.drawScrollingString(mc.font, gainList.get(i), left, width - left, top + (i * 12), 0xFFFFFF);
+            pGuiGraphics.drawScrollingString(mc.font, gainList.get(i), left, width + left, top + (i * 12), 0xFFFFFF);
         }
     }
 }

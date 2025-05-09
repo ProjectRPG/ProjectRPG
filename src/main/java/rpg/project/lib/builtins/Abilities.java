@@ -54,8 +54,14 @@ public class Abilities {
 		CommonSetup.ABILITIES.register("modify", () -> MODIFY_VALUE);
 	}
 
-	private static final Set<ItemAbility> DIG_ACTIONS = Set.of(ItemAbilities.PICKAXE_DIG, ItemAbilities.AXE_DIG,
-			ItemAbilities.SHOVEL_DIG, ItemAbilities.HOE_DIG, ItemAbilities.SHEARS_DIG, ItemAbilities.SWORD_DIG);
+	//TODO replace this logic to make the Ability functional again.
+	private static final Set<ItemAbility> DIG_ACTIONS = Set.of(
+//			ItemAbilities.PICKAXE_DIG,
+//			ItemAbilities.AXE_DIG,
+//			ItemAbilities.SHOVEL_DIG,
+//			ItemAbilities.HOE_DIG,
+//			ItemAbilities.SWORD_DIG,
+			ItemAbilities.SHEARS_DIG);
 	
 	private static final Ability BREAK_SPEED = Ability.begin(RegistrationSide.BOTH).addDefaults(getBreakSpeedDefaults()).setStart((player, settings, context) -> {
 		float speedIn = context.hasParam(AbilityUtils.BREAK_SPEED_INPUT_VALUE)
@@ -65,17 +71,16 @@ public class Abilities {
 		if (speedBonus == 0)
 			return ;
 
-		float newSpeed = speedIn * Math.max(0, 1 + settings.getInt(AbilityUtils.PROGRESS_LEVEL) * speedBonus);
+		float newSpeed = speedIn * Math.max(0, 1 + settings.getIntOr(AbilityUtils.PROGRESS_LEVEL, 0) * speedBonus);
 		context.setParam(AbilityUtils.BREAK_SPEED_OUTPUT_VALUE, newSpeed);
 	}).setStatus((player, settings, context) -> {
 		List<MutableComponent> lines = new ArrayList<>();
-		// int skillLevel = settings.getInt(APIUtils.SKILL_LEVEL);
-		// DIG_ACTIONS.stream()
-		// .filter(action -> settings.getFloat(action.name()) > 0)
-		// .forEach(action ->
-		// lines.add(LangProvider.PERK_BREAK_SPEED_STATUS_1.asComponent(action.name(),
-		// settings.getFloat(action.name()) * (float) skillLevel)));
-		lines.add(Component.literal("TEST"));
+		 int skillLevel = settings.getIntOr(AbilityUtils.PROGRESS_LEVEL, 0);
+		 DIG_ACTIONS.stream()
+		 .filter(action -> settings.getFloatOr(action.name(), 0f) > 0)
+		 .forEach(action ->
+		 lines.add(LangProvider.BREAK_SPEED_ABILITY_STATUS1.asComponent(action.name(),
+		 settings.getFloatOr(action.name(), 0f) * (float) skillLevel)));
 		return lines;
 	}).build();
 
@@ -83,7 +88,7 @@ public class Abilities {
 		float ratio = 0f;
 		for (ItemAbility action : DIG_ACTIONS) {
 			if (tool.canPerformAction(action)) {
-				ratio += nbt.getFloat(action.name());
+				ratio += nbt.getFloatOr(action.name(), 0f);
 			}
 		}
 		return ratio;
@@ -98,16 +103,16 @@ public class Abilities {
 	}
 	
 	public static AbilityFunction EFFECT_SETTER = (player, nbt, context) -> {
-		Optional<Holder.Reference<MobEffect>> effectHolder = BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(nbt.getString("effect")));
+		Optional<Holder.Reference<MobEffect>> effectHolder = BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(nbt.getStringOr("effect", "")));
 		effectHolder.ifPresent(effect -> {
-			int configDuration = nbt.getInt(AbilityUtils.DURATION);
+			int configDuration = nbt.getIntOr(AbilityUtils.DURATION, 0);
 			int duration = player.hasEffect(effect) && player.getEffect(effect).getDuration() > configDuration
 					? player.getEffect(effect).getDuration() 
 					: configDuration;
-			int perLevel = nbt.getInt(AbilityUtils.PER_LEVEL);
-			int amplifier = nbt.getInt(AbilityUtils.MODIFIER);
-			boolean ambient = nbt.getBoolean(AbilityUtils.AMBIENT);
-			boolean visible = nbt.getBoolean(AbilityUtils.VISIBLE);
+			int perLevel = nbt.getIntOr(AbilityUtils.PER_LEVEL, 0);
+			int amplifier = nbt.getIntOr(AbilityUtils.MODIFIER, 0);
+			boolean ambient = nbt.getBooleanOr(AbilityUtils.AMBIENT, false);
+			boolean visible = nbt.getBooleanOr(AbilityUtils.VISIBLE, true);
 			player.addEffect(new MobEffectInstance(effect, perLevel * duration, amplifier, ambient, visible));
 		});
 	};
@@ -123,17 +128,18 @@ public class Abilities {
 			.setTick((player, nbt, context, ticks) -> EFFECT_SETTER.start(player, nbt, context))
 			.setDescription(LangProvider.PERK_EFFECT_DESC.asComponent())
 			.setStatus((player, nbt, context) -> List.of(
-					LangProvider.PERK_EFFECT_STATUS_1.asComponent(Component.translatable(BuiltInRegistries.MOB_EFFECT.getValue(ResourceLocation.parse(nbt.getString("effect"))).getDescriptionId())),
+					LangProvider.PERK_EFFECT_STATUS_1.asComponent(Component.translatable(BuiltInRegistries.MOB_EFFECT.getValue(ResourceLocation.parse(nbt.getStringOr("effect", ""))).getDescriptionId())),
 					LangProvider.PERK_EFFECT_STATUS_2.asComponent(nbt.getInt(AbilityUtils.MODIFIER), nbt.getInt(AbilityUtils.DURATION))))
 			.build();
 
 	private static final Map<String, Holder.Reference<Attribute>> attributeCache = new HashMap<>();
 	private static Holder.Reference<Attribute> getAttribute(CompoundTag nbt, RegistryAccess access) {
-		return attributeCache.computeIfAbsent(nbt.getString(AbilityUtils.ATTRIBUTE),
+		return attributeCache.computeIfAbsent(nbt.getStringOr(AbilityUtils.ATTRIBUTE, ""),
 				name -> access.lookupOrThrow(Registries.ATTRIBUTE).get(ResourceLocation.parse(name)).orElse(null));
 	}
 
 	public static final Ability ATTRIBUTE = Ability.begin(RegistrationSide.SERVER)
+			.addConditions((player, tag, context) -> getAttribute(tag, player.level().registryAccess()) != null)
 			.addDefaults(TagBuilder.start()
 					.withString(AbilityUtils.ATTRIBUTE, "null:null")
 					.withDouble(AbilityUtils.BASE, 0d)
@@ -142,43 +148,61 @@ public class Abilities {
 					.withString(AbilityUtils.CONTAINER_NAME, "exp")
 					.withBool(AbilityUtils.MULTIPLICATIVE, true).build())
 			.setStart(((player, settings, context) -> {
-				double perLevel = settings.getDouble(AbilityUtils.PER_LEVEL);
-				double maxBoost = settings.getDouble(AbilityUtils.MAX_BOOST);
-				String container = settings.getString(AbilityUtils.CONTAINER_NAME);
+				double perLevel = settings.getDoubleOr(AbilityUtils.PER_LEVEL, 0d);
+				double maxBoost = settings.getDoubleOr(AbilityUtils.MAX_BOOST, 0d);
+				String container = settings.getStringOr(AbilityUtils.CONTAINER_NAME, "");
 				long progress = Core.get(player.level()).getProgression().getProgress(player.getUUID(), container).getProgressAsNumber();
 				AttributeInstance instance = player.getAttribute(getAttribute(settings, player.level().registryAccess()));
 				if (instance == null) return;
-				double boost = Math.min((perLevel * (double)progress) + settings.getDouble(AbilityUtils.BASE), maxBoost);
-				AttributeModifier.Operation operation = settings.getBoolean(AbilityUtils.MULTIPLICATIVE) ? AttributeModifier.Operation.ADD_MULTIPLIED_BASE :  AttributeModifier.Operation.ADD_VALUE;
+				double boost = Math.min((perLevel * (double)progress) + settings.getDoubleOr(AbilityUtils.BASE, 0d), maxBoost);
+				AttributeModifier.Operation operation = settings.getBooleanOr(AbilityUtils.MULTIPLICATIVE, true) ? AttributeModifier.Operation.ADD_MULTIPLIED_BASE :  AttributeModifier.Operation.ADD_VALUE;
 
-				ResourceLocation attributeID = Reference.resource("ability/"+settings.getString(AbilityUtils.ATTRIBUTE).replace(':','_')+"/"+container);
+				ResourceLocation attributeID = Reference.resource("ability/"+settings.getStringOr(AbilityUtils.ATTRIBUTE, "").replace(':','_')+"/"+container);
 				AttributeModifier modifier = new AttributeModifier(attributeID, boost, operation);
 				if (instance.hasModifier(attributeID))
 					instance.removeModifier(attributeID);
 				instance.addPermanentModifier(modifier);
 			}))
 			.setDescription(LangProvider.ATTRIBUTE_DESC.asComponent())
-			.setStatus((player, compoundTag, context) -> List.of())
-			.build();
+			.setStatus((player, settings, context) -> {
+				double perLevel = settings.getDoubleOr(AbilityUtils.PER_LEVEL, 0d);
+				double maxBoost = settings.getDoubleOr(AbilityUtils.MAX_BOOST, 0d);
+				String container = settings.getStringOr(AbilityUtils.CONTAINER_NAME, "");
+				long progress = Core.get(player.level()).getProgression().getProgress(player.getUUID(), container).getProgressAsNumber();
+				double boost = Math.min((perLevel * (double)progress) + settings.getDoubleOr(AbilityUtils.BASE, 0d), maxBoost);
+				String attribute = player.level().registryAccess()
+						.lookupOrThrow(Registries.ATTRIBUTE).getValue(ResourceLocation.parse(settings.getStringOr(AbilityUtils.ATTRIBUTE, ""))).getDescriptionId();
+				return List.of(
+					LangProvider.ATTRIBUTE_STATUS1.asComponent(
+						Component.translatable(attribute),
+						boost
+					)
+				);
+			}).build();
 
 	private static final String CMD = "command";
 	private static final String FNC = "function";
 	public static final Ability COMMAND = Ability.begin(RegistrationSide.SERVER)
+			.addConditions((p, n, e) -> n.contains(CMD) || n.contains(FNC))
 			.setStart((p, nbt, context) -> {
 				if (p instanceof ServerPlayer player ) {
 					if (nbt.contains(FNC)) {
 						player.getServer().getFunctions().execute(
-								player.getServer().getFunctions().get(ResourceLocation.parse(nbt.getString(FNC))).get(),
+								player.getServer().getFunctions().get(ResourceLocation.parse(nbt.getString(FNC).get())).get(),
 								player.createCommandSourceStack().withSuppressedOutput().withMaximumPermission(2));
 					} else if (nbt.contains(CMD)) {
 						player.getServer().getCommands().performPrefixedCommand(
 								player.createCommandSourceStack().withSuppressedOutput().withMaximumPermission(2),
-								nbt.getString(CMD));
+								nbt.getString(CMD).get());
 					}
 				}
 			})
 			.setDescription(LangProvider.COMMAND_DESC.asComponent())
-			.setStatus((player, nbt, context) -> List.of()).build();
+			.setStatus((player, nbt, context) -> List.of(
+					LangProvider.COMMAND_STATUS_1.asComponent(
+							nbt.contains(CMD) ? LangProvider.COMMMAND_COMMAND.asComponent() : LangProvider.COMMMAND_FUNCTION.asComponent(),
+							nbt.contains(CMD) ? nbt.getString(CMD) : nbt.getString(FNC))
+			)).build();
 
 	//Can be used to reduce damage as well as increase jump amount
 	public static final Ability MODIFY_VALUE = Ability.begin(RegistrationSide.BOTH)
@@ -190,19 +214,28 @@ public class Abilities {
 					.withList(AbilityUtils.DAMAGE_TYPES, new ListTag()).build())
 			.setStart(((player, settings, context) -> {
 				if (context.hasParam(EventContext.CHANGE_AMOUNT)
-						&& (settings.getList(AbilityUtils.DAMAGE_TYPES, StringTag.TAG_STRING).isEmpty()
+						&& (settings.getList(AbilityUtils.DAMAGE_TYPES).orElse(new ListTag()).isEmpty()
 						|| (context.hasParam(LootContextParams.DAMAGE_SOURCE)
 							&& tagContains(settings, AbilityUtils.DAMAGE_TYPES, context, LootContextParams.DAMAGE_SOURCE)))) {
 					float change = context.getParam(EventContext.CHANGE_AMOUNT);
-					String container = settings.getString(AbilityUtils.CONTAINER_NAME);
+					String container = settings.getStringOr(AbilityUtils.CONTAINER_NAME, "");
 					long progressLevel = Core.get(context.getLevel()).getProgression().getProgress(player.getUUID(), container).getProgressAsNumber();
-					change += settings.getFloat(AbilityUtils.BASE) + (settings.getFloat(AbilityUtils.PER_LEVEL) * (float)progressLevel);
+					change += settings.getFloatOr(AbilityUtils.BASE, 0f) + (settings.getFloatOr(AbilityUtils.PER_LEVEL, 0f) * (float)progressLevel);
 					context.setParam(EventContext.CHANGE_AMOUNT, change);
 				}
-			})).build();
+			}))
+			.setStatus((player, settings, context) -> {
+				float change = context.getParam(EventContext.CHANGE_AMOUNT);
+				String container = settings.getStringOr(AbilityUtils.CONTAINER_NAME, "");
+				long progressLevel = Core.get(context.getLevel()).getProgression().getProgress(player.getUUID(), container).getProgressAsNumber();
+				change += settings.getFloatOr(AbilityUtils.BASE, 0f) + (settings.getFloatOr(AbilityUtils.PER_LEVEL, 0f) * (float)progressLevel);
+				return List.of(
+					LangProvider.MODIFY_STATUS.asComponent(change)
+				);
+			}).build();
 
 	private static boolean tagContains(CompoundTag tag, String key, EventContext context, ContextKey<DamageSource> param) {
-		ListTag list = tag.getList(key, StringTag.TAG_STRING);
+		ListTag list = tag.getList(key).orElse(new ListTag());
 		DamageSource source = context.getParam(param);
 		StringTag strTag = StringTag.valueOf(RegistryUtil.getId(source.typeHolder()).toString());
 		return list.contains(strTag);

@@ -5,7 +5,9 @@ import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -30,6 +32,7 @@ import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.events.EventListenerSpecification;
 import rpg.project.lib.api.events.EventProvider;
 import rpg.project.lib.internal.Core;
+import rpg.project.lib.internal.config.scripting.Scripting;
 import rpg.project.lib.internal.registry.EventRegistry;
 import rpg.project.lib.internal.util.MsLoggy;
 import rpg.project.lib.internal.util.MsLoggy.LOG_CODE;
@@ -62,9 +65,11 @@ public class DataLoader {
 		return loaders.values();
 	}
 	
-	public static final ExecutableListener RELOADER = new ExecutableListener(() -> {
+	public ExecutableListener RELOADER;
+	public static final Consumer<RegistryAccess> RELOADER_FUNCTION = access -> {
 		Core.get(LogicalSide.SERVER).getLoader().resetData();
-	});
+		Scripting.readFiles(access);
+	};
 	
 	public void resetData() {
 		loaders.forEach((type, loader) -> loader.clearData());

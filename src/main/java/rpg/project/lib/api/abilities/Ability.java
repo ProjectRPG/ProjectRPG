@@ -2,6 +2,7 @@ package rpg.project.lib.api.abilities;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.DoubleTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -164,8 +165,12 @@ public record Ability(
      * @param nbt the configuration settings for this ability
      * @return the start behavior output tag
      */
-    public void start(Player player, CompoundTag nbt, EventContext context) {
-        if (canActivate(player, nbt, context)) start.start(player, nbt, context);
+    public boolean start(Player player, CompoundTag nbt, EventContext context) {
+        if (canActivate(player, nbt, context)) {
+            start.start(player, nbt, context);
+            return true;
+        }
+        return false;
     }
     
     /**If conditions are still met, executes the tick behavior of the ability
@@ -196,26 +201,26 @@ public record Ability(
         if (src.contains(AbilityUtils.COOLDOWN) && !Core.get(player.level()).isAbilityCooledDown(player, src)) {
             return false;
         }
-        if (src.contains(AbilityUtils.CHANCE) && src.getDouble(AbilityUtils.CHANCE) < player.level().random.nextDouble()) {
+        if (src.contains(AbilityUtils.CHANCE) && src.getDoubleOr(AbilityUtils.CHANCE, 0d) < player.level().random.nextDouble()) {
             return false;
         }
         if (src.contains(AbilityUtils.CONTAINER_NAME)) {            
-            int skillLevel = src.getInt(AbilityUtils.PROGRESS_LEVEL);
-            if (src.contains(AbilityUtils.MAX_LEVEL) && skillLevel > src.getInt(AbilityUtils.MAX_LEVEL)) {
+            int skillLevel = src.getIntOr(AbilityUtils.PROGRESS_LEVEL, 0);
+            if (src.contains(AbilityUtils.MAX_LEVEL) && skillLevel > src.getIntOr(AbilityUtils.MAX_LEVEL, Integer.MAX_VALUE)) {
                 return false;
             }
             
-            if (src.contains(AbilityUtils.MIN_LEVEL) && skillLevel < src.getInt(AbilityUtils.MIN_LEVEL)) {
+            if (src.contains(AbilityUtils.MIN_LEVEL) && skillLevel < src.getIntOr(AbilityUtils.MIN_LEVEL, 0)) {
                 return false;
             }
             
             boolean modulus = src.contains(AbilityUtils.MODULUS), milestone = src.contains(AbilityUtils.MILESTONES);
             if (modulus || milestone) {
                 boolean modulus_match = modulus, milestone_match = milestone;
-                if (modulus && skillLevel % Math.max(1, src.getInt(AbilityUtils.MODULUS)) != 0) {
+                if (modulus && skillLevel % Math.max(1, src.getIntOr(AbilityUtils.MODULUS, 0)) != 0) {
                     modulus_match = false;
                 }
-                if (milestone && !src.getList(AbilityUtils.MILESTONES, Tag.TAG_DOUBLE).stream().map(tag -> ((DoubleTag) tag).getAsInt()).toList().contains(skillLevel)) {
+                if (milestone && !src.getList(AbilityUtils.MILESTONES).orElse(new ListTag()).stream().map(tag -> ((DoubleTag) tag).intValue()).toList().contains(skillLevel)) {
                     milestone_match = false;
                 }
                 return modulus_match || milestone_match;

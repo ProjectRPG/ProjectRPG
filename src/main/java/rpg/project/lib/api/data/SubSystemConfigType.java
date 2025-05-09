@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import rpg.project.lib.api.APIUtils;
 
 import java.util.EnumSet;
+import java.util.Map;
 
 /**A type identifier used to reference and reverse-get
  * a configuration object.
@@ -35,4 +36,6 @@ public interface SubSystemConfigType {
 	SubSystemConfig getDefault(RegistryAccess access);
 
 	EnumSet<APIUtils.SystemType> applicableSystemTypes();
+
+	SubSystemConfig fromScript(Map<String, String> values);
 }

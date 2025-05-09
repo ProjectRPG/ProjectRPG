@@ -3,10 +3,10 @@
  "progression": [
     {"type":"minecraft:progression",
      "events": {
-       "projectrpg:break_block":100,
-       "projectrpg:place_block":50,
-       "prpg:craft":10,
-       "some_addon:transmute":1337
+       "projectrpg:break_block":[{"xp":100}],
+       "projectrpg:place_block":[{"xp":50}],
+       "prpg:craft":[{"xp":10}],
+       "some_addon:transmute":[{"xp":1337}]
     }},
     {"type":"other:other"}
  ]

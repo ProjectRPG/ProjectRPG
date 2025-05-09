@@ -17,14 +17,4 @@ public interface SubSystemConfig extends MergeableData {
 	/**@return The codec used to encode/decode this object
 	 */
     MapCodec<SubSystemConfig> getCodec();
-	
-	/**Supplies a value-less instance of this object.  This is 
-	 * used by the internal config writer to build config files
-	 * for users.  This should prepopulate map keys when
-	 * applicable so that users have an exaple of what options
-	 * are available to them.
-	 * 
-	 * @return a default instance of this object.
-	 */
-    SubSystemConfig getDefault();
 }

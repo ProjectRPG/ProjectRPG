@@ -3,8 +3,8 @@
  "progression": [
     {"type":"minecraft:progression",
      "events": {
-       "projectrpg:breed_animal":50,
-       "projectrpg:on_death": 1000
+       "projectrpg:breed_animal":[{"xp":50}],
+       "projectrpg:on_death": [{"xp":1000}]
     }}
  ]
 }

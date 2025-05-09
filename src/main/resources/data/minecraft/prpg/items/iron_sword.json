@@ -3,9 +3,9 @@
  "progression": [
     {"type":"minecraft:progression",
      "events": {
-       "projectrpg:anvil_repair":10000,
-       "projectrpg:item_crafted":30,
-       "projectrpg:enchant_item": 5000
+       "projectrpg:anvil_repair":[{"xp":10000}],
+       "projectrpg:item_crafted":[{"xp":30}],
+       "projectrpg:enchant_item":[{"xp":5000}]
     }}
  ]
 }

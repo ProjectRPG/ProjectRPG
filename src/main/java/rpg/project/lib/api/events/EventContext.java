@@ -30,16 +30,16 @@ public class EventContext{
 	private final Pair<ObjectType, ResourceLocation> subjectObject;
 	/**Populated by {@link ContextBuilder} as immutable properties of the context.  Values added to this map are
 	 * expected to never change and that doing so would create instability in the event sequence.*/
-	private final Map<ContextKey<?>, Object> contextParams;
+	private final Map<ResourceLocation, Object> contextParams;
 	/**May be populated with initial values via {@link ContextBuilder}, however this map contains mutable values
 	 * that subsystems can add and modify with {@link #setParam(ContextKey, Object)}.
 	 * Values in this map are typically used for event callbacks where the event exposes properties to a subsystem
 	 * expecting to then re-consume that value at some point in the event.
 	 * <h4>Note: {@link ContextKey} keys in {@link #contextParams} will always be returned instead of the same
 	 * key in this map.  Therefore, it is important to use unique keys in event implementations with similar values.</h4>*/
-	private final Map<ContextKey<?>, Object> dynamicParams;
+	private final Map<ResourceLocation, Object> dynamicParams;
 
-	protected EventContext(Pair<ObjectType, ResourceLocation> subjectObject, Map<ContextKey<?>, Object> contextParams, Map<ContextKey<?>, Object> dynamicParams) {
+	protected EventContext(Pair<ObjectType, ResourceLocation> subjectObject, Map<ResourceLocation, Object> contextParams, Map<ResourceLocation, Object> dynamicParams) {
 		this.subjectObject = subjectObject;
 		this.contextParams = contextParams;
 		this.dynamicParams = dynamicParams;
@@ -60,7 +60,7 @@ public class EventContext{
 	public ResourceLocation getSubjectID() {return subjectObject.getSecond();}
 
 	public boolean hasParam(ContextKey<?> param) {
-		return contextParams.containsKey(param) || dynamicParams.containsKey(param);
+		return contextParams.containsKey(param.name()) || dynamicParams.containsKey(param.name());
 	}
 
 	/**Return the value associated with the {@link ContextKey} key.  If a key is associated with
@@ -74,9 +74,9 @@ public class EventContext{
 	@Nullable
 	@SuppressWarnings("unchecked") //public setters enforce key-value type parity
 	public <T> T getParam(ContextKey<T> param) {
-		return (T) (contextParams.containsKey(param)
-                        ? contextParams.get(param)
-                        : dynamicParams.get(param));
+		return (T) (contextParams.containsKey(param.name())
+                        ? contextParams.get(param.name())
+                        : dynamicParams.get(param.name()));
 	}
 
 	/**Updates and existing parameter to the <b>mutable</b> internal map or adds if not previously assigned.
@@ -86,20 +86,20 @@ public class EventContext{
 	 * @param <T> the object class of the value
 	 */
 	public <T> void setParam(ContextKey<T> key, T value) {
-		dynamicParams.put(key, value);
+		dynamicParams.put(key.name(), value);
 	}
 
 	/**A helper method for accessing the player associated with this context.
 	 *
 	 * @return the player associated with this event.
 	 */
-	public Player getActor() {return (Player) contextParams.get(PLAYER);}
+	public Player getActor() {return (Player) contextParams.get(PLAYER.name());}
 
 	/**A helper method for access the level associated with this context.
 	 *
 	 * @return the level associated with this event.
 	 */
-	public LevelAccessor getLevel() {return (LevelAccessor) contextParams.get(LEVEL);}
+	public LevelAccessor getLevel() {return (LevelAccessor) contextParams.get(LEVEL.name());}
 
 	/**Creates a new {@link ContextBuilder} with the required initial properties.  Every event represents a specific
 	 * scenario in which the player interacts with a subject object.  This builder ensures the required objects for
@@ -143,11 +143,11 @@ public class EventContext{
 
 	public static class ContextBuilder {
 		private final Pair<ObjectType, ResourceLocation> subjectReference;
-		private final Map<ContextKey<?>, Object> contextParams = new HashMap<>();
-		private final Map<ContextKey<?>, Object> dynamicParams = new HashMap<>();
+		private final Map<ResourceLocation, Object> contextParams = new HashMap<>();
+		private final Map<ResourceLocation, Object> dynamicParams = new HashMap<>();
 		protected <T> ContextBuilder(ResourceLocation subjectID, ContextKey<T> subjectParam, T subject) {
 			this.subjectReference = Pair.of(getType(subject), subjectID);
-			contextParams.put(subjectParam, subject);
+			contextParams.put(subjectParam.name(), subject);
 		}
 
 		/**Adds an immutable value to the context.  These values cannot be changed by subsystems.
@@ -158,7 +158,7 @@ public class EventContext{
 		 * @param <T> the object class for the value
 		 */
 		public <T> ContextBuilder withParam(ContextKey<T> paramKey, T param) {
-			contextParams.put(paramKey, param);
+			contextParams.put(paramKey.name(), param);
 			return this;
 		}
 
@@ -171,7 +171,7 @@ public class EventContext{
 		 * @param <T> the object class for the value
 		 */
 		public <T> ContextBuilder withDynamicParam(ContextKey<T> paramKey, T param) {
-			dynamicParams.put(paramKey, param);
+			dynamicParams.put(paramKey.name(), param);
 			return this;
 		}
 

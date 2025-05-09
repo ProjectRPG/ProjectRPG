@@ -2,6 +2,7 @@ package rpg.project.lib.builtins;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -79,7 +80,7 @@ public class EventFactories {
 				Reference.resource("break_block"),
 				EventPriority.LOWEST,
 				BlockEvent.BreakEvent.class,
-				context -> context.getParam(LootContextParams.THIS_ENTITY) instanceof Player,
+				context -> true,
 				event -> EventContext.build(RegistryUtil.getId(event.getState()), LootContextParams.BLOCK_STATE, event.getState(), event.getPlayer(), event.getLevel())
 						.withParam(LootContextParams.ORIGIN, event.getPos().getCenter()).create(),
 				EventFactories::fullCancel,
@@ -187,7 +188,8 @@ public class EventFactories {
 				Reference.resource("effect_added"),
 				EventPriority.LOWEST,
 				MobEffectEvent.Applicable.class,
-				context -> !context.getParam(EventContext.CANCELLED), //used to check if previous events have set the result to what is effectively cancelled.
+				context -> !context.getParam(EventContext.CANCELLED) //used to check if previous events have set the result to what is effectively cancelled.
+						&& !context.getActor().hasEffect(context.getParam(EventContext.MOB_EFFECT).getEffect()),
 				event -> EventContext.build(RegistryUtil.getId(event.getEffectInstance().getEffect()), EventContext.MOB_EFFECT, event.getEffectInstance(), orNull(event.getEntity()), event.getEntity().level())
 						.withParam(EventContext.CANCELLED, event.getResult() == MobEffectEvent.Applicable.Result.DO_NOT_APPLY).create(),
 				(event, c) -> event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY),
@@ -275,7 +277,7 @@ public class EventFactories {
 			Reference.resource("entity_damage_player"),
 			EventPriority.LOWEST,
 			LivingDamageEvent.Pre.class,
-			context -> context.getParam(LootContextParams.DAMAGE_SOURCE).getEntity() != null,
+			context -> context.getParam(LootContextParams.THIS_ENTITY) != null,
 			event -> EventContext.build(event.getSource().getEntity() == null ? Reference.resource("null") : RegistryUtil.getId(event.getSource().getEntity()), LootContextParams.THIS_ENTITY, event.getSource().getEntity(), orNull(event.getEntity()), event.getEntity().level())
 					.withParam(LootContextParams.DAMAGE_SOURCE, event.getSource())
 					.withDynamicParam(EventContext.CHANGE_AMOUNT, event.getNewDamage()).create(),
@@ -454,7 +456,7 @@ public class EventFactories {
 				PlayerEnchantItemEvent.class,
 				context -> true,
 				event -> EventContext.build(RegistryUtil.getId(event.getEnchantedItem()), EventContext.ITEMSTACK, event.getEnchantedItem(), event.getEntity(), event.getEntity().level())
-						.withParam(LootContextParams.ENCHANTMENT_LEVEL, event.getEnchantments().stream().mapToInt(instance -> instance.level).max().orElse(0)).create(),
+						.withParam(LootContextParams.ENCHANTMENT_LEVEL, event.getEnchantments().stream().mapToInt(instance -> instance.level()).max().orElse(0)).create(),
 				(e, c) -> {},
 				(e, c) -> {}
 		));

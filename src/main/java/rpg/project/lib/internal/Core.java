@@ -106,22 +106,24 @@ public class Core implements Hub {
 
 	//=========ABILITIES METHODS=================
 	//<editor-fold>
-	public void executeAbility(ResourceLocation abilityID, Player player, CompoundTag dataIn, EventContext context) {
+	public void executeAbility(ResourceLocation abilityID, Player player, CompoundTag dataIn, EventContext context, ResourceLocation eventID) {
 		if (player == null) return;
 
 		Ability ability = AbilityUtils.get(player.level().registryAccess()).getAbility(abilityID);
 		CompoundTag config = ability.propertyDefaults().copy().merge(dataIn);
-		ability.start(player, config, context);
-		tickTracker.add(new TickSchedule(ability, player, config, context, new AtomicInteger(0)));
+		if (ability.start(player, config, context)) {
+			this.getAbility().abilityActivationCallback(ability, config.copy(), player, context, eventID);
+			tickTracker.add(new TickSchedule(ability, player, config, context, new AtomicInteger(0)));
 
-		if (config.contains(AbilityUtils.COOLDOWN)) {
-			coolTracker.add(new AbilityCooldown(abilityID, player, config, player.level().getGameTime()));
+			if (config.contains(AbilityUtils.COOLDOWN)) {
+				coolTracker.add(new AbilityCooldown(abilityID, player, config, player.level().getGameTime()));
+			}
 		}
 	}
 
 	private record TickSchedule(Ability ability, Player player, CompoundTag src, EventContext context, AtomicInteger ticksElapsed) {
 		public boolean shouldTick() {
-			return src.contains(AbilityUtils.DURATION) && ticksElapsed.get() <= src.getInt(AbilityUtils.DURATION);
+			return src.contains(AbilityUtils.DURATION) && ticksElapsed.get() <= src.getIntOr(AbilityUtils.DURATION, 0);
 		}
 
 		public void tick() {
@@ -132,7 +134,7 @@ public class Core implements Hub {
 
 	private record AbilityCooldown(ResourceLocation abilityID, Player player, CompoundTag src, long lastUse) {
 		public boolean cooledDown(Level level) {
-			return level.getGameTime() > lastUse + src.getInt(AbilityUtils.COOLDOWN);
+			return level.getGameTime() > lastUse + src.getIntOr(AbilityUtils.COOLDOWN, 0);
 		}
 	}
 
@@ -152,7 +154,7 @@ public class Core implements Hub {
 	}
 
 	public boolean isAbilityCooledDown(Player player, CompoundTag src) {
-		ResourceLocation abilityID = ResourceLocation.parse(src.getString("ability"));
+		ResourceLocation abilityID = ResourceLocation.parse(src.getStringOr("ability", ""));
 		return coolTracker.stream().noneMatch(cd -> cd.player().equals(player) && cd.abilityID().equals(abilityID));
 	}
 	//</editor-fold>

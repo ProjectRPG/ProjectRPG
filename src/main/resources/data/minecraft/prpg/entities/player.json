@@ -3,11 +3,11 @@
  "progression": [
     {"type":"minecraft:progression",
      "events": {
-       "projectrpg:breath_change":5,
-       "projectrpg:jump": 1,
-       "projectrpg:sprint_jump": 100,
-       "projectrpg:crouch_jump": 1000,
-       "projectrpg:sprinting": 1
+       "projectrpg:breath_change":[{"xp":5}],
+       "projectrpg:jump": [{"xp":1}],
+       "projectrpg:sprint_jump": [{"xp":100}],
+       "projectrpg:crouch_jump": [{"xp":1000}],
+       "projectrpg:sprinting": [{"xp":1}]
     }}
  ]
 }

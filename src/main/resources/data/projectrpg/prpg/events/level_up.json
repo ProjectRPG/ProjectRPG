@@ -2,13 +2,13 @@
   "copyTo":[],
   "abilities": [
     {"type": "minecraft:abilities", "configurations": [
-      {"type": "projectrpg:attribute",
-       "attribute": "minecraft:generic.max_health",
-       "per_level": 1,
-       "max_boost": 100,
-       "multiplicative":  false},
-      {"type": "projectrpg:command",
-       "command": "give @s minecraft:netherite_ingot"}
+      {"ability": {"type": "projectrpg:attribute",
+                   "attribute": "minecraft:max_health",
+                   "per_level": 1,
+                   "max_boost": 100,
+                   "multiplicative":  false}},
+      {"ability": {"type": "projectrpg:command",
+                   "command": "give @s minecraft:netherite_ingot"}}
     ]}
   ]
 }

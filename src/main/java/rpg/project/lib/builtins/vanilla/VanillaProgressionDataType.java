@@ -13,6 +13,7 @@ import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.api.progression.ProgressionDataType;
 
 import java.util.EnumSet;
+import java.util.Map;
 
 public record VanillaProgressionDataType() implements SubSystemConfigType{
 	public static final ResourceLocation ID = ResourceLocation.withDefaultNamespace("exp");
@@ -33,11 +34,23 @@ public record VanillaProgressionDataType() implements SubSystemConfigType{
 		return EnumSet.of(APIUtils.SystemType.PROGRESSION_DATA);
 	}
 
+	@Override
+	public SubSystemConfig fromScript(Map<String, String> values) {
+		return new VanillaProgressionData(Integer.parseInt(values.getOrDefault("xp", "0")));
+	}
+
 
 	public record VanillaProgressionData(int exp) implements ProgressionDataType {
 		public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 				Codec.INT.fieldOf("value").forGetter(ssc -> ((VanillaProgressionData)ssc).exp())
 				).apply(instance, VanillaProgressionData::new));
+
+		public static final Codec<VanillaProgressionData> DIRECT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+				Codec.INT.fieldOf("value").forGetter(VanillaProgressionData::exp)
+		).apply(instance, VanillaProgressionData::new));
+
+		@Override
+		public boolean isPriorityData() {return false;}
 
 		@Override
 		public MergeableData combine(MergeableData two) {
@@ -58,11 +71,6 @@ public record VanillaProgressionDataType() implements SubSystemConfigType{
 		@Override
 		public MapCodec<SubSystemConfig> getCodec() {
 			return CODEC;
-		}
-
-		@Override
-		public SubSystemConfig getDefault() {
-			return new VanillaProgressionData(0);
 		}
 
 		@Override

@@ -53,10 +53,18 @@ public class SubSystemCodecRegistry {
 			return EnumSet.noneOf(APIUtils.SystemType.class);
 		}
 
+		@Override
+		public SubSystemConfig fromScript(Map<String, String> values) {
+			return new DefaultConfig();
+		}
+
 		public record DefaultConfig() implements SubSystemConfig {
 			public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 					Codec.BOOL.optionalFieldOf("placeholder").forGetter(o -> Optional.of(true))
 					).apply(instance, bool -> new DefaultConfig()));
+
+			@Override
+			public boolean isPriorityData() {return false;}
 
 			@Override
 			public MergeableData combine(MergeableData two) {return this;}
@@ -69,11 +77,6 @@ public class SubSystemCodecRegistry {
 
 			@Override
 			public MapCodec<SubSystemConfig> getCodec() {return CODEC;}
-
-			@Override
-			public SubSystemConfig getDefault() {
-				return new DefaultConfig();
-			}			
 		}
 	}
 }

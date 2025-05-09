@@ -2,6 +2,7 @@ package rpg.project.lib.internal.config.readers;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -10,21 +11,25 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+import rpg.project.lib.internal.config.scripting.Scripting;
 
 public class ExecutableListener extends SimplePreparableReloadListener<Boolean> {
-	private final Runnable executor;
+	private final Consumer<RegistryAccess> executor;
+	private final RegistryAccess access;
 	
-	public ExecutableListener(Runnable executor) {
+	public ExecutableListener(RegistryAccess access, Consumer<RegistryAccess> executor) {
+		this.access = access;
 		this.executor = executor;
 	}
 
 	@Override
-	protected Boolean prepare(ResourceManager pResourceManager, ProfilerFiller pProfiler) {return false;}
+	protected Boolean prepare(ResourceManager pResourceManager, ProfilerFiller pProfiler) {
+		executor.accept(access);
+		return false;
+	}
 
 	@Override
-	protected void apply(Boolean pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
-		executor.run();		
-	}
+	protected void apply(Boolean pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {}
 
 	/**
 	 * This should be called at most once, during construction of your mod (static init of your main mod class is fine)

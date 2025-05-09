@@ -1,8 +1,8 @@
-{"replace":true,
+{"replace":false,
  "copyTo":["projectrpg:submerged"],
  "abilities": [
    {"type": "minecraft:abilities", "configurations": [
-     {"type": "projectrpg:modify", "per_level": 0.01, "max_boost":  10.0}
+     {"ability": {"type": "projectrpg:modify", "per_level": 0.01, "max_boost":  10.0}}
    ]}
  ]
 }

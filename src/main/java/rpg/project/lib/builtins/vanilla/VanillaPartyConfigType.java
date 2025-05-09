@@ -1,6 +1,7 @@
 package rpg.project.lib.builtins.vanilla;
 
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Optional;
 
 import com.mojang.serialization.Codec;
@@ -33,12 +34,17 @@ public record VanillaPartyConfigType() implements SubSystemConfigType{
 		return EnumSet.of(APIUtils.SystemType.PARTY);
 	}
 
+	@Override
+	public SubSystemConfig fromScript(Map<String, String> values) {
+		return new VanillaPartyConfig();
+	}
+
 
 	public record VanillaPartyConfig() implements SubSystemConfig {
 		
-		public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-				Codec.BOOL.optionalFieldOf("placeholder").forGetter(vpc -> Optional.of(true)))
-				.apply(instance, a -> new VanillaPartyConfig()));
+		public static final MapCodec<SubSystemConfig> CODEC = MapCodec.unit(new VanillaPartyConfig());
+		@Override
+		public boolean isPriorityData() {return false;}
 
 		@Override
 		public MergeableData combine(MergeableData two) {
@@ -59,10 +65,5 @@ public record VanillaPartyConfigType() implements SubSystemConfigType{
 		public MapCodec<SubSystemConfig> getCodec() {
 			return CODEC;
 		}
-
-		@Override
-		public SubSystemConfig getDefault() {
-			return new VanillaPartyConfig();
-		}		
 	}
 }
