@@ -42,7 +42,12 @@ public record EventConditionEntityMatches(ContextKey<?> param, ResourceLocation 
 
         @Override
         public EventConditionEntityMatches fromScripting(Map<String, String> value) {
-            return null;
+            //TODO consider updating scripting to use a KEYWORD_LABEL syntax to allow marrying values to keywords via labels
+            //NOTE_TO_SELF consider "keyword$label"as syntax
+            String[] paramValue = value.getOrDefault("matching", "missing,missing").split(",");
+            ResourceLocation entity = ResourceLocation.parse(paramValue.length >= 1 ? paramValue[0] : "prpg:missing_entity_matcher");
+            ResourceLocation target = ResourceLocation.parse(paramValue.length >= 2 ? paramValue[1] : "prpg:missing_entity_match");
+            return new EventConditionEntityMatches(new ContextKey<>(entity), target);
         }
     }
 }

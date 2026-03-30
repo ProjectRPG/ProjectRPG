@@ -129,7 +129,7 @@ public class Abilities {
 			.setDescription(LangProvider.PERK_EFFECT_DESC.asComponent())
 			.setStatus((player, nbt, context) -> List.of(
 					LangProvider.PERK_EFFECT_STATUS_1.asComponent(Component.translatable(BuiltInRegistries.MOB_EFFECT.getValue(ResourceLocation.parse(nbt.getStringOr("effect", ""))).getDescriptionId())),
-					LangProvider.PERK_EFFECT_STATUS_2.asComponent(nbt.getInt(AbilityUtils.MODIFIER), nbt.getInt(AbilityUtils.DURATION))))
+					LangProvider.PERK_EFFECT_STATUS_2.asComponent(nbt.getIntOr(AbilityUtils.MODIFIER, 0), nbt.getIntOr(AbilityUtils.DURATION, 0))))
 			.build();
 
 	private static final Map<String, Holder.Reference<Attribute>> attributeCache = new HashMap<>();
@@ -201,7 +201,7 @@ public class Abilities {
 			.setStatus((player, nbt, context) -> List.of(
 					LangProvider.COMMAND_STATUS_1.asComponent(
 							nbt.contains(CMD) ? LangProvider.COMMMAND_COMMAND.asComponent() : LangProvider.COMMMAND_FUNCTION.asComponent(),
-							nbt.contains(CMD) ? nbt.getString(CMD) : nbt.getString(FNC))
+							nbt.contains(CMD) ? nbt.getString(CMD).get() : nbt.getString(FNC).get())
 			)).build();
 
 	//Can be used to reduce damage as well as increase jump amount
@@ -212,17 +212,16 @@ public class Abilities {
 					.withFloat(AbilityUtils.MAX_BOOST, Float.MAX_VALUE)
 					.withString(AbilityUtils.CONTAINER_NAME, "exp")
 					.withList(AbilityUtils.DAMAGE_TYPES, new ListTag()).build())
+			.addConditions((player, settings, context) -> context.hasParam(EventContext.CHANGE_AMOUNT)
+					&& (settings.getList(AbilityUtils.DAMAGE_TYPES).orElse(new ListTag()).isEmpty()
+					|| (context.hasParam(LootContextParams.DAMAGE_SOURCE)
+					&& tagContains(settings, AbilityUtils.DAMAGE_TYPES, context, LootContextParams.DAMAGE_SOURCE))))
 			.setStart(((player, settings, context) -> {
-				if (context.hasParam(EventContext.CHANGE_AMOUNT)
-						&& (settings.getList(AbilityUtils.DAMAGE_TYPES).orElse(new ListTag()).isEmpty()
-						|| (context.hasParam(LootContextParams.DAMAGE_SOURCE)
-							&& tagContains(settings, AbilityUtils.DAMAGE_TYPES, context, LootContextParams.DAMAGE_SOURCE)))) {
-					float change = context.getParam(EventContext.CHANGE_AMOUNT);
-					String container = settings.getStringOr(AbilityUtils.CONTAINER_NAME, "");
-					long progressLevel = Core.get(context.getLevel()).getProgression().getProgress(player.getUUID(), container).getProgressAsNumber();
-					change += settings.getFloatOr(AbilityUtils.BASE, 0f) + (settings.getFloatOr(AbilityUtils.PER_LEVEL, 0f) * (float)progressLevel);
-					context.setParam(EventContext.CHANGE_AMOUNT, change);
-				}
+				float change = context.getParam(EventContext.CHANGE_AMOUNT);
+				String container = settings.getStringOr(AbilityUtils.CONTAINER_NAME, "");
+				long progressLevel = Core.get(context.getLevel()).getProgression().getProgress(player.getUUID(), container).getProgressAsNumber();
+				change += settings.getFloatOr(AbilityUtils.BASE, 0f) + (settings.getFloatOr(AbilityUtils.PER_LEVEL, 0f) * (float)progressLevel);
+				context.setParam(EventContext.CHANGE_AMOUNT, change);
 			}))
 			.setStatus((player, settings, context) -> {
 				float change = context.getParam(EventContext.CHANGE_AMOUNT);

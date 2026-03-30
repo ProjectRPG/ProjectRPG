@@ -22,7 +22,7 @@ public record Expression(
         ResourceLocation targetID,
         Map<String, String> value,
         List<Node> features) {
-    public record Node(String param, NodeConsumer consumer) {@Override public String toString() {return param;}}
+    public record Node(String qualifier, String param, NodeConsumer consumer) {@Override public String toString() {return param;}}
 
     public static List<Expression> create(RegistryAccess access, String str) {
         MsLoggy.DEBUG.log(MsLoggy.LOG_CODE.DATA, "Raw Script Line: {}", str);
@@ -35,19 +35,21 @@ public record Expression(
         for (String node : nodes) {
             MsLoggy.DEBUG.log(MsLoggy.LOG_CODE.DATA, "NODE: {}", node);
             String keyword = node.substring(0, node.indexOf('('));
+            String unqualifiedKeyword = keyword.contains("$") ? keyword.substring(0, keyword.indexOf("$")) : keyword;
+            String qualifier = keyword.contains("$") ? keyword.substring(keyword.indexOf("$")) : "";
             String param = node.substring(node.indexOf('(')+1).replaceAll("[ )]", "");
 
-            if (targetType == null && ObjectType.byName(keyword.toUpperCase()) != null) {
-                targetType = ObjectType.byName(keyword.toUpperCase());
+            if (targetType == null && ObjectType.byName(unqualifiedKeyword.toUpperCase()) != null) {
+                targetType = ObjectType.byName(unqualifiedKeyword.toUpperCase());
                 targetIDs = parseIDs(param, targetType, access);
             }
-            else if (targetType == null && Functions.TARGETORS.containsKey(keyword)) {
-                TargetSelector.Selection selection = Functions.TARGETORS.get(keyword).read(param, access);
+            else if (targetType == null && Functions.TARGETORS.containsKey(unqualifiedKeyword)) {
+                TargetSelector.Selection selection = Functions.TARGETORS.get(unqualifiedKeyword).read(param, access);
                 targetType = selection.type();
                 targetIDs = selection.IDs();
             }
-            else if (Functions.KEYWORDS.containsKey(keyword))
-                features.add(new Node(param, Functions.KEYWORDS.get(keyword)));
+            else if (Functions.KEYWORDS.containsKey(unqualifiedKeyword))
+                features.add(new Node(qualifier, param, Functions.KEYWORDS.get(unqualifiedKeyword)));
             else values.put(keyword, param);
         }
 
@@ -59,7 +61,7 @@ public record Expression(
     public boolean isValid() {return targetType != null && targetID != null;}
 
     public void commit() {
-        features.forEach(c -> c.consumer().consume(c.param(), targetID, targetType, value));
+        features.forEach(c -> c.consumer().consume(c.qualifier(), c.param(), targetID, targetType, value));
     }
 
     public static List<ResourceLocation> parseIDs(String raw, ObjectType type, RegistryAccess access) {

@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Functions {
     //Map of keywords and their "registered" consumers
@@ -38,42 +39,48 @@ public class Functions {
     public static final Pattern operationRegex = Pattern.compile("(>=|<=|>|<|=)\\s*([-+]?\\d*\\.?\\d+(?:[eE][-+]?\\d+)?)");
     public static final Pattern attributeRegex = Pattern.compile("(.*?)(\\*\\*|\\+|\\*)(.*)");
 
-    private static void gateConsumer(String param, ResourceLocation id, ObjectType type, Map<String, String> value, GateUtils.Type gate) {
+    private static Map<String, String> qualifiedValues(String qualifier, Map<String, String> map) {
+        return map.entrySet().stream()
+                .filter(entry -> !entry.getKey().contains("$") || entry.getKey().contains(qualifier))
+                .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
+    }
+
+    private static void gateConsumer(String qualifier, String param, ResourceLocation id, ObjectType type, Map<String, String> value, GateUtils.Type gate) {
         SubSystemConfigType subsystem = CommonSetup.CODECS.getRegistry().get().getValue(ResourceLocation.parse(param));
         MergeableCodecDataManager<?> loader = Core.get(LogicalSide.SERVER).getLoader().getLoader(type);
         MainSystemConfig config = MainSystemConfig.getForScripts();
-        config.gates().put(gate, List.of(subsystem.fromScript(value)));
+        config.gates().put(gate, List.of(subsystem.fromScript(qualifiedValues(qualifier, value))));
         MainSystemConfig existing = loader.getData(id);
         loader.registerDefault(id, (MainSystemConfig) existing.combine(config));
     }
 
     static {
 
-        KEYWORDS.put("eventgates", (param, id, type, value) -> gateConsumer(param, id, type, value, GateUtils.Type.EVENT));
-        KEYWORDS.put("featuregates", (param, id, type, value) -> gateConsumer(param, id, type, value, GateUtils.Type.FEATURE));
-        KEYWORDS.put("abilitygates", (param, id, type, value) -> gateConsumer(param, id, type, value, GateUtils.Type.ABILITY));
-        KEYWORDS.put("progressiongates", (param, id, type, value) -> gateConsumer(param, id, type, value, GateUtils.Type.PROGRESS));
-        KEYWORDS.put("progression", (param, id, type, value) -> {
+        KEYWORDS.put("eventgates", (qualifier, param, id, type, value) -> gateConsumer(qualifier, param, id, type, value, GateUtils.Type.EVENT));
+        KEYWORDS.put("featuregates", (qualifier, param, id, type, value) -> gateConsumer(qualifier, param, id, type, value, GateUtils.Type.FEATURE));
+        KEYWORDS.put("abilitygates", (qualifier, param, id, type, value) -> gateConsumer(qualifier, param, id, type, value, GateUtils.Type.ABILITY));
+        KEYWORDS.put("progressiongates", (qualifier, param, id, type, value) -> gateConsumer(qualifier, param, id, type, value, GateUtils.Type.PROGRESS));
+        KEYWORDS.put("progression", (qualifier, param, id, type, value) -> {
             SubSystemConfigType subsystem = CommonSetup.CODECS.getRegistry().get().getValue(ResourceLocation.parse(param));
             MergeableCodecDataManager<?> loader = Core.get(LogicalSide.SERVER).getLoader().getLoader(type);
             MainSystemConfig config = MainSystemConfig.getForScripts();
-            config.progression().add(subsystem.fromScript(value));
+            config.progression().add(subsystem.fromScript(qualifiedValues(qualifier, value)));
             MainSystemConfig existing = loader.getData(id);
             loader.registerDefault(id, (MainSystemConfig) existing.combine(config));
         });
-        KEYWORDS.put("ability", (param, id, type, value) -> {
+        KEYWORDS.put("ability", (qualifier, param, id, type, value) -> {
             SubSystemConfigType subsystem = CommonSetup.CODECS.getRegistry().get().getValue(ResourceLocation.parse(param));
             MergeableCodecDataManager<?> loader = Core.get(LogicalSide.SERVER).getLoader().getLoader(type);
             MainSystemConfig config = MainSystemConfig.getForScripts();
-            config.abilities().add(subsystem.fromScript(value));
+            config.abilities().add(subsystem.fromScript(qualifiedValues(qualifier, value)));
             MainSystemConfig existing = loader.getData(id);
             loader.registerDefault(id, (MainSystemConfig) existing.combine(config));
         });
-        KEYWORDS.put("feature", (param, id, type, value) -> {
+        KEYWORDS.put("feature", (qualifier, param, id, type, value) -> {
             SubSystemConfigType subsystem = CommonSetup.CODECS.getRegistry().get().getValue(ResourceLocation.parse(param));
             MergeableCodecDataManager<?> loader = Core.get(LogicalSide.SERVER).getLoader().getLoader(type);
             MainSystemConfig config = MainSystemConfig.getForScripts();
-            config.features().add(subsystem.fromScript(value));
+            config.features().add(subsystem.fromScript(qualifiedValues(qualifier, value)));
             MainSystemConfig existing = loader.getData(id);
             loader.registerDefault(id, (MainSystemConfig) existing.combine(config));
         });
