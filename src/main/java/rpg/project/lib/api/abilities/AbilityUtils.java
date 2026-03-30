@@ -4,7 +4,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -84,11 +84,11 @@ public class AbilityUtils {
     }
 
     public record AbilityGetter(Registry<Ability> registry) {
-        public MutableComponent getDescription(ResourceLocation id) {
+        public MutableComponent getDescription(Identifier id) {
             return registry().getOptional(id).orElse(Ability.empty()).description();
         }
 
-        public List<MutableComponent> getStatusLines(ResourceLocation id, Player player, CompoundTag settings, EventContext context) {
+        public List<MutableComponent> getStatusLines(Identifier id, Player player, CompoundTag settings, EventContext context) {
             return registry().getOptional(id).orElse(Ability.empty()).status().apply(player, settings, context);
         }
 
@@ -100,7 +100,7 @@ public class AbilityUtils {
             }).toList();
         }
 
-        public Ability getAbility(ResourceLocation id) {
+        public Ability getAbility(Identifier id) {
             return registry().getOptional(id).orElse(Ability.empty());
         }
     }

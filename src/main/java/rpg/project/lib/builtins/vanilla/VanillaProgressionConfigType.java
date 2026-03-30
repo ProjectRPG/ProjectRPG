@@ -14,7 +14,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
@@ -26,11 +26,11 @@ import rpg.project.lib.internal.registry.EventRegistry;
 import rpg.project.lib.internal.util.Functions;
 
 public record VanillaProgressionConfigType() implements SubSystemConfigType{
-	public static final ResourceLocation ID = ResourceLocation.withDefaultNamespace("progression");
+	public static final Identifier ID = Identifier.withDefaultNamespace("progression");
 	public static final VanillaProgressionConfigType IMPL = new VanillaProgressionConfigType();
 
 	@Override
-	public ResourceLocation getId() {return ID;}
+	public Identifier getId() {return ID;}
 	@Override
 	public MapCodec<SubSystemConfig> getCodec() {
 		return VanillaProgressionConfig.CODEC;
@@ -47,7 +47,7 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 
 	@Override
 	public SubSystemConfig fromScript(Map<String, String> values) {
-		ResourceLocation id = ResourceLocation.parse(values.getOrDefault("for_event", "invalid_event"));
+		Identifier id = Identifier.parse(values.getOrDefault("for_event", "invalid_event"));
 		int xp = Integer.parseInt(values.getOrDefault("xp", "0"));
 		Optional<ConditionWrapper> conditionWrapper = Optional.of(ConditionWrapper.fromScripting(values));
 		Optional<Boolean> priority = Optional.of(values.containsKey("override"));
@@ -55,7 +55,7 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 	}
 
 
-	public record VanillaProgressionConfig(Map<ResourceLocation, List<ExpData>> eventToXp, Optional<Boolean> isPriority) implements SubSystemConfig {
+	public record VanillaProgressionConfig(Map<Identifier, List<ExpData>> eventToXp, Optional<Boolean> isPriority) implements SubSystemConfig {
 		public static class ExpData {
 			private int xp;
 			private Optional<ConditionWrapper> conditions;
@@ -86,7 +86,7 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 		}
 		
 		public static final MapCodec<SubSystemConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-				Codec.unboundedMap(ResourceLocation.CODEC, ExpData.CODEC.codec().listOf()).fieldOf("events").forGetter(e -> ((VanillaProgressionConfig)e).eventToXp),
+				Codec.unboundedMap(Identifier.CODEC, ExpData.CODEC.codec().listOf()).fieldOf("events").forGetter(e -> ((VanillaProgressionConfig)e).eventToXp),
 				Codec.BOOL.optionalFieldOf("override").forGetter(e -> Optional.of(e.isPriorityData()))
 				).apply(instance, VanillaProgressionConfig::new));
 
@@ -96,7 +96,7 @@ public record VanillaProgressionConfigType() implements SubSystemConfigType{
 		@Override
 		public MergeableData combine(MergeableData two) {
 			VanillaProgressionConfig t = (VanillaProgressionConfig) two;
-			Map<ResourceLocation, List<ExpData>> map = new HashMap<>();
+			Map<Identifier, List<ExpData>> map = new HashMap<>();
 
 			BiConsumer<VanillaProgressionConfig, VanillaProgressionConfig> bothOrNeither = (pri, sec) -> {
 				pri.eventToXp().forEach((key, list) -> map.put(key, new ArrayList<>(list)));

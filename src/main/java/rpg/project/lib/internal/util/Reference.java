@@ -1,12 +1,12 @@
 package rpg.project.lib.internal.util;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class Reference {
 	public static final String MODID = "projectrpg";
 	
-	public static ResourceLocation resource(String path) {
-		return ResourceLocation.fromNamespaceAndPath(MODID, path);
+	public static Identifier resource(String path) {
+		return Identifier.fromNamespaceAndPath(MODID, path);
 	}
-	public static ResourceLocation mc(String path) {return ResourceLocation.withDefaultNamespace(path);}
+	public static Identifier mc(String path) {return Identifier.withDefaultNamespace(path);}
 }

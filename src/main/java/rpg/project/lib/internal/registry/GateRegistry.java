@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.events.EventContext;
@@ -44,7 +44,7 @@ public class GateRegistry{
 	 * @param context event information provided to the gate system for evaluation
 	 * @return the cancellation result
 	 */
-	public static CancellationType isEventPermitted(Hub core, ResourceLocation event, EventContext context) {
+	public static CancellationType isEventPermitted(Hub core, Identifier event, EventContext context) {
 		var systems = getSystems(Type.EVENT, context.getLevel().registryAccess());
 		if (systems.isEmpty())
 			return CancellationType.NONE;
@@ -66,7 +66,7 @@ public class GateRegistry{
 	 * apply progression to.  
 	 * @return whether progression can be committed or not.
 	 */
-	public static float isProgressionPermitted(Hub core, ResourceLocation event, EventContext context, String container) {
+	public static float isProgressionPermitted(Hub core, Identifier event, EventContext context, String container) {
 		var systems = getSystems(Type.PROGRESS, context.getLevel().registryAccess());
 		if (systems.isEmpty())
 			return HARD_PASS;
@@ -86,7 +86,7 @@ public class GateRegistry{
 	 * @param featureReference the feature specification being invoked
 	 * @return whether a feature is allowed to perform its function
 	 */
-	public static float isFeaturePermitted(Hub core, ResourceLocation event, EventContext context, Feature featureReference) {
+	public static float isFeaturePermitted(Hub core, Identifier event, EventContext context, Feature featureReference) {
 		var systems = getSystems(Type.FEATURE, context.getLevel().registryAccess());
 		if (systems.isEmpty())
 			return HARD_PASS;
@@ -108,7 +108,7 @@ public class GateRegistry{
 	 * @param ability the ability instance being activated
 	 * @return whether an ability is allowed to perform its function
 	 */
-	public static float isAbilityPermitted(Player player, Hub core, ResourceLocation event, EventContext context, ResourceLocation ability) {
+	public static float isAbilityPermitted(Player player, Hub core, Identifier event, EventContext context, Identifier ability) {
 		var systems = getSystems(Type.ABILITY, context.getLevel().registryAccess());
 		if (systems.isEmpty())
 			return HARD_PASS;

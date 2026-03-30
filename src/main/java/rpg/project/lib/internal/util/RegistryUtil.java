@@ -6,7 +6,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
@@ -22,47 +22,47 @@ import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.abilities.Ability;
 
 public class RegistryUtil {
-	public static <T> ResourceLocation getId(RegistryAccess access, ResourceKey<Registry<T>> registry, T source) {
+	public static <T> Identifier getId(RegistryAccess access, ResourceKey<Registry<T>> registry, T source) {
 		return access.lookupOrThrow(registry).getKey(source);
 	}
 
-	public static ResourceLocation getId(RegistryAccess access, ItemStack stack) {
+	public static Identifier getId(RegistryAccess access, ItemStack stack) {
 		return getId(access, Registries.ITEM, stack.getItem());
 	}
 
-	public static ResourceLocation getId(ItemStack stack) {
+	public static Identifier getId(ItemStack stack) {
 		return getId(stack.getItem());
 	}
 
-	public static ResourceLocation getId(Item item) {
+	public static Identifier getId(Item item) {
 		return BuiltInRegistries.ITEM.getKey(item);
 	}
 
-	public static ResourceLocation getId(BlockState blockState) {
+	public static Identifier getId(BlockState blockState) {
 		return getId(blockState.getBlock());
 	}
 
-	public static ResourceLocation getId(Block block) {
+	public static Identifier getId(Block block) {
 		return BuiltInRegistries.BLOCK.getKey(block);
 	}
 
-	public static ResourceLocation getId(Holder<?> biome) {
+	public static Identifier getId(Holder<?> biome) {
 		return biome.unwrapKey().get().location();
 	}
 
-	public static ResourceLocation getId(SoundEvent sound) {
+	public static Identifier getId(SoundEvent sound) {
 		return BuiltInRegistries.SOUND_EVENT.getKey(sound);
 	}
 
-	public static ResourceLocation getId(Entity entity) {
+	public static Identifier getId(Entity entity) {
 		return getId(entity.getType());
 	}
 
-	public static ResourceLocation getId(EntityType<?> entity) {
+	public static Identifier getId(EntityType<?> entity) {
 		return BuiltInRegistries.ENTITY_TYPE.getKey(entity);
 	}
 
-	public static ResourceLocation getDimension(LevelAccessor level) {
+	public static Identifier getDimension(LevelAccessor level) {
 		return level.registryAccess().lookupOrThrow(Registries.DIMENSION_TYPE).getKey(level.dimensionType());
 	}
 }

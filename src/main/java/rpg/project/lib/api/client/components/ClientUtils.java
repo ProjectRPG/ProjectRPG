@@ -2,7 +2,7 @@ package rpg.project.lib.api.client.components;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**Utilities for the client which safely do not access server-only classes*/
 public class ClientUtils {
@@ -14,7 +14,7 @@ public class ClientUtils {
      * @param eventID the id of the event
      * @return a translatable component of the event name
      */
-    public static MutableComponent getEventName(ResourceLocation eventID) {
+    public static MutableComponent getEventName(Identifier eventID) {
         return Component.translatable("projectrpg.event."+eventID.toString().replace(":","."));
     }
 
@@ -25,7 +25,7 @@ public class ClientUtils {
      * @param abilityID the id of the ability
      * @return a translatable component of the ability name
      */
-    public static MutableComponent getAbilityName(ResourceLocation abilityID) {
+    public static MutableComponent getAbilityName(Identifier abilityID) {
         return Component.translatable("ability."+abilityID.toString().replace(":","."));
     }
 }

@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import rpg.project.lib.api.client.components.SidePanelContentProvider;
@@ -14,7 +14,7 @@ import rpg.project.lib.internal.config.Config;
 import rpg.project.lib.internal.util.Reference;
 
 public class OverlaySlidePanels implements LayeredDraw.Layer {
-    protected static final ResourceLocation TEXTURE_LOCATION = Reference.resource("textures/overlay_background.png");
+    protected static final Identifier TEXTURE_LOCATION = Reference.resource("textures/overlay_background.png");
 
     private SidePanelContentProvider provider;
     private double openAmount = 5.0;

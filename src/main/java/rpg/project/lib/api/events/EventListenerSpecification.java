@@ -7,7 +7,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 
@@ -18,7 +18,7 @@ import net.neoforged.bus.api.EventPriority;
  */
 public record EventListenerSpecification<T extends Event>(
 		/**A Unique identifier used for querying features for relevant logic.*/
-		ResourceLocation registryID,
+		Identifier registryID,
 		/**@see EventPriority*/
 		EventPriority priority,
 		/**The event class this applies to.*/

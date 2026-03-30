@@ -1,7 +1,7 @@
 package rpg.project.lib.api.events.conditions;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rpg.project.lib.api.APIUtils;
@@ -31,7 +31,7 @@ public interface EventCondition extends Predicate<EventContext> {
         List<String> conditionValues = value.keySet().stream().filter(str -> str.startsWith(nodePrefix)).toList();
         List<EventCondition> conditions = new ArrayList<>();
         for (String conditionValue : conditionValues) {
-            ResourceLocation conditionKey = ResourceLocation.parse(value.get(conditionValue));
+            Identifier conditionKey = Identifier.parse(value.get(conditionValue));
             Optional<EventConditionType> cType = CONDITIONS.getRegistry().get().getOptional(conditionKey);
             cType.ifPresent(type -> conditions.add(type.fromScripting(value)));
         }

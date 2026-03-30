@@ -9,7 +9,7 @@ import com.mojang.serialization.Codec;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import rpg.project.lib.api.APIUtils;

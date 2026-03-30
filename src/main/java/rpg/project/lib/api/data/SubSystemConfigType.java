@@ -3,7 +3,7 @@ package rpg.project.lib.api.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import rpg.project.lib.api.APIUtils;
 
 import java.util.EnumSet;
@@ -13,7 +13,7 @@ import java.util.Map;
  * a configuration object.
  */
 public interface SubSystemConfigType {
-	ResourceLocation getId();
+	Identifier getId();
 	/**@return the codec used to parse the associated config object
 	 */
 	MapCodec<SubSystemConfig> getCodec();

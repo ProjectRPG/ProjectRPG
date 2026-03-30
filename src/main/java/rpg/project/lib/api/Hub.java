@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import rpg.project.lib.api.abilities.AbilitySystem;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.data.SubSystemConfig;
@@ -38,7 +38,7 @@ public interface Hub {
 	 * @param objectID the id of the object
 	 * @return an optional containing the configuration, if present
 	 */
-	Optional<SubSystemConfig> getProgressionData(SubSystemConfigType systemType, ObjectType type, ResourceLocation objectID);
+	Optional<SubSystemConfig> getProgressionData(SubSystemConfigType systemType, ObjectType type, Identifier objectID);
 	/**<p>Accesses the Hub's internal configuration data and returns 
 	 * the configuration object associated with the in-game object
 	 * specified and for the configuration type.</p>
@@ -52,7 +52,7 @@ public interface Hub {
 	 * @param objectID the id of the object
 	 * @return an optional containing the configuration, if present
 	 */
-	Optional<SubSystemConfig> getGateData(SubSystemConfigType systemType, ObjectType type, Type gateType, ResourceLocation objectID);
+	Optional<SubSystemConfig> getGateData(SubSystemConfigType systemType, ObjectType type, Type gateType, Identifier objectID);
 	/**<p>Accesses the Hub's internal configuration data and returns 
 	 * the configuration object associated with the in-game object
 	 * specified and for the configuration type.</p>
@@ -66,7 +66,7 @@ public interface Hub {
 	 * @param objectID the id of the object
 	 * @return an optional containing the configuration, if present
 	 */
-	Optional<SubSystemConfig> getAbilityData(SubSystemConfigType systemType, ObjectType type, ResourceLocation objectID);
+	Optional<SubSystemConfig> getAbilityData(SubSystemConfigType systemType, ObjectType type, Identifier objectID);
 	/**<p>Accesses the Hub's internal configuration data and returns 
 	 * the configuration object associated with the in-game object
 	 * specified and for the configuration type.</p>
@@ -80,7 +80,7 @@ public interface Hub {
 	 * @param eventID the event this feature data is being invoked for
 	 * @return an optional containing the configuration, if present
 	 */
-	List<SubSystemConfig> getFeatureData(ObjectType type, ResourceLocation objectID, ResourceLocation eventID);
+	List<SubSystemConfig> getFeatureData(ObjectType type, Identifier objectID, Identifier eventID);
 	/**@return the active {@link PartySystem} implementation for this instance
 	 */
 	PartySystem getParty();
@@ -101,10 +101,10 @@ public interface Hub {
 	 * @param context
 	 * @return
 	 */
-	default List<Feature> getFeaturesForContext(ResourceLocation eventID, EventContext context) {
+	default List<Feature> getFeaturesForContext(Identifier eventID, EventContext context) {
 		List<Feature> validFeatures = new ArrayList<>();
 		for (SubSystemConfig config : this.getFeatureData(context.getSubjectType(), context.getSubjectID(), eventID)) {
-			ResourceLocation featureID = CommonSetup.CODECS.getRegistry().get().getKey(config.getType());
+			Identifier featureID = CommonSetup.CODECS.getRegistry().get().getKey(config.getType());
 			Feature feature = context.getLevel().registryAccess().lookupOrThrow(APIUtils.FEATURE).getValue(featureID);
 			if (feature.isValidContext().test(eventID, context)) validFeatures.add(feature);
 		}

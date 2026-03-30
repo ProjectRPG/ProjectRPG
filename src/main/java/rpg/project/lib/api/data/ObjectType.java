@@ -11,7 +11,7 @@ import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Item;
 import org.apache.logging.log4j.LogManager;
@@ -67,7 +67,7 @@ public enum ObjectType implements StringRepresentable{
 		return out.isUnconfigured() ? null : out;
 	}
 
-	public static void printData(Map<ResourceLocation, ? extends Record> data) {
+	public static void printData(Map<Identifier, ? extends Record> data) {
 		data.forEach((id, value) -> {
 			if (id == null || value == null) return;
 			MsLoggy.INFO.log(MsLoggy.LOG_CODE.DATA, "Object: {} with Data: {}", id.toString(), value.toString());

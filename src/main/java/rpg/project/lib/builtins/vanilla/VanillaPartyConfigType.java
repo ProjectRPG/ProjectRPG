@@ -9,18 +9,18 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
 
 public record VanillaPartyConfigType() implements SubSystemConfigType{
-	public static final ResourceLocation ID = ResourceLocation.withDefaultNamespace("party");
+	public static final Identifier ID = Identifier.withDefaultNamespace("party");
 	public static final VanillaPartyConfigType IMPL = new VanillaPartyConfigType();
 
 	@Override
-	public ResourceLocation getId() {return ID;}
+	public Identifier getId() {return ID;}
 	@Override
 	public MapCodec<SubSystemConfig> getCodec() {
 		return VanillaPartyConfig.CODEC;

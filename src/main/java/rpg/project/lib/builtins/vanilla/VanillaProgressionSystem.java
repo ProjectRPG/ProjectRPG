@@ -28,7 +28,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
 import rpg.project.lib.api.Hub;
@@ -99,7 +99,7 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 	}
 	
 	@Override
-	public List<Pair<String, Consumer<Float>>> getProgressionToBeAwarded(Hub core, ResourceLocation eventID, EventContext context) {
+	public List<Pair<String, Consumer<Float>>> getProgressionToBeAwarded(Hub core, Identifier eventID, EventContext context) {
 		//TODO factor parties into the xp distribution.
 		List<VanillaProgressionConfig.ExpData> eventConfig = core.getProgressionData(VanillaProgressionConfigType.IMPL, ObjectType.EVENT, eventID)
 				.map(config -> ((VanillaProgressionConfig)config).eventToXp().getOrDefault(eventID, List.of())

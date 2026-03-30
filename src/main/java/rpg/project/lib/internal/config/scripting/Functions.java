@@ -3,7 +3,7 @@ package rpg.project.lib.internal.config.scripting;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -45,8 +45,8 @@ public class Functions {
                 .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
     }
 
-    private static void gateConsumer(String qualifier, String param, ResourceLocation id, ObjectType type, Map<String, String> value, GateUtils.Type gate) {
-        SubSystemConfigType subsystem = CommonSetup.CODECS.getRegistry().get().getValue(ResourceLocation.parse(param));
+    private static void gateConsumer(String qualifier, String param, Identifier id, ObjectType type, Map<String, String> value, GateUtils.Type gate) {
+        SubSystemConfigType subsystem = CommonSetup.CODECS.getRegistry().get().getValue(Identifier.parse(param));
         MergeableCodecDataManager<?> loader = Core.get(LogicalSide.SERVER).getLoader().getLoader(type);
         MainSystemConfig config = MainSystemConfig.getForScripts();
         config.gates().put(gate, List.of(subsystem.fromScript(qualifiedValues(qualifier, value))));
@@ -61,7 +61,7 @@ public class Functions {
         KEYWORDS.put("abilitygates", (qualifier, param, id, type, value) -> gateConsumer(qualifier, param, id, type, value, GateUtils.Type.ABILITY));
         KEYWORDS.put("progressiongates", (qualifier, param, id, type, value) -> gateConsumer(qualifier, param, id, type, value, GateUtils.Type.PROGRESS));
         KEYWORDS.put("progression", (qualifier, param, id, type, value) -> {
-            SubSystemConfigType subsystem = CommonSetup.CODECS.getRegistry().get().getValue(ResourceLocation.parse(param));
+            SubSystemConfigType subsystem = CommonSetup.CODECS.getRegistry().get().getValue(Identifier.parse(param));
             MergeableCodecDataManager<?> loader = Core.get(LogicalSide.SERVER).getLoader().getLoader(type);
             MainSystemConfig config = MainSystemConfig.getForScripts();
             config.progression().add(subsystem.fromScript(qualifiedValues(qualifier, value)));
@@ -69,7 +69,7 @@ public class Functions {
             loader.registerDefault(id, (MainSystemConfig) existing.combine(config));
         });
         KEYWORDS.put("ability", (qualifier, param, id, type, value) -> {
-            SubSystemConfigType subsystem = CommonSetup.CODECS.getRegistry().get().getValue(ResourceLocation.parse(param));
+            SubSystemConfigType subsystem = CommonSetup.CODECS.getRegistry().get().getValue(Identifier.parse(param));
             MergeableCodecDataManager<?> loader = Core.get(LogicalSide.SERVER).getLoader().getLoader(type);
             MainSystemConfig config = MainSystemConfig.getForScripts();
             config.abilities().add(subsystem.fromScript(qualifiedValues(qualifier, value)));
@@ -77,7 +77,7 @@ public class Functions {
             loader.registerDefault(id, (MainSystemConfig) existing.combine(config));
         });
         KEYWORDS.put("feature", (qualifier, param, id, type, value) -> {
-            SubSystemConfigType subsystem = CommonSetup.CODECS.getRegistry().get().getValue(ResourceLocation.parse(param));
+            SubSystemConfigType subsystem = CommonSetup.CODECS.getRegistry().get().getValue(Identifier.parse(param));
             MergeableCodecDataManager<?> loader = Core.get(LogicalSide.SERVER).getLoader().getLoader(type);
             MainSystemConfig config = MainSystemConfig.getForScripts();
             config.features().add(subsystem.fromScript(qualifiedValues(qualifier, value)));
@@ -106,7 +106,7 @@ public class Functions {
             }
             final Pair<Float, Float> values = Pair.of(nutVal, satVal);
             final Pair<Operator, Operator> ops = Pair.of(nutOp, satOp);
-            List<ResourceLocation> food = access.lookupOrThrow(Registries.ITEM).entrySet().stream()
+            List<Identifier> food = access.lookupOrThrow(Registries.ITEM).entrySet().stream()
                     .filter(entry -> entry.getValue().getDefaultInstance().get(DataComponents.FOOD) instanceof FoodProperties props
                             && ops.getFirst().evaluation.test(Integer.valueOf(props.nutrition()).floatValue(), values.getFirst())
                             && ops.getSecond().evaluation.test(props.saturation(), values.getSecond()))
@@ -115,14 +115,14 @@ public class Functions {
             return new TargetSelector.Selection(ObjectType.ITEM, food);
         });
         TARGETORS.put("tool", (param, access) -> {
-            List<ResourceLocation>  tools = new ArrayList<>();
+            List<Identifier>  tools = new ArrayList<>();
             if (param.isEmpty())
                 tools.addAll(access.lookupOrThrow(Registries.ITEM).entrySet().stream()
                         .filter(entry -> entry.getValue().components().has(DataComponents.TOOL))
                         .map(entry -> entry.getKey().location())
                         .toList());
             else {
-                ResourceLocation tag = Reference.resource(param);
+                Identifier tag = Reference.resource(param);
                 tools.addAll(access.lookupOrThrow(Registries.ITEM).get(TagKey.create(Registries.ITEM, tag))
                         .map(named -> named.stream()
                                 .filter(holder -> holder.value().components().has(DataComponents.TOOL))
@@ -132,7 +132,7 @@ public class Functions {
             return new TargetSelector.Selection(ObjectType.ITEM, tools);
         });
         TARGETORS.put("wearable", (param, access) -> {
-            List<ResourceLocation>  tools = new ArrayList<>();
+            List<Identifier>  tools = new ArrayList<>();
             if (param.isEmpty())
                 tools.addAll(access.lookupOrThrow(Registries.ITEM).entrySet().stream()
                         .filter(entry -> entry.getValue().components().has(DataComponents.EQUIPPABLE) &&
@@ -141,7 +141,7 @@ public class Functions {
                         .map(entry -> entry.getKey().location())
                         .toList());
             else {
-                ResourceLocation tag = Reference.resource(param);
+                Identifier tag = Reference.resource(param);
                 tools.addAll(access.lookupOrThrow(Registries.ITEM).get(TagKey.create(Registries.ITEM, tag))
                         .map(named -> named.stream()
                                 .filter(entry -> entry.value().components().has(DataComponents.EQUIPPABLE) &&
@@ -153,14 +153,14 @@ public class Functions {
             return new TargetSelector.Selection(ObjectType.ITEM, tools);
         });
         TARGETORS.put("weapon", (param, access) -> {
-            List<ResourceLocation>  tools = new ArrayList<>();
+            List<Identifier>  tools = new ArrayList<>();
             if (param.isEmpty())
                 tools.addAll(access.lookupOrThrow(Registries.ITEM).entrySet().stream()
                         .filter(entry -> entry.getValue().components().has(DataComponents.DAMAGE))
                         .map(entry -> entry.getKey().location())
                         .toList());
             else {
-                ResourceLocation tag = Reference.resource(param);
+                Identifier tag = Reference.resource(param);
                 tools.addAll(access.lookupOrThrow(Registries.ITEM).get(TagKey.create(Registries.ITEM, tag))
                         .map(named -> named.stream()
                                 .filter(holder -> holder.value().components().has(DataComponents.DAMAGE))
@@ -216,7 +216,7 @@ public class Functions {
 //    public static double getDouble(Map<String, String> values) {
 //        return Double.parseDouble(values.getOrDefault("value", "0"));
 //    }
-//    public static ResourceLocation getId(Map<String, String> values) {
+//    public static Identifier getId(Map<String, String> values) {
 //        return Reference.resource(values.getOrDefault("value", "pmmo_scripting:missing_value"));
 //    }
 //    public static boolean getBool(Map<String, String> values) {

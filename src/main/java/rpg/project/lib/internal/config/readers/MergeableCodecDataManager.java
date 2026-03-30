@@ -55,7 +55,7 @@ import com.google.gson.JsonParseException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -73,25 +73,25 @@ import rpg.project.lib.internal.util.MsLoggy.LOG_CODE;
  * to the forge events necessary for syncing datapack data to clients.
  * @param <V> The type of the objects that the codec is parsing jsons as
  */
-public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener<Map<ResourceLocation, MainSystemConfig>>
+public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener<Map<Identifier, MainSystemConfig>>
 {
 	protected static final String JSON_EXTENSION = ".json";
 	protected static final int JSON_EXTENSION_LENGTH = JSON_EXTENSION.length();
 	protected static final Gson STANDARD_GSON = new Gson();
 	@Nonnull
 	/** Mutable, non-null map containing whatever data was loaded last time server datapacks were loaded */
-	protected Map<ResourceLocation, MainSystemConfig> data = new HashMap<>();
+	protected Map<Identifier, MainSystemConfig> data = new HashMap<>();
 	
 	public final String folderName;
 	private final Logger logger;
 	private final Codec<MainSystemConfig> codec = MainSystemConfig.CODEC;
 	private final Function<List<MainSystemConfig>, MainSystemConfig> merger;
-	private final Consumer<Map<ResourceLocation, MainSystemConfig>> finalizer;
+	private final Consumer<Map<Identifier, MainSystemConfig>> finalizer;
 	private final Gson gson;
 	private final Supplier<MainSystemConfig> defaultImpl = MainSystemConfig::new;
 	private final ResourceKey<Registry<V>> registry;
-	private final Map<ResourceLocation, MainSystemConfig> defaultSettings = new HashMap<>();
-	private final Map<ResourceLocation, MainSystemConfig> overrideSettings = new HashMap<>();
+	private final Map<Identifier, MainSystemConfig> defaultSettings = new HashMap<>();
+	private final Map<Identifier, MainSystemConfig> overrideSettings = new HashMap<>();
 	
 	/**
 	 * Initialize a data manager with the given folder name, codec, and merger
@@ -108,7 +108,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	 * and then all tag jsons defined with the same ID are merged additively into a single set of items, etc
 	 */
 	public MergeableCodecDataManager(final String folderName, final Logger logger, final Function<List<MainSystemConfig>, MainSystemConfig> merger
-			, final Consumer<Map<ResourceLocation, MainSystemConfig>> finalizer, ResourceKey<Registry<V>> registry)
+			, final Consumer<Map<Identifier, MainSystemConfig>> finalizer, ResourceKey<Registry<V>> registry)
 	{
 		this(folderName, logger, merger, finalizer, STANDARD_GSON, registry);
 	}
@@ -131,7 +131,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	 * raw json to a JsonElement, which the Codec then parses into a proper java object.
 	 */
 	public MergeableCodecDataManager(final String folderName, final Logger logger, final Function<List<MainSystemConfig>, MainSystemConfig> merger
-			, final Consumer<Map<ResourceLocation, MainSystemConfig>> finalizer, final Gson gson, ResourceKey<Registry<V>> registry)
+			, final Consumer<Map<Identifier, MainSystemConfig>> finalizer, final Gson gson, ResourceKey<Registry<V>> registry)
 	{
 		this.folderName = folderName;
 		this.logger = logger;
@@ -141,11 +141,11 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 		this.registry = registry;
 	}
 	
-	public Map<ResourceLocation, MainSystemConfig> getData() {return data;}
+	public Map<Identifier, MainSystemConfig> getData() {return data;}
 	
 	public void clearData() {this.data = new HashMap<>();}
 	
-	public MainSystemConfig getData(ResourceLocation id) {
+	public MainSystemConfig getData(Identifier id) {
 		return data.computeIfAbsent(id, res -> getGenericTypeInstance());
 	}
 	
@@ -163,7 +163,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	 * @param id the object registry ID
 	 * @param data the object containing the specific data
 	 */
-	public void registerDefault(ResourceLocation id, MainSystemConfig data) {
+	public void registerDefault(Identifier id, MainSystemConfig data) {
 		defaultSettings.merge(id, data, (currData, newData) -> (MainSystemConfig)currData.combine(newData));
 	}
 	
@@ -180,29 +180,29 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	 * @param id the object registry ID
 	 * @param data the object containing the specific data
 	 */
-	public void registerOverride(ResourceLocation id, MainSystemConfig data) {
+	public void registerOverride(Identifier id, MainSystemConfig data) {
 		overrideSettings.merge(id, data, (currData, newData) -> (MainSystemConfig)currData.combine(newData));
 	}
 
 	/** Off-thread processing (can include reading files from hard drive) **/
 	@Override
-	protected Map<ResourceLocation, MainSystemConfig> prepare(final ResourceManager resourceManager, final ProfilerFiller profiler)
+	protected Map<Identifier, MainSystemConfig> prepare(final ResourceManager resourceManager, final ProfilerFiller profiler)
 	{
-		final Map<ResourceLocation, List<MainSystemConfig>> map = new HashMap<>();
+		final Map<Identifier, List<MainSystemConfig>> map = new HashMap<>();
 
-		for (ResourceLocation resourceLocation : resourceManager.listResources(this.folderName, MergeableCodecDataManager::isStringJsonFile).keySet())
+		for (Identifier Identifier : resourceManager.listResources(this.folderName, MergeableCodecDataManager::isStringJsonFile).keySet())
 		{
-			final String namespace = resourceLocation.getNamespace();
-			final String filePath = resourceLocation.getPath();
+			final String namespace = Identifier.getNamespace();
+			final String filePath = Identifier.getPath();
 			final String dataPath = filePath.substring(this.folderName.length() + 1, filePath.length() - JSON_EXTENSION_LENGTH);
 			
 			// this is a json with identifier "somemodid:somedata"
-			final ResourceLocation jsonIdentifier = ResourceLocation.fromNamespaceAndPath(namespace, dataPath);
+			final Identifier jsonIdentifier = Identifier.fromNamespaceAndPath(namespace, dataPath);
 			// this is the list of all json objects with the given resource location (i.e. in multiple datapacks)
 			final List<MainSystemConfig> unmergedRaws = new ArrayList<>();
 			// it's entirely possible that there are multiple jsons with this identifier,
 			// we can query the resource manager for these
-			for (Resource resource : resourceManager.getResourceStack(resourceLocation))
+			for (Resource resource : resourceManager.getResourceStack(Identifier))
 			{
 				try // with resources
 				(final Reader reader = resource.openAsReader())
@@ -217,7 +217,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 				}
 				catch(RuntimeException | IOException exception)
 				{
-					this.logger.error("Data loader for {} could not read data {} from file {} in data pack {}", this.folderName, jsonIdentifier, resourceLocation, resource.sourcePackId(), exception); 
+					this.logger.error("Data loader for {} could not read data {} from file {} in data pack {}", this.folderName, jsonIdentifier, Identifier, resource.sourcePackId(), exception); 
 				}
 			}			
 			
@@ -227,7 +227,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 		return MergeableCodecDataManager.mapValues(map, this.merger::apply);
 	}
 	
-	static boolean isStringJsonFile(final ResourceLocation file)
+	static boolean isStringJsonFile(final Identifier file)
 	{
 		return file.getPath().endsWith(".json");
 	}
@@ -252,7 +252,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	
 	/** Main-thread processing, runs after prepare concludes **/
 	@Override
-	protected void apply(final Map<ResourceLocation, MainSystemConfig> processedData, final ResourceManager resourceManager, final ProfilerFiller profiler)
+	protected void apply(final Map<Identifier, MainSystemConfig> processedData, final ResourceManager resourceManager, final ProfilerFiller profiler)
 	{
 		var debug = this.folderName;
 		MsLoggy.INFO.log(LOG_CODE.DATA, "Beginning loading of data for data loader: {}", this.folderName);
@@ -272,15 +272,15 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	public void postProcess(HolderLookup.Provider lookup) {
 		if (registry == null) return;
 		MsLoggy.DEBUG.log(LOG_CODE.DATA, "Begin PostProcessing for {}", folderName);
-		for (Map.Entry<ResourceLocation, MainSystemConfig> dataRaw : new HashMap<>(this.data).entrySet()) {
+		for (Map.Entry<Identifier, MainSystemConfig> dataRaw : new HashMap<>(this.data).entrySet()) {
 			MainSystemConfig dataValue = dataRaw.getValue();
 			if (dataValue.tagValues().isEmpty()) continue;
 			MsLoggy.INFO.log(LOG_CODE.DATA, "Tag Data Found for {}", dataRaw.getKey().toString());
-			List<ResourceLocation> tags = new ArrayList<>();
+			List<Identifier> tags = new ArrayList<>();
 			for (String str : dataValue.tagValues()) {
 				MsLoggy.INFO.log(LOG_CODE.DATA, "Applying Setting to Tag: {}", str);
 				if (str.startsWith("#")) {
-					lookup.lookupOrThrow(registry).get(TagKey.create(registry, ResourceLocation.parse(str.substring(1))))
+					lookup.lookupOrThrow(registry).get(TagKey.create(registry, Identifier.parse(str.substring(1))))
 					.ifPresent(holder -> tags.addAll(holder.stream()
 							.map(h -> h.unwrapKey().get().location())
 							.collect(Collectors.toSet())));
@@ -292,7 +292,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 							.toList());
 				}
 				else
-					tags.add(ResourceLocation.parse(str));
+					tags.add(Identifier.parse(str));
 			}
 			dataValue.tagValues().clear();
 			tags.forEach(rl -> this.data.merge(rl, dataValue, (o, n) -> (MainSystemConfig)o.combine(n)));
@@ -309,7 +309,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	 * @return this manager object
 	 */
 	public MergeableCodecDataManager<V> subscribeAsSyncable(
-		final Function<Map<ResourceLocation, MainSystemConfig>, CustomPacketPayload> packetFactory)
+		final Function<Map<Identifier, MainSystemConfig>, CustomPacketPayload> packetFactory)
 	{
 		NeoForge.EVENT_BUS.addListener(this.getDatapackSyncListener(packetFactory));
 		return this;
@@ -317,12 +317,12 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 	
 	/** Generate an event listener function for the on-datapack-sync event **/
 	private Consumer<OnDatapackSyncEvent> getDatapackSyncListener(
-		final Function<Map<ResourceLocation, MainSystemConfig>, CustomPacketPayload> packetFactory)
+		final Function<Map<Identifier, MainSystemConfig>, CustomPacketPayload> packetFactory)
 	{
 		return event -> {
 			ServerPlayer player = event.getPlayer();
 			List<CustomPacketPayload> packets = new ArrayList<>();
-			for (Map.Entry<ResourceLocation, MainSystemConfig> entry : new HashMap<>(this.data).entrySet()) {
+			for (Map.Entry<Identifier, MainSystemConfig> entry : new HashMap<>(this.data).entrySet()) {
 				if (entry.getKey() == null) continue;
 				packets.add(packetFactory.apply(Map.of(entry.getKey(), entry.getValue())));
 			}

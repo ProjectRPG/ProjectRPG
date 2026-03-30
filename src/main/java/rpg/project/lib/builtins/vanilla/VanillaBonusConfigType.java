@@ -11,18 +11,18 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
 
 public record VanillaBonusConfigType() implements SubSystemConfigType {
-	public static final ResourceLocation ID = ResourceLocation.withDefaultNamespace("bonus");
+	public static final Identifier ID = Identifier.withDefaultNamespace("bonus");
 	public static final VanillaBonusConfigType IMPL = new VanillaBonusConfigType();
 
 	@Override
-	public ResourceLocation getId() {return ID;}
+	public Identifier getId() {return ID;}
 	@Override
 	public MapCodec<SubSystemConfig> getCodec() {
 		return VanillaBonusConfig.CODEC;

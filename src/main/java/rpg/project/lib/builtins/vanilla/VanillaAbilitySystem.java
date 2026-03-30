@@ -7,7 +7,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.abilities.Ability;
@@ -23,7 +23,7 @@ import rpg.project.lib.internal.setup.datagen.LangProvider;
 public class VanillaAbilitySystem implements AbilitySystem{
 
 	@Override
-	public List<CompoundTag> getAbilitiesForContext(Hub core, ResourceLocation eventID, EventContext context) {
+	public List<CompoundTag> getAbilitiesForContext(Hub core, Identifier eventID, EventContext context) {
 		return ((VanillaAbilityConfig)core.getAbilityData(VanillaAbilityConfigType.IMPL, ObjectType.EVENT, eventID)
 			.orElse(new VanillaAbilityConfig(List.of()))).data().stream()
 			.filter(wrapper -> wrapper.conditions().stream().allMatch(c -> c.test(context)))
@@ -32,7 +32,7 @@ public class VanillaAbilitySystem implements AbilitySystem{
 	}
 
 	@Override
-	public void abilityActivationCallback(Ability ability, CompoundTag data, Player player, EventContext context, ResourceLocation eventID) {
+	public void abilityActivationCallback(Ability ability, CompoundTag data, Player player, EventContext context, Identifier eventID) {
 		VanillaAbilityPanel panel = (VanillaAbilityPanel) getSidePanelProvider();
 		panel.addLine(LangProvider.ABILITY_SIDE_PANEL_EVENT_HEADER.asComponent(
 			ClientUtils.getAbilityName(AbilityUtils.get(player.level().registryAccess()).registry().getKey(ability)),

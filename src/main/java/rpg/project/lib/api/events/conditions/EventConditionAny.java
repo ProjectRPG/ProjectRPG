@@ -2,7 +2,7 @@ package rpg.project.lib.api.events.conditions;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import rpg.project.lib.api.events.EventContext;
 
 import java.util.ArrayList;

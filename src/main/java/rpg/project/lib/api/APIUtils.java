@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rpg.project.lib.api.abilities.Ability;

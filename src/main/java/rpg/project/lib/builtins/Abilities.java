@@ -16,7 +16,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.damagesource.DamageSource;
@@ -103,7 +103,7 @@ public class Abilities {
 	}
 	
 	public static AbilityFunction EFFECT_SETTER = (player, nbt, context) -> {
-		Optional<Holder.Reference<MobEffect>> effectHolder = BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(nbt.getStringOr("effect", "")));
+		Optional<Holder.Reference<MobEffect>> effectHolder = BuiltInRegistries.MOB_EFFECT.get(Identifier.parse(nbt.getStringOr("effect", "")));
 		effectHolder.ifPresent(effect -> {
 			int configDuration = nbt.getIntOr(AbilityUtils.DURATION, 0);
 			int duration = player.hasEffect(effect) && player.getEffect(effect).getDuration() > configDuration
@@ -128,14 +128,14 @@ public class Abilities {
 			.setTick((player, nbt, context, ticks) -> EFFECT_SETTER.start(player, nbt, context))
 			.setDescription(LangProvider.PERK_EFFECT_DESC.asComponent())
 			.setStatus((player, nbt, context) -> List.of(
-					LangProvider.PERK_EFFECT_STATUS_1.asComponent(Component.translatable(BuiltInRegistries.MOB_EFFECT.getValue(ResourceLocation.parse(nbt.getStringOr("effect", ""))).getDescriptionId())),
+					LangProvider.PERK_EFFECT_STATUS_1.asComponent(Component.translatable(BuiltInRegistries.MOB_EFFECT.getValue(Identifier.parse(nbt.getStringOr("effect", ""))).getDescriptionId())),
 					LangProvider.PERK_EFFECT_STATUS_2.asComponent(nbt.getIntOr(AbilityUtils.MODIFIER, 0), nbt.getIntOr(AbilityUtils.DURATION, 0))))
 			.build();
 
 	private static final Map<String, Holder.Reference<Attribute>> attributeCache = new HashMap<>();
 	private static Holder.Reference<Attribute> getAttribute(CompoundTag nbt, RegistryAccess access) {
 		return attributeCache.computeIfAbsent(nbt.getStringOr(AbilityUtils.ATTRIBUTE, ""),
-				name -> access.lookupOrThrow(Registries.ATTRIBUTE).get(ResourceLocation.parse(name)).orElse(null));
+				name -> access.lookupOrThrow(Registries.ATTRIBUTE).get(Identifier.parse(name)).orElse(null));
 	}
 
 	public static final Ability ATTRIBUTE = Ability.begin(RegistrationSide.SERVER)
@@ -157,7 +157,7 @@ public class Abilities {
 				double boost = Math.min((perLevel * (double)progress) + settings.getDoubleOr(AbilityUtils.BASE, 0d), maxBoost);
 				AttributeModifier.Operation operation = settings.getBooleanOr(AbilityUtils.MULTIPLICATIVE, true) ? AttributeModifier.Operation.ADD_MULTIPLIED_BASE :  AttributeModifier.Operation.ADD_VALUE;
 
-				ResourceLocation attributeID = Reference.resource("ability/"+settings.getStringOr(AbilityUtils.ATTRIBUTE, "").replace(':','_')+"/"+container);
+				Identifier attributeID = Reference.resource("ability/"+settings.getStringOr(AbilityUtils.ATTRIBUTE, "").replace(':','_')+"/"+container);
 				AttributeModifier modifier = new AttributeModifier(attributeID, boost, operation);
 				if (instance.hasModifier(attributeID))
 					instance.removeModifier(attributeID);
@@ -171,7 +171,7 @@ public class Abilities {
 				long progress = Core.get(player.level()).getProgression().getProgress(player.getUUID(), container).getProgressAsNumber();
 				double boost = Math.min((perLevel * (double)progress) + settings.getDoubleOr(AbilityUtils.BASE, 0d), maxBoost);
 				String attribute = player.level().registryAccess()
-						.lookupOrThrow(Registries.ATTRIBUTE).getValue(ResourceLocation.parse(settings.getStringOr(AbilityUtils.ATTRIBUTE, ""))).getDescriptionId();
+						.lookupOrThrow(Registries.ATTRIBUTE).getValue(Identifier.parse(settings.getStringOr(AbilityUtils.ATTRIBUTE, ""))).getDescriptionId();
 				return List.of(
 					LangProvider.ATTRIBUTE_STATUS1.asComponent(
 						Component.translatable(attribute),
@@ -188,7 +188,7 @@ public class Abilities {
 				if (p instanceof ServerPlayer player ) {
 					if (nbt.contains(FNC)) {
 						player.getServer().getFunctions().execute(
-								player.getServer().getFunctions().get(ResourceLocation.parse(nbt.getString(FNC).get())).get(),
+								player.getServer().getFunctions().get(Identifier.parse(nbt.getString(FNC).get())).get(),
 								player.createCommandSourceStack().withSuppressedOutput().withMaximumPermission(2));
 					} else if (nbt.contains(CMD)) {
 						player.getServer().getCommands().performPrefixedCommand(

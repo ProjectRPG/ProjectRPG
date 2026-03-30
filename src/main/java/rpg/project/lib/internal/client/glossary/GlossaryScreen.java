@@ -6,7 +6,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.tabs.Tab;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.fml.LogicalSide;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.data.ObjectType;
@@ -15,7 +15,7 @@ import rpg.project.lib.internal.Core;
 import java.util.Arrays;
 
 public class GlossaryScreen extends Screen {
-    public static final ResourceLocation INWORLD_MENU_BACKGROUND = ResourceLocation.withDefaultNamespace("textures/gui/inworld_menu_background.png");
+    public static final Identifier INWORLD_MENU_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/inworld_menu_background.png");
 
     private DropDownComponent categoryFilterBox;
     private DropDownComponent eventFilterBox;
@@ -23,7 +23,7 @@ public class GlossaryScreen extends Screen {
     private ObjectScroll objectScroll;
 
     private DropDownComponent.SelectionEntry<ObjectType> categorySelection;
-    private DropDownComponent.SelectionEntry<ResourceLocation> eventFilter;
+    private DropDownComponent.SelectionEntry<Identifier> eventFilter;
     private String filterString;
 
     public GlossaryScreen() {super(Component.literal("projectrpg_glossary"));}
@@ -37,7 +37,7 @@ public class GlossaryScreen extends Screen {
             categorySelection = selection;
             filter();
         });
-        eventFilterBox = new DropDownComponent<DropDownComponent.SelectionEntry<ResourceLocation>>(categoryFilterBox.getX(), categoryFilterBox.getY() + 42, filterSectionWidth, Component.literal("event_filter_box"), selection -> {
+        eventFilterBox = new DropDownComponent<DropDownComponent.SelectionEntry<Identifier>>(categoryFilterBox.getX(), categoryFilterBox.getY() + 42, filterSectionWidth, Component.literal("event_filter_box"), selection -> {
            eventFilter = selection;
            filter();
         });

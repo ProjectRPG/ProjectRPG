@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.entity.Entity;
 import rpg.project.lib.api.events.EventContext;
@@ -12,12 +12,12 @@ import rpg.project.lib.internal.registry.EventRegistry;
 
 import java.util.Map;
 
-public record EventConditionEntityMatches(ContextKey<?> param, ResourceLocation value) implements EventCondition {
+public record EventConditionEntityMatches(ContextKey<?> param, Identifier value) implements EventCondition {
     public static final MapCodec<EventConditionEntityMatches> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ResourceLocation.CODEC.fieldOf("entity")
+            Identifier.CODEC.fieldOf("entity")
                     .xmap(rl -> new ContextKey(rl), param -> param.name())
                     .forGetter(EventConditionEntityMatches::param),
-            ResourceLocation.CODEC.fieldOf("value").forGetter(EventConditionEntityMatches::value)
+            Identifier.CODEC.fieldOf("value").forGetter(EventConditionEntityMatches::value)
     ).apply(instance, EventConditionEntityMatches::new));
 
     @Override
@@ -45,8 +45,8 @@ public record EventConditionEntityMatches(ContextKey<?> param, ResourceLocation 
             //TODO consider updating scripting to use a KEYWORD_LABEL syntax to allow marrying values to keywords via labels
             //NOTE_TO_SELF consider "keyword$label"as syntax
             String[] paramValue = value.getOrDefault("matching", "missing,missing").split(",");
-            ResourceLocation entity = ResourceLocation.parse(paramValue.length >= 1 ? paramValue[0] : "prpg:missing_entity_matcher");
-            ResourceLocation target = ResourceLocation.parse(paramValue.length >= 2 ? paramValue[1] : "prpg:missing_entity_match");
+            Identifier entity = Identifier.parse(paramValue.length >= 1 ? paramValue[0] : "prpg:missing_entity_matcher");
+            Identifier target = Identifier.parse(paramValue.length >= 2 ? paramValue[1] : "prpg:missing_entity_match");
             return new EventConditionEntityMatches(new ContextKey<>(entity), target);
         }
     }

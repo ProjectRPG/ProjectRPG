@@ -8,7 +8,7 @@ import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.storage.LevelResource;
@@ -55,8 +55,8 @@ public class DatapackGenerator {
         EVENT(ObjectType.EVENT, server -> server.registryAccess().lookupOrThrow(APIUtils.GAMEPLAY_EVENTS).keySet());
 
         public ObjectType type;
-        public Function<MinecraftServer, Set<ResourceLocation>> provider;
-        Category(ObjectType type, Function<MinecraftServer, Set<ResourceLocation>> provider) {
+        public Function<MinecraftServer, Set<Identifier>> provider;
+        Category(ObjectType type, Function<MinecraftServer, Set<Identifier>> provider) {
             this.type = type;
             this.provider = provider;
         }
@@ -94,10 +94,10 @@ public class DatapackGenerator {
 //                continue;
 //            if ((!category.equals(Category.CONFIGS) && !category.equals(Category.TAGS) && !applyObjects))
 //                continue;
-            Collection<ResourceLocation> filteredList = namespaceFilter.isEmpty() //|| category == Category.TAGS
+            Collection<Identifier> filteredList = namespaceFilter.isEmpty() //|| category == Category.TAGS
                     ? category.provider.apply(server)
                     : category.provider.apply(server).stream().filter(id -> namespaceFilter.contains(id.getNamespace())).toList();
-            for (ResourceLocation id : filteredList) {
+            for (Identifier id : filteredList) {
                 int index = id.getPath().lastIndexOf('/');
                 String pathRoute = id.getPath().substring(0, Math.max(index, 0));
                 Path finalPath = filepath.resolve("data/"+id.getNamespace()+"/"+category.type.getPath()+"/"+pathRoute);

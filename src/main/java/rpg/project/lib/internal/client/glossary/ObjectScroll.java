@@ -16,7 +16,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
@@ -52,7 +52,7 @@ public class ObjectScroll extends ObjectSelectionList<ObjectScroll.Panel> {
     @Override
     public NarrationPriority narrationPriority() {return NarrationPriority.NONE;}
 
-    private static <T> boolean validObject(ObjectType type, ResourceLocation eventFilter, String searchFilter, ResourceLocation objectID, String name, Core core) {
+    private static <T> boolean validObject(ObjectType type, Identifier eventFilter, String searchFilter, Identifier objectID, String name, Core core) {
         if (eventFilter == null && (searchFilter == null || searchFilter.isEmpty())) return true;
         if (searchFilter != null && StringUtils.containsIgnoreCase(name, searchFilter) && !searchFilter.isEmpty()) return true;
         MainSystemConfig config = core.getLoader().getLoader(type).getData(objectID);
@@ -66,7 +66,7 @@ public class ObjectScroll extends ObjectSelectionList<ObjectScroll.Panel> {
         return false;
     }
 
-    public void filter(ObjectType typeFilter, ResourceLocation eventFilter, String searchFilter) {
+    public void filter(ObjectType typeFilter, Identifier eventFilter, String searchFilter) {
         this.clearEntries();
         RegistryAccess reg = Minecraft.getInstance().level.registryAccess();
         Core core = Core.get(LogicalSide.CLIENT);
@@ -112,7 +112,7 @@ public class ObjectScroll extends ObjectSelectionList<ObjectScroll.Panel> {
                     .forEach(entry -> this.addEntry(new Panel(Component.literal(entry.getKey().location().toString()), ObjectType.EVENT)));
         }
         if (typeFilter == null || typeFilter == ObjectType.PLAYER) {
-            if (validObject(ObjectType.ENTITY, eventFilter, searchFilter, ResourceLocation.withDefaultNamespace("player"), Minecraft.getInstance().player.getDisplayName().getString(), core))
+            if (validObject(ObjectType.ENTITY, eventFilter, searchFilter, Identifier.withDefaultNamespace("player"), Minecraft.getInstance().player.getDisplayName().getString(), core))
                 this.addEntry(new Panel(Minecraft.getInstance().player));
         }
     }

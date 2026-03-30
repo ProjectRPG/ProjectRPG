@@ -18,7 +18,7 @@ import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
@@ -53,7 +53,7 @@ public class DataLoader {
 		core.getLoader().all().forEach(loader -> loader.postProcess(event.getLookupProvider()));
 	}
 	
-	public void applyData(ObjectType type, Map<ResourceLocation, MainSystemConfig> data) {
+	public void applyData(ObjectType type, Map<Identifier, MainSystemConfig> data) {
 		loaders.get(type).getData().putAll(data);
 		ObjectType.printData(data);
 	}

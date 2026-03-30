@@ -19,7 +19,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.TagParser;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.fml.LogicalSide;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.abilities.AbilityUtils;
@@ -31,11 +31,11 @@ import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.util.MsLoggy;
 
 public record VanillaAbilityConfigType() implements SubSystemConfigType {
-	public static final ResourceLocation ID = ResourceLocation.withDefaultNamespace("abilities");
+	public static final Identifier ID = Identifier.withDefaultNamespace("abilities");
 	public static final VanillaAbilityConfigType IMPL = new VanillaAbilityConfigType();
 
 	@Override
-	public ResourceLocation getId() {return ID;}
+	public Identifier getId() {return ID;}
 	@Override
 	public MapCodec<SubSystemConfig> getCodec() {
 		return VanillaAbilityConfig.CODEC;

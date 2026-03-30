@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.Event;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -45,7 +45,7 @@ public class EventRegistry {
 			return;
 
 		Core core = Core.get(context.getLevel());
-		ResourceLocation eventID = spec.registryID();
+		Identifier eventID = spec.registryID();
 		MsLoggy.DEBUG.log(LOG_CODE.EVENT, "Firing Event: {} with Context: {}", eventID, context);
 		//Process EVENT gates
 		CancellationType eventCancellationStatus = GateRegistry.isEventPermitted(core, eventID, context);
@@ -60,7 +60,7 @@ public class EventRegistry {
 				
 		//Activate event-specific abilities
 		for (CompoundTag config : core.getAbility().getAbilitiesForContext(core, eventID, context)) {
-			ResourceLocation abilityID = ResourceLocation.parse(config.getStringOr(AbilityUtils.TYPE, ""));
+			Identifier abilityID = Identifier.parse(config.getStringOr(AbilityUtils.TYPE, ""));
 			float gating = GateRegistry.isAbilityPermitted(context.getActor(), core, eventID, context, abilityID);
 			if (gating != GateRegistry.HARD_FAIL) {
 				context.setParam(AbilityUtils.REDUCE, gating);

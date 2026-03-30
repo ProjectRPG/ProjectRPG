@@ -5,7 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.data.MergeableData;
 import rpg.project.lib.api.data.SubSystemConfig;
@@ -16,11 +16,11 @@ import java.util.EnumSet;
 import java.util.Map;
 
 public record VanillaProgressionDataType() implements SubSystemConfigType{
-	public static final ResourceLocation ID = ResourceLocation.withDefaultNamespace("exp");
+	public static final Identifier ID = Identifier.withDefaultNamespace("exp");
 	public static final VanillaProgressionDataType IMPL = new VanillaProgressionDataType();
 
 	@Override
-	public ResourceLocation getId() {return ID;}
+	public Identifier getId() {return ID;}
 	@Override
 	public MapCodec<SubSystemConfig> getCodec() {
 		return VanillaProgressionData.CODEC;

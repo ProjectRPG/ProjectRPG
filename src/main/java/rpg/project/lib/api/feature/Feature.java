@@ -1,6 +1,6 @@
 package rpg.project.lib.api.feature;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.events.EventContext;
 
@@ -26,7 +26,7 @@ import java.util.function.BiPredicate;
 *         by the event and determines if this should be passed back to the event handlers.  The event
  *        ID and context are provided.  Sidedness test should be conducted here.
  */
-public record Feature(ResourceLocation featureID, FeatureFunction execution, BiPredicate<ResourceLocation, EventContext> isValidContext) {
+public record Feature(Identifier featureID, FeatureFunction execution, BiPredicate<Identifier, EventContext> isValidContext) {
 }
 
 

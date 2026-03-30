@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.mojang.datafixers.util.Pair;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.AgeableMob;
@@ -27,19 +27,19 @@ public class EventContext{
 	/**The object type and id for the subject of this event.  Note that other objects can be passed in context,
 	 * however this pair specifically refers to the subject of this event and is used by sub systems to isolate
 	 * relevant parameters*/
-	private final Pair<ObjectType, ResourceLocation> subjectObject;
+	private final Pair<ObjectType, Identifier> subjectObject;
 	/**Populated by {@link ContextBuilder} as immutable properties of the context.  Values added to this map are
 	 * expected to never change and that doing so would create instability in the event sequence.*/
-	private final Map<ResourceLocation, Object> contextParams;
+	private final Map<Identifier, Object> contextParams;
 	/**May be populated with initial values via {@link ContextBuilder}, however this map contains mutable values
 	 * that subsystems can add and modify with {@link #setParam(ContextKey, Object)}.
 	 * Values in this map are typically used for event callbacks where the event exposes properties to a subsystem
 	 * expecting to then re-consume that value at some point in the event.
 	 * <h4>Note: {@link ContextKey} keys in {@link #contextParams} will always be returned instead of the same
 	 * key in this map.  Therefore, it is important to use unique keys in event implementations with similar values.</h4>*/
-	private final Map<ResourceLocation, Object> dynamicParams;
+	private final Map<Identifier, Object> dynamicParams;
 
-	protected EventContext(Pair<ObjectType, ResourceLocation> subjectObject, Map<ResourceLocation, Object> contextParams, Map<ResourceLocation, Object> dynamicParams) {
+	protected EventContext(Pair<ObjectType, Identifier> subjectObject, Map<Identifier, Object> contextParams, Map<Identifier, Object> dynamicParams) {
 		this.subjectObject = subjectObject;
 		this.contextParams = contextParams;
 		this.dynamicParams = dynamicParams;
@@ -57,7 +57,7 @@ public class EventContext{
 	public static final ContextKey<Float> MAGNITUDE = new ContextKey<>(Reference.resource("magnitude"));
 
 	public ObjectType getSubjectType() {return subjectObject.getFirst();}
-	public ResourceLocation getSubjectID() {return subjectObject.getSecond();}
+	public Identifier getSubjectID() {return subjectObject.getSecond();}
 
 	public boolean hasParam(ContextKey<?> param) {
 		return contextParams.containsKey(param.name()) || dynamicParams.containsKey(param.name());
@@ -113,7 +113,7 @@ public class EventContext{
 	 * @return a new {@link ContextBuilder}
 	 * @param <T> the object class of the subject object.
 	 */
-	public static <T> ContextBuilder build(ResourceLocation subjectID, ContextKey<T> subjectParam, T subject, Player actor, LevelAccessor level) {
+	public static <T> ContextBuilder build(Identifier subjectID, ContextKey<T> subjectParam, T subject, Player actor, LevelAccessor level) {
 		return new ContextBuilder(subjectID, subjectParam, subject)
 				.withParam(PLAYER, actor)
 				.withParam(LEVEL, level);
@@ -128,7 +128,7 @@ public class EventContext{
 	 * @return a new {@link ContextBuilder}
 	 */
 	public static ContextBuilder self(Player actor, LevelAccessor level) {
-		return new ContextBuilder(ResourceLocation.withDefaultNamespace("player"), PLAYER, actor)
+		return new ContextBuilder(Identifier.withDefaultNamespace("player"), PLAYER, actor)
 				.withParam(LEVEL, level);
 	}
 
@@ -142,10 +142,10 @@ public class EventContext{
 	}
 
 	public static class ContextBuilder {
-		private final Pair<ObjectType, ResourceLocation> subjectReference;
-		private final Map<ResourceLocation, Object> contextParams = new HashMap<>();
-		private final Map<ResourceLocation, Object> dynamicParams = new HashMap<>();
-		protected <T> ContextBuilder(ResourceLocation subjectID, ContextKey<T> subjectParam, T subject) {
+		private final Pair<ObjectType, Identifier> subjectReference;
+		private final Map<Identifier, Object> contextParams = new HashMap<>();
+		private final Map<Identifier, Object> dynamicParams = new HashMap<>();
+		protected <T> ContextBuilder(Identifier subjectID, ContextKey<T> subjectParam, T subject) {
 			this.subjectReference = Pair.of(getType(subject), subjectID);
 			contextParams.put(subjectParam.name(), subject);
 		}

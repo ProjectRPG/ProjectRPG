@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -74,7 +74,7 @@ public class Core implements Hub {
 	public AbilitySystem getAbility() {return abilitySys;}
 
 	@Override
-	public Optional<SubSystemConfig> getProgressionData(SubSystemConfigType systemType, ObjectType type, ResourceLocation objectID) {
+	public Optional<SubSystemConfig> getProgressionData(SubSystemConfigType systemType, ObjectType type, Identifier objectID) {
 		MergeableCodecDataManager<?> loader = getLoader().getLoader(type);
 		return loader.getData(objectID).progression().stream()
 				.filter(config -> config.getType().equals(systemType))
@@ -82,7 +82,7 @@ public class Core implements Hub {
 	}
 
 	@Override
-	public Optional<SubSystemConfig> getGateData(SubSystemConfigType systemType, ObjectType type, Type gateType, ResourceLocation objectID) {
+	public Optional<SubSystemConfig> getGateData(SubSystemConfigType systemType, ObjectType type, Type gateType, Identifier objectID) {
 		MergeableCodecDataManager<?> loader = getLoader().getLoader(type);
 		return loader.getData(objectID).gates().getOrDefault(gateType, List.of()).stream()
 				.filter(config -> config.getType().equals(systemType))
@@ -90,7 +90,7 @@ public class Core implements Hub {
 	}
 
 	@Override
-	public Optional<SubSystemConfig> getAbilityData(SubSystemConfigType systemType, ObjectType type, ResourceLocation objectID) {
+	public Optional<SubSystemConfig> getAbilityData(SubSystemConfigType systemType, ObjectType type, Identifier objectID) {
 		MergeableCodecDataManager<?> loader = getLoader().getLoader(type);
 		return loader.getData(objectID).abilities().stream()
 				.filter(config -> config.getType().equals(systemType))
@@ -98,7 +98,7 @@ public class Core implements Hub {
 	}
 
 	@Override
-	public List<SubSystemConfig> getFeatureData(ObjectType type, ResourceLocation objectID, ResourceLocation eventID) {
+	public List<SubSystemConfig> getFeatureData(ObjectType type, Identifier objectID, Identifier eventID) {
 		MergeableCodecDataManager<?> loader = getLoader().getLoader(type);
 		MainSystemConfig eventData = (MainSystemConfig) getLoader().getLoader(ObjectType.EVENT).getData(eventID).combine(loader.getData(objectID));
 		return eventData.features();
@@ -106,7 +106,7 @@ public class Core implements Hub {
 
 	//=========ABILITIES METHODS=================
 	//<editor-fold>
-	public void executeAbility(ResourceLocation abilityID, Player player, CompoundTag dataIn, EventContext context, ResourceLocation eventID) {
+	public void executeAbility(Identifier abilityID, Player player, CompoundTag dataIn, EventContext context, Identifier eventID) {
 		if (player == null) return;
 
 		Ability ability = AbilityUtils.get(player.level().registryAccess()).getAbility(abilityID);
@@ -132,7 +132,7 @@ public class Core implements Hub {
 		}
 	}
 
-	private record AbilityCooldown(ResourceLocation abilityID, Player player, CompoundTag src, long lastUse) {
+	private record AbilityCooldown(Identifier abilityID, Player player, CompoundTag src, long lastUse) {
 		public boolean cooledDown(Level level) {
 			return level.getGameTime() > lastUse + src.getIntOr(AbilityUtils.COOLDOWN, 0);
 		}
@@ -154,7 +154,7 @@ public class Core implements Hub {
 	}
 
 	public boolean isAbilityCooledDown(Player player, CompoundTag src) {
-		ResourceLocation abilityID = ResourceLocation.parse(src.getStringOr("ability", ""));
+		Identifier abilityID = Identifier.parse(src.getStringOr("ability", ""));
 		return coolTracker.stream().noneMatch(cd -> cd.player().equals(player) && cd.abilityID().equals(abilityID));
 	}
 	//</editor-fold>

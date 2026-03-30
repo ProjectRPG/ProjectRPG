@@ -8,7 +8,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.client.components.SidePanelContentProvider;
 import rpg.project.lib.api.data.SubSystemConfigType;
@@ -53,7 +53,7 @@ public interface ProgressionSystem<T extends ProgressionDataType> {
 	 * progress value and should not be used to increment progress.  
 	 * Behavior such as increments should be implemented separately and 
 	 * routed through systemic behavior such as the {@link Runnable} used
-	 * by {@link #getProgressionToBeAwarded(Hub, ResourceLocation, EventContext)}.</p>
+	 * by {@link #getProgressionToBeAwarded(Hub, Identifier, EventContext)}.</p>
 	 * 
 	 * @param playerID the unique identifier of the player being modified
 	 * @param container the name of the progress container being modified
@@ -76,7 +76,7 @@ public interface ProgressionSystem<T extends ProgressionDataType> {
 	 * consumer which takes the permission threshold and commits progress for 
 	 * that container
 	 */
-	List<Pair<String, Consumer<Float>>> getProgressionToBeAwarded(Hub core, ResourceLocation eventID, EventContext context);
+	List<Pair<String, Consumer<Float>>> getProgressionToBeAwarded(Hub core, Identifier eventID, EventContext context);
 	
 	/**<p>This method is called once during server startup to set the progression
 	 * commands for the entire ecosystem.  If your implementation works
