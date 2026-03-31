@@ -282,7 +282,7 @@ public class MergeableCodecDataManager<V> extends SimplePreparableReloadListener
 				if (str.startsWith("#")) {
 					lookup.lookupOrThrow(registry).get(TagKey.create(registry, Identifier.parse(str.substring(1))))
 					.ifPresent(holder -> tags.addAll(holder.stream()
-							.map(h -> h.unwrapKey().get().location())
+							.map(h -> h.unwrapKey().get().identifier())
 							.collect(Collectors.toSet())));
 				}
 				else if (str.endsWith(":*")) {

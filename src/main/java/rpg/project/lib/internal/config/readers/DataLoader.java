@@ -38,7 +38,7 @@ import rpg.project.lib.internal.util.MsLoggy;
 import rpg.project.lib.internal.util.MsLoggy.LOG_CODE;
 import rpg.project.lib.internal.util.Reference;
 
-@EventBusSubscriber(modid=Reference.MODID, bus= EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber(modid=Reference.MODID)
 public class DataLoader {
 	public static final Logger DATA_LOGGER = LogManager.getLogger();
 	private final EnumMap<ObjectType, MergeableCodecDataManager<?>> loaders = new EnumMap<>(ObjectType.class);

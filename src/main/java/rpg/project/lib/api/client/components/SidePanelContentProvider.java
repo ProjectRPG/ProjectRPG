@@ -1,7 +1,6 @@
 package rpg.project.lib.api.client.components;
 
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import rpg.project.lib.api.Hub;
 
 /**Provides addons with a means to supply a renderable portion for Project RPG
@@ -15,7 +14,7 @@ public interface SidePanelContentProvider {
      * this method are limited by a scissor operation to not draw outside of the
      * provided bounds.
      *
-     * @param pGuiGraphics the {@link GuiGraphics} instance used by the rendering GUI
+     * @param pGuiGraphics the {@link GuiGraphicsExtractor} instance used by the rendering GUI
      * @param top the Y position where this panel is placed on the screen
      * @param left the X position where this panel is placed on the screen
      * @param width the width of the renderable area
@@ -24,5 +23,5 @@ public interface SidePanelContentProvider {
      * @param pPartialTick the partial ticks of the rendering GUI
      * @param core the client's instance of the {@link Hub} object
      */
-    void render(GuiGraphics pGuiGraphics, int top, int left, int width, int height, double scale, float pPartialTick, Hub core);
+    void render(GuiGraphicsExtractor pGuiGraphics, int top, int left, int width, int height, double scale, float pPartialTick, Hub core);
 }

@@ -110,7 +110,7 @@ public class Functions {
                     .filter(entry -> entry.getValue().getDefaultInstance().get(DataComponents.FOOD) instanceof FoodProperties props
                             && ops.getFirst().evaluation.test(Integer.valueOf(props.nutrition()).floatValue(), values.getFirst())
                             && ops.getSecond().evaluation.test(props.saturation(), values.getSecond()))
-                    .map(entry -> entry.getKey().location())
+                    .map(entry -> entry.getKey().identifier())
                     .toList();
             return new TargetSelector.Selection(ObjectType.ITEM, food);
         });
@@ -119,14 +119,14 @@ public class Functions {
             if (param.isEmpty())
                 tools.addAll(access.lookupOrThrow(Registries.ITEM).entrySet().stream()
                         .filter(entry -> entry.getValue().components().has(DataComponents.TOOL))
-                        .map(entry -> entry.getKey().location())
+                        .map(entry -> entry.getKey().identifier())
                         .toList());
             else {
                 Identifier tag = Reference.resource(param);
                 tools.addAll(access.lookupOrThrow(Registries.ITEM).get(TagKey.create(Registries.ITEM, tag))
                         .map(named -> named.stream()
                                 .filter(holder -> holder.value().components().has(DataComponents.TOOL))
-                                .map(holder -> holder.getKey().location()).toList())
+                                .map(holder -> holder.getKey().identifier()).toList())
                         .orElse(List.of()));
             }
             return new TargetSelector.Selection(ObjectType.ITEM, tools);
@@ -138,7 +138,7 @@ public class Functions {
                         .filter(entry -> entry.getValue().components().has(DataComponents.EQUIPPABLE) &&
                                 entry.getValue().components().get(DataComponents.EQUIPPABLE).slot() != EquipmentSlot.OFFHAND &&
                                 entry.getValue().components().get(DataComponents.EQUIPPABLE).slot() != EquipmentSlot.MAINHAND)
-                        .map(entry -> entry.getKey().location())
+                        .map(entry -> entry.getKey().identifier())
                         .toList());
             else {
                 Identifier tag = Reference.resource(param);
@@ -147,7 +147,7 @@ public class Functions {
                                 .filter(entry -> entry.value().components().has(DataComponents.EQUIPPABLE) &&
                                         entry.value().components().get(DataComponents.EQUIPPABLE).slot() != EquipmentSlot.OFFHAND &&
                                         entry.value().components().get(DataComponents.EQUIPPABLE).slot() != EquipmentSlot.MAINHAND)
-                                .map(holder -> holder.getKey().location()).toList())
+                                .map(holder -> holder.getKey().identifier()).toList())
                         .orElse(List.of()));
             }
             return new TargetSelector.Selection(ObjectType.ITEM, tools);
@@ -157,14 +157,14 @@ public class Functions {
             if (param.isEmpty())
                 tools.addAll(access.lookupOrThrow(Registries.ITEM).entrySet().stream()
                         .filter(entry -> entry.getValue().components().has(DataComponents.DAMAGE))
-                        .map(entry -> entry.getKey().location())
+                        .map(entry -> entry.getKey().identifier())
                         .toList());
             else {
                 Identifier tag = Reference.resource(param);
                 tools.addAll(access.lookupOrThrow(Registries.ITEM).get(TagKey.create(Registries.ITEM, tag))
                         .map(named -> named.stream()
                                 .filter(holder -> holder.value().components().has(DataComponents.DAMAGE))
-                                .map(holder -> holder.getKey().location()).toList())
+                                .map(holder -> holder.getKey().identifier()).toList())
                         .orElse(List.of()));
             }
             return new TargetSelector.Selection(ObjectType.ITEM, tools);

@@ -47,7 +47,7 @@ public class RegistryUtil {
 	}
 
 	public static Identifier getId(Holder<?> biome) {
-		return biome.unwrapKey().get().location();
+		return biome.unwrapKey().get().identifier();
 	}
 
 	public static Identifier getId(SoundEvent sound) {

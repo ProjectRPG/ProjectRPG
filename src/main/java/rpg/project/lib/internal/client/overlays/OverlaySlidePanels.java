@@ -2,18 +2,18 @@ package rpg.project.lib.internal.client.overlays;
 
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.LayeredDraw;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.neoforged.fml.LogicalSide;
+import net.neoforged.neoforge.client.gui.GuiLayer;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import rpg.project.lib.api.client.components.SidePanelContentProvider;
 import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.config.Config;
 import rpg.project.lib.internal.util.Reference;
 
-public class OverlaySlidePanels implements LayeredDraw.Layer {
+public class OverlaySlidePanels implements GuiLayer {
     protected static final Identifier TEXTURE_LOCATION = Reference.resource("textures/overlay_background.png");
 
     private SidePanelContentProvider provider;
@@ -37,7 +37,7 @@ public class OverlaySlidePanels implements LayeredDraw.Layer {
     }
 
     @Override
-    public void render(GuiGraphics pGuiGraphics, DeltaTracker pDeltaTracker) {
+    public void render(GuiGraphicsExtractor pGuiGraphics, DeltaTracker pDeltaTracker) {
         final int anchorX = (int)((pGuiGraphics.guiWidth() * ratioX) - openAmount);
         final int anchorY = (int)(pGuiGraphics.guiHeight() * ratioY);
         final int height = (int)(pGuiGraphics.guiHeight() * ratioHeight);
@@ -45,7 +45,7 @@ public class OverlaySlidePanels implements LayeredDraw.Layer {
         final double scale = Minecraft.getInstance().getWindow().getGuiScale();
         final int offset = scale == 1d ? 20 : 10;
         setExtensionValue(width);
-        pGuiGraphics.blit(RenderType::guiTexturedOverlay, TEXTURE_LOCATION, anchorX, anchorY, 0, 0, width, height, width, height);
+        pGuiGraphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE_LOCATION, anchorX, anchorY, 0, 0, width, height, width, height);
         //Constrain and render the delegated content.
         pGuiGraphics.enableScissor(anchorX + offset, anchorY + offset, anchorX + width - offset, anchorY + height - offset);
         provider.render(pGuiGraphics, anchorY + offset, anchorX + offset, width, height, scale, pDeltaTracker.getGameTimeDeltaPartialTick(true), core);

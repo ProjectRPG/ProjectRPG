@@ -201,7 +201,7 @@ public record Ability(
         if (src.contains(AbilityUtils.COOLDOWN) && !Core.get(player.level()).isAbilityCooledDown(player, src)) {
             return false;
         }
-        if (src.contains(AbilityUtils.CHANCE) && src.getDoubleOr(AbilityUtils.CHANCE, 0d) < player.level().random.nextDouble()) {
+        if (src.contains(AbilityUtils.CHANCE) && src.getDoubleOr(AbilityUtils.CHANCE, 0d) < player.level().getRandom().nextDouble()) {
             return false;
         }
         if (src.contains(AbilityUtils.CONTAINER_NAME)) {            

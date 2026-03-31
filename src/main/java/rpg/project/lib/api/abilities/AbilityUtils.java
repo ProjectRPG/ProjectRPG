@@ -11,15 +11,9 @@ import java.util.function.Supplier;
 
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.fml.LogicalSide;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import rpg.project.lib.api.APIUtils;
-import rpg.project.lib.api.data.SubSystemConfigType;
-import rpg.project.lib.api.enums.RegistrationSide;
 import rpg.project.lib.api.events.EventContext;
-import rpg.project.lib.internal.Core;
-import rpg.project.lib.internal.registry.SubSystemCodecRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
 import rpg.project.lib.internal.util.Reference;
 
@@ -95,7 +89,7 @@ public class AbilityUtils {
         public List<CompoundTag> getDefaults() {
             return registry().entrySet().stream().map(entry -> {
                 var nbt = entry.getValue().propertyDefaults().copy();
-                nbt.putString(AbilityUtils.TYPE, entry.getKey().location().toString());
+                nbt.putString(AbilityUtils.TYPE, entry.getKey().identifier().toString());
                 return nbt;
             }).toList();
         }

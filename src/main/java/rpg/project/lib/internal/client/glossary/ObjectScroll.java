@@ -6,7 +6,7 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
@@ -73,43 +73,43 @@ public class ObjectScroll extends ObjectSelectionList<ObjectScroll.Panel> {
 
         if (typeFilter == null || typeFilter == ObjectType.ITEM) {
             reg.lookupOrThrow(Registries.ITEM).entrySet().stream()
-                    .filter(item -> validObject(ObjectType.ITEM, eventFilter, searchFilter, item.getKey().location(), item.getValue().getDefaultInstance().getDisplayName().getString(), core))
+                    .filter(item -> validObject(ObjectType.ITEM, eventFilter, searchFilter, item.getKey().identifier(), item.getValue().getDefaultInstance().getDisplayName().getString(), core))
                     .forEach(item -> this.addEntry(new Panel(item.getValue().getDefaultInstance())));
         }
         if (typeFilter == null || typeFilter == ObjectType.BLOCK) {
             reg.lookupOrThrow(Registries.BLOCK).entrySet().stream()
-                    .filter(entry -> validObject(ObjectType.BLOCK, eventFilter, searchFilter, entry.getKey().location(), entry.getValue().getName().getString(), core))
+                    .filter(entry -> validObject(ObjectType.BLOCK, eventFilter, searchFilter, entry.getKey().identifier(), entry.getValue().getName().getString(), core))
                     .forEach(block -> this.addEntry(new Panel(block.getValue())));
         }
         if (typeFilter == null || typeFilter == ObjectType.ENTITY) {
             reg.lookupOrThrow(Registries.ENTITY_TYPE).entrySet().stream()
-                    .filter(entry -> validObject(ObjectType.ENTITY, eventFilter, searchFilter, entry.getKey().location(), entry.getValue().getDescription().getString(), core))
+                    .filter(entry -> validObject(ObjectType.ENTITY, eventFilter, searchFilter, entry.getKey().identifier(), entry.getValue().getDescription().getString(), core))
                     .forEach(entity -> this.addEntry(new Panel(entity.getValue())));
         }
         if (typeFilter == null || typeFilter == ObjectType.DIMENSION) {
             Minecraft.getInstance().getConnection().levels().stream()
-                    .filter(level -> validObject(ObjectType.DIMENSION, eventFilter, searchFilter, level.location(), level.location().toString(), core))
-                    .forEach(key -> this.addEntry(new Panel(Component.literal(key.location().toString()), ObjectType.DIMENSION)));
+                    .filter(level -> validObject(ObjectType.DIMENSION, eventFilter, searchFilter, level.identifier(), level.identifier().toString(), core))
+                    .forEach(key -> this.addEntry(new Panel(Component.literal(key.identifier().toString()), ObjectType.DIMENSION)));
         }
         if (typeFilter == null || typeFilter == ObjectType.BIOME) {
             reg.lookupOrThrow(Registries.BIOME).entrySet().stream()
-                    .filter(entry -> validObject(ObjectType.BIOME, eventFilter, searchFilter, entry.getKey().location(), entry.getKey().location().toString(), core))
-                    .forEach(entry -> this.addEntry(new Panel(Component.literal(entry.getKey().location().toString()), ObjectType.BIOME)));
+                    .filter(entry -> validObject(ObjectType.BIOME, eventFilter, searchFilter, entry.getKey().identifier(), entry.getKey().identifier().toString(), core))
+                    .forEach(entry -> this.addEntry(new Panel(Component.literal(entry.getKey().identifier().toString()), ObjectType.BIOME)));
         }
         if (typeFilter == null || typeFilter == ObjectType.ENCHANTMENT) {
             reg.lookupOrThrow(Registries.ENCHANTMENT).entrySet().stream()
-                    .filter(entry -> validObject(ObjectType.ENCHANTMENT, eventFilter, searchFilter, entry.getKey().location(), entry.getValue().description().getString(), core))
+                    .filter(entry -> validObject(ObjectType.ENCHANTMENT, eventFilter, searchFilter, entry.getKey().identifier(), entry.getValue().description().getString(), core))
                     .forEach(entry -> this.addEntry(new Panel(entry.getValue().description(), ObjectType.ENCHANTMENT)));
         }
         if (typeFilter == null || typeFilter == ObjectType.EFFECT) {
             reg.lookupOrThrow(Registries.MOB_EFFECT).entrySet().stream()
-                    .filter(entry -> validObject(ObjectType.EFFECT, eventFilter, searchFilter, entry.getKey().location(), entry.getValue().getDisplayName().getString(), core))
+                    .filter(entry -> validObject(ObjectType.EFFECT, eventFilter, searchFilter, entry.getKey().identifier(), entry.getValue().getDisplayName().getString(), core))
                     .forEach(entry -> this.addEntry(new Panel(entry.getValue().getDisplayName(), ObjectType.EFFECT)));
         }
         if (typeFilter == null || typeFilter == ObjectType.EVENT) {
             reg.lookupOrThrow(APIUtils.GAMEPLAY_EVENTS).entrySet().stream()
-                    .filter(entry -> validObject(ObjectType.EVENT, eventFilter, searchFilter, entry.getKey().location(), entry.getKey().location().toString(), core))
-                    .forEach(entry -> this.addEntry(new Panel(Component.literal(entry.getKey().location().toString()), ObjectType.EVENT)));
+                    .filter(entry -> validObject(ObjectType.EVENT, eventFilter, searchFilter, entry.getKey().identifier(), entry.getKey().identifier().toString(), core))
+                    .forEach(entry -> this.addEntry(new Panel(Component.literal(entry.getKey().identifier().toString()), ObjectType.EVENT)));
         }
         if (typeFilter == null || typeFilter == ObjectType.PLAYER) {
             if (validObject(ObjectType.ENTITY, eventFilter, searchFilter, Identifier.withDefaultNamespace("player"), Minecraft.getInstance().player.getDisplayName().getString(), core))
@@ -128,12 +128,12 @@ public class ObjectScroll extends ObjectSelectionList<ObjectScroll.Panel> {
         }
         public Panel(ItemStack stack) {
             this.text = stack.getDisplayName();
-            this.renderer = (graphics, x, y) -> graphics.renderItem(stack, x, y);
+            this.renderer = (graphics, x, y) -> graphics.item(stack, x, y);
             this.type = ObjectType.ITEM;
         }
         public Panel(Block block) {
             this.text = block.getName();
-            this.renderer = (graphics, x, y) -> graphics.renderItem(block.asItem().getDefaultInstance(), x, y);
+            this.renderer = (graphics, x, y) -> graphics.item(block.asItem().getDefaultInstance(), x, y);
             this.type = ObjectType.BLOCK;
         }
         public Panel(EntityType<?> entity) {
@@ -153,15 +153,15 @@ public class ObjectScroll extends ObjectSelectionList<ObjectScroll.Panel> {
         public Component getNarration() {return text;}
 
         @Override
-        public void render(GuiGraphics pGuiGraphics, int pIndex, int pTop, int pLeft, int pWidth, int pHeight, int pMouseX, int pMouseY, boolean pHovering, float pPartialTick) {
+        public void extractContent(GuiGraphicsExtractor pGuiGraphics, int x, int y, boolean pHovering, float pPartialTick) {
             if (renderer != null)
-                renderer.render(pGuiGraphics, pLeft, pTop);
-            pGuiGraphics.drawScrollingString(font, text, pLeft + 20, pLeft+pWidth - 6, pTop + 2, 0xFFFFFF);
+                renderer.render(pGuiGraphics, x, y);
+            pGuiGraphics.drawScrollingString(pGuiGraphics.textRenderer(), font, text, x + 20, this.getContentRight(), y + 2);
         }
     }
 
     @FunctionalInterface
     private interface PanelRenderer {
-        void render(GuiGraphics guiGraphics, int x, int y);
+        void render(GuiGraphicsExtractor guiGraphics, int x, int y);
     }
 }

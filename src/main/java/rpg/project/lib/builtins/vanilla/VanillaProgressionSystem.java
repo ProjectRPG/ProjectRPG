@@ -8,6 +8,9 @@ import java.util.function.Consumer;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataProvider;
+import net.minecraft.server.permissions.LevelBasedPermissionSet;
+import net.minecraft.server.permissions.PermissionLevel;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.level.saveddata.SavedDataType;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -140,7 +143,7 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 		public static OfflineProgress get() {
 			return ServerLifecycleHooks.getCurrentServer() == null ? new OfflineProgress()
 					: ServerLifecycleHooks.getCurrentServer().overworld().getDataStorage().computeIfAbsent(
-							new SavedDataType<OfflineProgress>("prpg_vanilla_progress_data", OfflineProgress::new, CODEC, null));
+							new SavedDataType<>(Identifier.fromNamespaceAndPath("prpg","vanilla_progress_data"), OfflineProgress::new, CODEC, null));
 		}
 		
 		private OfflineProgress() {
@@ -156,7 +159,7 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 	@Override
 	public LiteralArgumentBuilder<CommandSourceStack> getCommands() {
 		return Commands.literal("xp")
-				.requires(ctx -> ctx.hasPermission(2))
+				.requires(ctx -> ctx.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))
 				.then(Commands.argument(PLAYERS, EntityArgument.players())
 					.then(Commands.literal("set")
 						.then(Commands.argument(AMOUNT, IntegerArgumentType.integer())

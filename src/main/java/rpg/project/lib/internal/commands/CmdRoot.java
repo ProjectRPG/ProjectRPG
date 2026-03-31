@@ -15,6 +15,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.fml.LogicalSide;
 import rpg.project.lib.internal.Core;
@@ -107,7 +108,7 @@ public class CmdRoot {
 				.then(Commands.argument(NAME, StringArgumentType.word())
 					.executes(ctx -> {
 						for (UUID playerID : Core.get(LogicalSide.SERVER).getParty().getPartyMembers(StringArgumentType.getString(ctx, NAME))) {
-							String name = ctx.getSource().getServer().getProfileCache().get(playerID).get().getName();
+							Component name = ctx.getSource().getServer().getPlayerList().getPlayer(playerID).getName();
 							ctx.getSource().sendSuccess(() -> LangProvider.PARTY_LIST_SUCCESS.asComponent(name), false);
 						}
 						return 0;
@@ -124,7 +125,7 @@ public class CmdRoot {
 					return 0;
 				}))
 			.then(Commands.literal("join")
-				.requires(ctx -> ctx.hasPermission(2))
+				.requires(ctx -> ctx.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))
 				.then(Commands.argument(PLAYER, EntityArgument.players())
 					.then(Commands.argument(NAME, StringArgumentType.word())
 						.executes(ctx -> {

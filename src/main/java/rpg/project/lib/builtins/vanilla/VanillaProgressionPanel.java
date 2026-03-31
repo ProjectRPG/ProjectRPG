@@ -2,7 +2,7 @@ package rpg.project.lib.builtins.vanilla;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import rpg.project.lib.api.Hub;
@@ -26,10 +26,10 @@ public class VanillaProgressionPanel implements SidePanelContentProvider {
             gainList.remove(1);
     }
     @Override
-    public void render(GuiGraphics pGuiGraphics, int top, int left, int width, int height, double scale, float pPartialTick, Hub core) {
+    public void render(GuiGraphicsExtractor pGuiGraphics, int top, int left, int width, int height, double scale, float pPartialTick, Hub core) {
         int limit = scale == 1d ? 20 : 10;
         for (int i = 0; i < gainList.size() && i < limit; i++) {
-            pGuiGraphics.drawScrollingString(mc.font, gainList.get(i), left, width - left, top + (i * 12), 0xFFFFFF);
+            pGuiGraphics.drawScrollingString(pGuiGraphics.textRenderer(), mc.font, gainList.get(i).withColor(0xFFFFFF), left, width - left, top + (i * 12));
         }
     }
 }

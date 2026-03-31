@@ -48,7 +48,7 @@ import rpg.project.lib.internal.setup.datagen.LangProvider;
 import rpg.project.lib.internal.setup.datagen.LangProvider.Locale;
 import rpg.project.lib.internal.util.Reference;
 
-@EventBusSubscriber(modid=Reference.MODID, bus= EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber(modid=Reference.MODID)
 public class CommonSetup {
 	public static final DeferredRegister<SubSystemConfigType> CODECS = DeferredRegister.create(APIUtils.SUBSYSTEM_CODECS, Reference.MODID);
 	public static final DeferredRegister<Feature> FEATURES = DeferredRegister.create(APIUtils.FEATURE, Reference.MODID);

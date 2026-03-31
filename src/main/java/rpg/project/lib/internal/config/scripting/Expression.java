@@ -96,7 +96,7 @@ public record Expression(
         var reg = access.lookupOrThrow(registry);
         return forTags
                 ? reg.get(TagKey.create(registry, tagID))
-                .map(named -> named.stream().map(holder -> holder.unwrapKey().get().location()).toList())
+                .map(named -> named.stream().map(holder -> holder.unwrapKey().get().identifier()).toList())
                 .orElse(List.of())
                 : reg.keySet().stream().filter(id -> id.getNamespace().equals(tagID.getNamespace())).toList();
     }

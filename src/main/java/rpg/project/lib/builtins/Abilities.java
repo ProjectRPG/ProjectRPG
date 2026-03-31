@@ -18,6 +18,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
@@ -187,12 +188,12 @@ public class Abilities {
 			.setStart((p, nbt, context) -> {
 				if (p instanceof ServerPlayer player ) {
 					if (nbt.contains(FNC)) {
-						player.getServer().getFunctions().execute(
-								player.getServer().getFunctions().get(Identifier.parse(nbt.getString(FNC).get())).get(),
-								player.createCommandSourceStack().withSuppressedOutput().withMaximumPermission(2));
+						player.level().getServer().getFunctions().execute(
+								player.level().getServer().getFunctions().get(Identifier.parse(nbt.getString(FNC).get())).get(),
+								player.createCommandSourceStack().withSuppressedOutput().withMaximumPermission(LevelBasedPermissionSet.GAMEMASTER));
 					} else if (nbt.contains(CMD)) {
-						player.getServer().getCommands().performPrefixedCommand(
-								player.createCommandSourceStack().withSuppressedOutput().withMaximumPermission(2),
+						player.level().getServer().getCommands().performPrefixedCommand(
+								player.createCommandSourceStack().withSuppressedOutput().withMaximumPermission(LevelBasedPermissionSet.GAMEMASTER),
 								nbt.getString(CMD).get());
 					}
 				}

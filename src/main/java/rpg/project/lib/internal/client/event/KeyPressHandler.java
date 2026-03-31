@@ -10,7 +10,7 @@ import rpg.project.lib.internal.config.Config;
 import rpg.project.lib.internal.setup.ClientSetup;
 import rpg.project.lib.internal.util.Reference;
 
-@EventBusSubscriber(modid = Reference.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Reference.MODID, value = Dist.CLIENT)
 public class KeyPressHandler {
     @SubscribeEvent
     public static void keyPressEvent(InputEvent.Key event) {

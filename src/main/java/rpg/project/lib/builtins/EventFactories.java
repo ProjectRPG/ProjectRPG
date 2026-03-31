@@ -21,7 +21,7 @@ import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import net.neoforged.neoforge.event.entity.living.LivingHealEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
-import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
+import net.neoforged.neoforge.event.entity.player.AnvilCraftEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEnchantItemEvent;
@@ -30,7 +30,6 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rpg.project.lib.api.abilities.AbilityUtils;
-import rpg.project.lib.api.events.DelegatedEventListenerSpecification;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.EventListenerSpecification;
 import rpg.project.lib.api.events.EventProvider;
@@ -70,7 +69,7 @@ public class EventFactories {
 		VALUES.add(new EventListenerSpecification<>(
 				Reference.resource("anvil_repair"),
 				EventPriority.LOWEST,
-				AnvilRepairEvent.class,
+				AnvilCraftEvent.class,
 				context -> true,
 				event -> EventContext.build(RegistryUtil.getId(event.getOutput()), EventContext.ITEMSTACK, event.getOutput(), event.getEntity(), event.getEntity().level()).create(),
 				(e, v) -> {},

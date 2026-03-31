@@ -1,19 +1,17 @@
 package rpg.project.lib.internal.client.glossary;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.locale.Language;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import rpg.project.lib.internal.util.Reference;
 
@@ -48,29 +46,27 @@ public class DropDownComponent<T extends DropDownComponent.SelectionEntry<?>> ex
     }
 
     @Override
-    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        //graphics.setColor(1.0F, 1.0F, 1.0F, this.alpha);
-//        RenderSystem.enableBlend();
-//        RenderSystem.enableDepthTest();
+    public void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
         Identifier location = BUTTON_SPRITES.get(this.isActive(), this.isMouseOver(mouseX, mouseY));
-        graphics.blitSprite(RenderType::guiTextured, location, this.getX(), this.getY(), this.getWidth(), this.getHeight()/*, 20, 4, 200, 20, 0, 66*/);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, location, this.getX(), this.getY(), this.getWidth(), this.getHeight()/*, 20, 4, 200, 20, 0, 66*/);
 
         if (selected != null)
-            selected.render(graphics, getX(), getY(), getX() + width - 20, false, getFGColor(), alpha);
-        else
-            graphics.drawScrollingString(font, title, getX() + 6, getX() + width - 20, getY() + (height - 8) / 2, getFGColor() | Mth.ceil(alpha * 255.0F) << 24);
+            selected.render(graphics, getX(), getY(), width, false, getFGColor(), alpha);
+        else {
+            graphics.enableScissor(this.getX(), this.getY(), this.getRight(), this.getBottom());
+            graphics.textRenderer().accept(TextAlignment.LEFT,getX() + 6, getY() + (height - 8) / 2, title.copy().withColor(getFGColor() | Mth.ceil(alpha * 255.0F) << 24));
+            graphics.disableScissor();
+        }
 
         if (extended) {
-            graphics.pose().pushPose();
-            graphics.pose().translate(0, 0, 500);
+            graphics.pose().translate(0, 0);
 
             int boxHeight = Math.max(1, ENTRY_HEIGHT * Math.min(entries.size(), 4)) + 2;
 
-            graphics.fill(RenderType.gui(), getX(),     getY() + ENTRY_HEIGHT - 1, getX() + width,     getY() + ENTRY_HEIGHT + boxHeight - 1, 0xFFFFFFFF);
-            graphics.fill(RenderType.gui(), getX() + 1, getY() + ENTRY_HEIGHT,     getX() + width - 1, getY() + ENTRY_HEIGHT + boxHeight - 2, 0xFF000000);
+            graphics.fill(RenderPipelines.GUI, getX(),     getY() + ENTRY_HEIGHT - 1, getX() + width,     getY() + ENTRY_HEIGHT + boxHeight - 1, 0xFFFFFFFF);
+            graphics.fill(RenderPipelines.GUI, getX() + 1, getY() + ENTRY_HEIGHT,     getX() + width - 1, getY() + ENTRY_HEIGHT + boxHeight - 2, 0xFF000000);
 
-            graphics.blitSprite(RenderType::guiTextured, SORT_UP_SPRITE, getX() + width - 22, getY() + 1, 20, 18);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SORT_UP_SPRITE, getX() + width - 22, getY() + 1, 20, 18);
 
             T hoverEntry = getEntryAtPosition(mouseX, mouseY);
 
@@ -90,14 +86,12 @@ public class DropDownComponent<T extends DropDownComponent.SelectionEntry<?>> ex
                 int barHeight = (int)(ENTRY_HEIGHT * 4 * scale + 1);
                 int scrollBotY = Math.min(scrollY + barHeight, getY() + ENTRY_HEIGHT + boxHeight - 2);
 
-                graphics.fill(RenderType.gui(), getX() + width - 5, scrollY,     getX() + width - 1, scrollBotY,     0xFF666666);
-                graphics.fill(RenderType.gui(), getX() + width - 4, scrollY + 1, getX() + width - 2, scrollBotY - 1, 0xFFAAAAAA);
+                graphics.fill(RenderPipelines.GUI, getX() + width - 5, scrollY,     getX() + width - 1, scrollBotY,     0xFF666666);
+                graphics.fill(RenderPipelines.GUI, getX() + width - 4, scrollY + 1, getX() + width - 2, scrollBotY - 1, 0xFFAAAAAA);
             }
-
-            graphics.pose().popPose();
         }
         else {
-            graphics.blitSprite(RenderType::guiTextured, SORT_DOWN_SPRITE, getX() + width - 22, getY() + 1, 20, 18);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SORT_DOWN_SPRITE, getX() + width - 22, getY() + 1, 20, 18);
         }
     }
 
@@ -112,14 +106,14 @@ public class DropDownComponent<T extends DropDownComponent.SelectionEntry<?>> ex
     public boolean isExtended() { return extended; }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (active && mouseX >= getX() && mouseX <= getX() + width && mouseY >= getY() && mouseY <= getY() + getHeight()) {
+    public boolean mouseClicked(MouseButtonEvent mouseEvent, boolean doubleClicked) {
+        if (active && mouseEvent.x() >= getX() && mouseEvent.x() <= getX() + width && mouseEvent.y() >= getY() && mouseEvent.y() <= getY() + getHeight()) {
             int maxX = getX() + width - (entries.size() > 4 ? 5 : 0);
             int maxY = getY() + ENTRY_HEIGHT * Math.min(entries.size() + 1, 5);
-            if (extended && mouseX < maxX && mouseY > (getY() + ENTRY_HEIGHT) && mouseY < maxY)
-                setSelected(getEntryAtPosition(mouseX, mouseY), true);
+            if (extended && mouseEvent.x() < maxX && mouseEvent.y() > (getY() + ENTRY_HEIGHT) && mouseEvent.y() < maxY)
+                setSelected(getEntryAtPosition(mouseEvent.x(), mouseEvent.y()), true);
 
-            if ((mouseY < getY() + ENTRY_HEIGHT && mouseX < getX() + width) || mouseX < maxX) {
+            if ((mouseEvent.y() < getY() + ENTRY_HEIGHT && mouseEvent.x() < getX() + width) || mouseEvent.x() < maxX) {
                 extended = !extended;
                 scrollOffset = 0;
             }
@@ -132,7 +126,7 @@ public class DropDownComponent<T extends DropDownComponent.SelectionEntry<?>> ex
         extended = false;
         scrollOffset = 0;
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(mouseEvent, doubleClicked);
     }
 
     @Override
@@ -172,15 +166,12 @@ public class DropDownComponent<T extends DropDownComponent.SelectionEntry<?>> ex
             selectCallback.accept(selected);
     }
 
-    public T getSelected() { return selected; }
-
     public Stream<T> stream() { return entries.stream(); }
 
     @Override
     protected void updateWidgetNarration(NarrationElementOutput pNarrationElementOutput) { }
 
     public static class SelectionEntry<T> implements GuiEventListener {
-        private Font font = Minecraft.getInstance().font;
         public final Component message;
         public T reference;
 
@@ -189,12 +180,11 @@ public class DropDownComponent<T extends DropDownComponent.SelectionEntry<?>> ex
             this.reference = reference;
         }
 
-        public void render(GuiGraphics graphics, int x, int y, int width, boolean hovered, int fgColor, float alpha) {
+        public void render(GuiGraphicsExtractor graphics, int x, int y, int width, boolean hovered, int fgColor, float alpha) {
             if (hovered)
-                graphics.fill(RenderType.gui(), x, y, x + width, y + ENTRY_HEIGHT, 0xFFA0A0A0);
+                graphics.fill(RenderPipelines.GUI, x, y, x + width, y + ENTRY_HEIGHT, 0xFFA0A0A0);
 
-//            FormattedCharSequence text = Language.getInstance().getVisualOrder(FormattedText.composite(font.substrByWidth(message, width - 12)));
-            graphics.drawScrollingString(font, message, x + 6, width, y + 6, fgColor | Mth.ceil(alpha * 255.0F) << 24);
+            graphics.textRenderer().accept(TextAlignment.LEFT, x + 6, y + 6, message.copy().withColor(fgColor | Mth.ceil(alpha * 255.0F) << 24));
         }
 
         @Override

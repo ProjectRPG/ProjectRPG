@@ -1,16 +1,13 @@
 package rpg.project.lib.internal.client.glossary;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.tabs.Tab;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.neoforged.fml.LogicalSide;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.data.ObjectType;
-import rpg.project.lib.internal.Core;
 
 import java.util.Arrays;
 
@@ -62,17 +59,17 @@ public class GlossaryScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
-        pGuiGraphics.drawString(this.font, Component.literal("Category Filter"), categoryFilterBox.getX(), categoryFilterBox.getY() - 12, 0xFFFFFF);
-        pGuiGraphics.drawString(this.font, Component.literal("Event Filter"), eventFilterBox.getX(), eventFilterBox.getY() - 12, 0xFFFFFF);
-        pGuiGraphics.drawString(this.font, Component.literal("Item Search"), searchBox.getX(), searchBox.getY() - 12, 0xFFFFFF);
+    public void extractRenderState(GuiGraphicsExtractor pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        super.extractRenderState(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+        pGuiGraphics.textRenderer().accept(categoryFilterBox.getX(), categoryFilterBox.getY() - 12, Component.literal("Category Filter").withColor(0xFFFFFF));
+        pGuiGraphics.textRenderer().accept(eventFilterBox.getX(), eventFilterBox.getY() - 12, Component.literal("Event Filter").withColor(0xFFFFFF));
+        pGuiGraphics.textRenderer().accept(searchBox.getX(), searchBox.getY() - 12, Component.literal("Item Search").withColor(0xFFFFFF));
     }
 
     @Override
-    public void renderBackground(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        super.renderBackground(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
-        renderMenuBackgroundTexture(pGuiGraphics, INWORLD_MENU_BACKGROUND, 5, 5, 0.0F, 0.0F, (this.width/5) + 10, this.height-10);
+    public void extractBackground(GuiGraphicsExtractor pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        super.extractBackground(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+        extractMenuBackgroundTexture(pGuiGraphics, INWORLD_MENU_BACKGROUND, 5, 5, 0.0F, 0.0F, (this.width/5) + 10, this.height-10);
     }
 
     /**Passes through the current filter values to the object list box to update its filtering*/

@@ -12,7 +12,7 @@ import rpg.project.lib.internal.config.Config;
 import rpg.project.lib.internal.setup.datagen.LangProvider;
 import rpg.project.lib.internal.util.Reference;
 
-@EventBusSubscriber(modid=Reference.MODID, bus=EventBusSubscriber.Bus.MOD, value= Dist.CLIENT)
+@EventBusSubscriber(modid=Reference.MODID, value= Dist.CLIENT)
 public class ClientSetup {
     @SubscribeEvent
     public static void registerOverlay(RegisterGuiLayersEvent event) {
@@ -20,9 +20,10 @@ public class ClientSetup {
         event.registerAboveAll(Reference.resource("abilities_overlay"), new OverlaySlidePanels(true, 0.1, 0.65, 0.4, Config.ABILITY_MENU_OPEN));
     }
 
-    public static final KeyMapping LEFT_MENU = new KeyMapping(LangProvider.KEYBIND_SHOW_PROGRESSION.key(), GLFW.GLFW_KEY_LEFT_ALT, LangProvider.KEYBIND_CATEGORY.key());
-    public static final KeyMapping RIGHT_MENU = new KeyMapping(LangProvider.KEYBIND_SHOW_ABILITIES.key(), GLFW.GLFW_KEY_RIGHT_ALT, LangProvider.KEYBIND_CATEGORY.key());
-    public static final KeyMapping GLOSSARY = new KeyMapping(LangProvider.GLOSSARY_OPEN.key(), GLFW.GLFW_KEY_P, LangProvider.KEYBIND_CATEGORY.key());
+    public static final KeyMapping.Category KEY_BIND_CATEGORY = new KeyMapping.Category(Reference.resource("key_binds"));
+    public static final KeyMapping LEFT_MENU = new KeyMapping(LangProvider.KEYBIND_SHOW_PROGRESSION.key(), GLFW.GLFW_KEY_LEFT_ALT, KEY_BIND_CATEGORY);
+    public static final KeyMapping RIGHT_MENU = new KeyMapping(LangProvider.KEYBIND_SHOW_ABILITIES.key(), GLFW.GLFW_KEY_RIGHT_ALT, KEY_BIND_CATEGORY);
+    public static final KeyMapping GLOSSARY = new KeyMapping(LangProvider.GLOSSARY_OPEN.key(), GLFW.GLFW_KEY_P, KEY_BIND_CATEGORY);
     @SubscribeEvent
     public static void init(RegisterKeyMappingsEvent event) {
         event.register(LEFT_MENU);

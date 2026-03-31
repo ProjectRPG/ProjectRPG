@@ -43,8 +43,4 @@ public class Networking {
 	public static void sendToClient(CustomPacketPayload packet, ServerPlayer player) {
 		PacketDistributor.sendToPlayer(player, packet);
 	}
-	public static void sendToServer(CustomPacketPayload packet) {
-		PacketDistributor.sendToServer(packet);
-	}
-
 }
