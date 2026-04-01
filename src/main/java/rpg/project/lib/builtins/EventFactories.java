@@ -69,7 +69,7 @@ public class EventFactories {
 		VALUES.add(new EventListenerSpecification<>(
 				Reference.resource("anvil_repair"),
 				EventPriority.LOWEST,
-				AnvilCraftEvent.class,
+				AnvilCraftEvent.Post.class,
 				context -> true,
 				event -> EventContext.build(RegistryUtil.getId(event.getOutput()), EventContext.ITEMSTACK, event.getOutput(), event.getEntity(), event.getEntity().level()).create(),
 				(e, v) -> {},

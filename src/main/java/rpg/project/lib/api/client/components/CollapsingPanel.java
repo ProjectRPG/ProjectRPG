@@ -1,0 +1,78 @@
+package rpg.project.lib.api.client.components;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.resources.Identifier;
+import rpg.project.lib.api.client.types.DisplayType;
+import rpg.project.lib.api.client.types.GlossaryFilter;
+import rpg.project.lib.internal.util.Reference;
+
+import java.util.function.Consumer;
+
+public class CollapsingPanel extends ReactiveWidget {
+    protected static final Identifier TEXTURE_LOCATION = Reference.resource("textures/gui/player_stats.png");
+    protected static final Identifier RIGHT = Reference.resource("textures/gui/arrow_right.png");
+    protected static final Identifier LEFT = Reference.resource("textures/gui/arrow_left.png");
+    public final int expandedWidth;
+    private final double scale;
+    private Consumer<CollapsingPanel> callback;
+
+    public CollapsingPanel(int x, int y, int width, int height) {
+        this(x, y, width, height, true);
+    }
+    public CollapsingPanel(int x, int y, int width, int height, boolean open) {
+        super(x, y, width, height);
+        this.expandedWidth = width;
+        this.scale = Minecraft.getInstance().getWindow().getGuiScale();
+        this.setPadding(5, 5, 7, 7);
+        this.setWidth(open ? this.expandedWidth : (int)(20d / scale));
+    }
+
+    @Override public DisplayType getDisplayType() {return DisplayType.BLOCK;}
+
+    private boolean collapsed() {return this.getWidth() < this.expandedWidth;}
+
+    public CollapsingPanel addCallback(Consumer<CollapsingPanel> callback) {
+        this.callback = callback;
+        return this;
+    }
+
+    @Override public void resize() {} //Panel does not adjust height beyond parent size constraints
+
+    @Override
+    public void extractWidgetRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
+        GuiGraphicsExtractor.enableScissor(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        GuiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, TEXTURE_LOCATION, this.getX(), this.getY(), collapsed() ? 140 : 0, 0,
+                this.getWidth(), this.getHeight(), collapsed() ? 7 : 147, 165, 256, 256);
+        int offset = (int) (28d / scale);
+        int hScaled = (int) (80d / scale);
+        GuiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, collapsed() ? RIGHT : LEFT, this.getX()+this.width-offset,
+                this.getY()+ (this.height/2) - (hScaled/2) - 1,
+                0, 0, offset, hScaled, 7, 20, 7, 20);
+        super.extractWidgetRenderState(GuiGraphicsExtractor, mouseX, mouseY, partialTick);
+        GuiGraphicsExtractor.disableScissor();
+    }
+
+    @Override
+    public boolean mouseClicked(MouseButtonEvent mbe, boolean isDoubleClick) {
+        if (mbe.y() > this.getY() && mbe.y() < this.getY() + this.getHeight()
+           && mbe.x() > this.getRight() - (20/scale) && mbe.x() < this.getX() + this.getRight()) {
+            this.setWidth(collapsed() ? this.expandedWidth : (int)(20d / scale));
+            if (this.callback != null)
+                callback.accept(this);
+            return true;
+        }
+        return super.mouseClicked(mbe, isDoubleClick);
+    }
+
+    @Override
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
+
+    @Override
+    public boolean applyFilter(GlossaryFilter.Filter filter) {
+        return false;
+    }
+}

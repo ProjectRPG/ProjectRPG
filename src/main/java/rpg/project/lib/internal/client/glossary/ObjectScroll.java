@@ -155,8 +155,8 @@ public class ObjectScroll extends ObjectSelectionList<ObjectScroll.Panel> {
         @Override
         public void extractContent(GuiGraphicsExtractor pGuiGraphics, int x, int y, boolean pHovering, float pPartialTick) {
             if (renderer != null)
-                renderer.render(pGuiGraphics, x, y);
-            pGuiGraphics.drawScrollingString(pGuiGraphics.textRenderer(), font, text, x + 20, this.getContentRight(), y + 2);
+                renderer.render(pGuiGraphics, this.getX(), this.getY());
+            pGuiGraphics.drawScrollingString(pGuiGraphics.textRenderer(), font, text, this.getX() + 20, this.getContentRight(), this.getY() + 2);
         }
     }
 

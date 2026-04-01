@@ -1,7 +1,6 @@
 package rpg.project.lib.builtins.vanilla;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.MutableComponent;
 import rpg.project.lib.api.Hub;
