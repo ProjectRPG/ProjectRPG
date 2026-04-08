@@ -6,6 +6,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
+import rpg.project.lib.api.client.ReactiveWidget;
 import rpg.project.lib.api.client.types.DisplayType;
 import rpg.project.lib.api.client.types.GlossaryFilter;
 import rpg.project.lib.internal.util.Reference;

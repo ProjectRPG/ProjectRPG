@@ -51,8 +51,91 @@ public class LangProvider extends LanguageProvider {
 	//Example Translation
 	public static final Translation EXAMPLE = Translation.Builder.start("key.key.key")
 			.addLocale(Locale.EN_US, "Translated Text").build();
-
-	//======EVENTS===========
+	//region======GLOSSARY VALUES========
+	public static final Translation NONE_DROPDOWN = Translation.Builder.start("prpg.glossary.dropdown.none")
+			.addLocale(Locale.EN_US, "Choose a System").build();
+	public static final Translation ABILITY_DROPDOWN = Translation.Builder.start("prpg.glossary.dropdown.ability")
+			.addLocale(Locale.EN_US, "Player Abilities").build();
+	public static final Translation FEATURE_DROPDOWN = Translation.Builder.start("prpg.glossary.dropdown.features")
+			.addLocale(Locale.EN_US, "Gameplay Features").build();
+	public static final Translation PROGRESSION_DROPDOWN = Translation.Builder.start("prpg.glossary.dropdown.progression")
+			.addLocale(Locale.EN_US, "Progression").build();
+	public static final Translation OBJECT_DROPDOWN_ITEM = Translation.Builder.start("prpg.glossary.dropdown.object.item")
+			.addLocale(Locale.EN_US, "Items").build();
+	public static final Translation OBJECT_DROPDOWN_BLOCK = Translation.Builder.start("prpg.glossary.dropdown.object.block")
+			.addLocale(Locale.EN_US, "Blocks").build();
+	public static final Translation OBJECT_DROPDOWN_ENTITY = Translation.Builder.start("prpg.glossary.dropdown.object.entity")
+			.addLocale(Locale.EN_US, "Animals/Mobs").build();
+	public static final Translation OBJECT_DROPDOWN_DIMENSION = Translation.Builder.start("prpg.glossary.dropdown.object.dimension")
+			.addLocale(Locale.EN_US, "Dimensions").build();
+	public static final Translation OBJECT_DROPDOWN_BIOME = Translation.Builder.start("prpg.glossary.dropdown.object.biome")
+			.addLocale(Locale.EN_US, "Biomes").build();
+	public static final Translation OBJECT_DROPDOWN_ENCHANTMENT = Translation.Builder.start("prpg.glossary.dropdown.object.enchantment")
+			.addLocale(Locale.EN_US, "Enchantments").build();
+	public static final Translation OBJECT_DROPDOWN_EFFECT = Translation.Builder.start("prpg.glossary.dropdown.object.effect")
+			.addLocale(Locale.EN_US, "Effects").build();
+	public static final Translation OBJECT_DROPDOWN_EVENT = Translation.Builder.start("prpg.glossary.dropdown.object.event")
+			.addLocale(Locale.EN_US, "Gameplay Events").build();
+	public static final Translation OBJECT_DROPDOWN_PLAYER = Translation.Builder.start("prpg.glossary.dropdown.object.player")
+			.addLocale(Locale.EN_US, "Player-Specific").build();
+	//endregion===GLOSSARY VALUES========
+	//region======GUI PANEL VALUES=======
+	public static final Translation CONDITION_ANY_OF = Translation.Builder.start("prpg.condition.any_of.header")
+			.addLocale(Locale.EN_US, "If any of the following are true:").build();
+	public static final Translation CONDITION_ALL_OF = Translation.Builder.start("prpg.condition.all_of.header")
+			.addLocale(Locale.EN_US, "If ALL of the following are true:").build();
+	public static final Translation CONDITION_NOT = Translation.Builder.start("prpg.condition.not.header")
+			.addLocale(Locale.EN_US, "When the following is false:").build();
+	public static final Translation CONDITION_ENTITY_MATCH = Translation.Builder.start("prpg.condition.entity_match")
+			.addLocale(Locale.EN_US, "When the %s equals %s").build();
+	public static final Translation ENTITY_PARAM_PRPG_ACTOR = Translation.Builder.start("prpg.entity_param.projectrpg.actor")
+			.addLocale(Locale.EN_US, "action doer").build();
+	//endregion===GUI PANEL VALUES=======
+	//region======NBT GLOSSARY===========
+	public static final Translation GLOSSARY_NBT_ENTRY_HEADER = Translation.Builder.start("prpg.gui.glossary.nbt.entry.header")
+			.addLocale(Locale.EN_US, "Logic for Entry #%s").build();
+	public static final Translation GLOSSARY_NBT_BTP_ADD = Translation.Builder.start("prpg.gui.glossary.nbt.btp.add")
+			.addLocale(Locale.EN_US, "Adds this result to the previous result").build();
+	public static final Translation GLOSSARY_NBT_BTP_SUB = Translation.Builder.start("prpg.gui.glossary.nbt.btp.sub")
+			.addLocale(Locale.EN_US, "Subtracts this result from the previous result").build();
+	public static final Translation GLOSSARY_NBT_BTP_HIGH = Translation.Builder.start("prpg.gui.glossary.nbt.btp.high")
+			.addLocale(Locale.EN_US, "Uses the highest values from this result and the prior one").build();
+	public static final Translation GLOSSARY_NBT_BTP_REPL = Translation.Builder.start("prpg.gui.glossary.nbt.btp.replace")
+			.addLocale(Locale.EN_US, "Ignores previous results and uses this one instead").build();
+	public static final Translation GLOSSARY_NBT_CASE_ADD = Translation.Builder.start("prpg.gui.glossary.nbt.case.add")
+			.addLocale(Locale.EN_US, "The following results will add together if multiple are true:").build();
+	public static final Translation GLOSSARY_NBT_CASE_NOADD = Translation.Builder.start("prpg.gui.glossary.nbt.case.noadd")
+			.addLocale(Locale.EN_US, "The result will be the highest value from these cases:").build();
+	public static final Translation GLOSSARY_NBT_CASE_PATH = Translation.Builder.start("prpg.gui.glossary.nbt.case.path")
+			.addLocale(Locale.EN_US, "For NBT value of: %s").build();
+	public static final Translation GLOSSARY_NBT_ANY_OF = Translation.Builder.start("prpg.gui.glossary.nbt.op.anyof")
+			.addLocale(Locale.EN_US, "any of [%s]").build();
+	public static final Translation GLOSSARY_NBT_OP_EQ = Translation.Builder.start("prpg.gui.glossary.nbt.op.eq")
+			.addLocale(Locale.EN_US, "%s, if value matches %s").build();
+	public static final Translation GLOSSARY_NBT_OP_GT = Translation.Builder.start("prpg.gui.glossary.nbt.op.gt")
+			.addLocale(Locale.EN_US, "%s, if value > %s").build();
+	public static final Translation GLOSSARY_NBT_OP_LT = Translation.Builder.start("prpg.gui.glossary.nbt.op.lt")
+			.addLocale(Locale.EN_US, "%s, if value < %s").build();
+	public static final Translation GLOSSARY_NBT_OP_GTOE = Translation.Builder.start("prpg.gui.glossary.nbt.op.gtoe")
+			.addLocale(Locale.EN_US, "%s, if value >= %s").build();
+	public static final Translation GLOSSARY_NBT_OP_LTOE = Translation.Builder.start("prpg.gui.glossary.nbt.op.ltoe")
+			.addLocale(Locale.EN_US, "%s, if value <= %s").build();
+	public static final Translation GLOSSARY_NBT_OP_EXISTS = Translation.Builder.start("prpg.gui.glossary.nbt.op.exists")
+			.addLocale(Locale.EN_US, "%s, if value is present").build();
+	public static final Translation GLOSSARY_NBT_OP_CONTAINS = Translation.Builder.start("prpg.gui.glossary.nbt.op.contains")
+			.addLocale(Locale.EN_US, "%s, if value partially contains %s").build();
+	//endregion===NBT GLOSSARY===========
+	//region======GATE SYSTEM TYPES======
+	public static final Translation GATE_TYPE_EVENT = Translation.Builder.start("prpg.gating.type.event")
+			.addLocale(Locale.EN_US, "Event Gates").build();
+	public static final Translation GATE_TYPE_PROGRESSION = Translation.Builder.start("prpg.gating.type.progression")
+			.addLocale(Locale.EN_US, "Progress Gates").build();
+	public static final Translation GATE_TYPE_ABILITY = Translation.Builder.start("prpg.gating.type.ability")
+			.addLocale(Locale.EN_US, "Ability Gates").build();
+	public static final Translation GATE_TYPE_FEATURE = Translation.Builder.start("prpg.gating.type.feature")
+			.addLocale(Locale.EN_US, "Feature Gates").build();
+	//endregion GATE SYSTEM TYPES
+	//region ======EVENTS===========
 	public static final Translation LEVEL_UP = Translation.Builder.start("projectrpg.event.projectrpg.level_up")
 			.addLocale(Locale.EN_US, "Leveling Up").build();
 	public static final Translation ANVIL_REPAIR = Translation.Builder.start("projectrpg.event.projectrpg.anvil_repair")
@@ -123,8 +206,8 @@ public class LangProvider extends LanguageProvider {
 			.addLocale(Locale.EN_US, "Riding").build();
 	public static final Translation USE_ITEM = Translation.Builder.start("projectrpg.event.projectrpg.use_item")
 			.addLocale(Locale.EN_US, "Using an Item").build();
-	
-	//======PARTY SYSTEM=====
+	//endregion EVENTS
+	//region======PARTY SYSTEM=====
 	public static final Translation PARTY_CREATE_SUCCESS = Translation.Builder.start("projectrpg.cmd.party.create.success")
 		.addLocale(Locale.EN_US, "Created Party: %s").build();
 	public static final Translation PARTY_CREATE_FAILURE = Translation.Builder.start("projectrpg.cmd.party.create.failure")
@@ -145,8 +228,8 @@ public class LangProvider extends LanguageProvider {
 			.addLocale(Locale.EN_US, "You are not in a party to invite players to.").build();
 	public static final Translation PARTY_JOIN_SUCCESS = Translation.Builder.start("projectrpg.cmd.party.join.success")
 			.addLocale(Locale.EN_US, "You have added %s to the %s party.").build();
-	
-	//=======ABILITIES=======
+	//endregion PARTY SYSTEM
+	//region=======ABILITIES=======
 	public static final Translation PERK_EFFECT = Translation.Builder.start("ability.projectrpg.effect")
 			.addLocale(Locale.EN_US, "Status Effect").build();
 	public static final Translation PERK_EFFECT_DESC = Translation.Builder.start("ability.projectrpg.effect.description")
@@ -175,8 +258,8 @@ public class LangProvider extends LanguageProvider {
 			.addLocale(Locale.EN_US, "Dig Speed Boost").build();
 	public static final Translation BREAK_SPEED_ABILITY_STATUS1 = Translation.Builder.start("ability.projectrpg.break_speed.status1")
 			.addLocale(Locale.EN_US, "%s increased by %s").build();
-
-	//========KEY BINDS=========
+	//endregion ABILITIES
+	//region========KEY BINDS=========
 	public static final Translation KEYBIND_CATEGORY = Translation.Builder.start("category.projectrpg")
 			.addLocale(Locale.EN_US, "Project RPG").build();
 	public static final Translation KEYBIND_SHOW_PROGRESSION = Translation.Builder.start("key.projectrpg.showprogression")
@@ -185,8 +268,8 @@ public class LangProvider extends LanguageProvider {
 			.addLocale(Locale.EN_US, "Opens or closes the right-side menu").build();
 	public static final Translation GLOSSARY_OPEN = Translation.Builder.start("key.projectrpg.openglossary")
 			.addLocale(Locale.EN_US, "Opens the Glossary menu").build();
-
-	//=======VANILLA SYSTEM TRANSLATIONS================
+	//endregion KEY BINDS
+	//region=======VANILLA SYSTEM TRANSLATIONS================
 	public static final Translation ABILITY_SIDE_PANEL_HEADER = Translation.Builder.start("vanilla.ability.panel.header")
 			.addLocale(Locale.EN_US, "Recently Activated Abilities").build();
 	public static final Translation ABILITY_SIDE_PANEL_EVENT_HEADER = Translation.Builder.start("vanilla.ability.panel.eventheader")
@@ -195,7 +278,7 @@ public class LangProvider extends LanguageProvider {
 			.addLocale(Locale.EN_US, "Recently Gained Experience").build();
 	public static final Translation PROGRESSION_GAIN = Translation.Builder.start("vanilla.progression.panel.gain")
 			.addLocale(Locale.EN_US, "%s Exp from %s").build();
-	//End Translations
+	//endregion Vanilla System Translations
 	
 	@Override
 	protected void addTranslations() {

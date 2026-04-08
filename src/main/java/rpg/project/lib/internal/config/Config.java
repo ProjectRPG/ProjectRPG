@@ -1,10 +1,13 @@
 package rpg.project.lib.internal.config;
 
+import com.mojang.serialization.Codec;
 import net.neoforged.neoforge.common.ModConfigSpec;
+import rpg.project.lib.internal.config.readers.TomlConfigHelper;
 import rpg.project.lib.internal.util.MsLoggy.LOG_CODE;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Config {
 	public static ModConfigSpec CLIENT_CONFIG;
@@ -94,6 +97,17 @@ public class Config {
 	//====================SERVER SETTINGS===============================
 	
 	private static void setupServer(ModConfigSpec.Builder builder) {
-		
+		builder.push("Server Settings");
+		buildGlobals(builder);
+		builder.pop();
+	}
+
+	public static TomlConfigHelper.ConfigObject<Map<String, String>> GLOBALS;
+	public static TomlConfigHelper.ConfigObject<Map<String, String>> CONSTANTS;
+	private static void buildGlobals(ModConfigSpec.Builder builder) {
+		builder.push("NBT Globals");
+		GLOBALS = TomlConfigHelper.defineObject(builder, "global_definitions", Codec.unboundedMap(Codec.STRING, Codec.STRING), Map.of("example", "object{}.array[0].value"));
+		CONSTANTS = TomlConfigHelper.defineObject(builder, "constants_definitions", Codec.unboundedMap(Codec.STRING, Codec.STRING), Map.of("example", "minecraft:stick"));
+		builder.pop();
 	}
 }

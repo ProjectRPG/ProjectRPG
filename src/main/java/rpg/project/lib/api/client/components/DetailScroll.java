@@ -6,7 +6,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import rpg.project.lib.api.client.PanelWidget;
+import rpg.project.lib.internal.client.glossary.PanelWidget;
 import rpg.project.lib.api.client.ResponsiveLayout;
 import rpg.project.lib.api.client.types.DisplayType;
 import rpg.project.lib.api.client.types.GlossaryFilter;

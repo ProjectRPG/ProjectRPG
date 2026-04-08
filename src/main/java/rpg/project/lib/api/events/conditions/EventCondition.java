@@ -24,6 +24,7 @@ public interface EventCondition extends Predicate<EventContext> {
     public static final DeferredHolder<EventConditionType, EventConditionType> ANY_OF = CONDITIONS.register("any", EventConditionAny.EventConditionAnyType::new);
     public static final DeferredHolder<EventConditionType, EventConditionType> NOT = CONDITIONS.register("not", EventConditionNot.EventConditionNotType::new);
     public static final DeferredHolder<EventConditionType, EventConditionType> ENTITY_MATCHES = CONDITIONS.register("entity_matches", EventConditionEntityMatches.EventConditionEntityMatchesType::new);
+    public static final DeferredHolder<EventConditionType, EventConditionType> NBT = CONDITIONS.register("nbt", EventConditionNBT.EventConditionNBTType::new);
 
     EventConditionType getType();
 

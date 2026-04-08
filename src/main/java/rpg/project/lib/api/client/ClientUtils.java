@@ -1,4 +1,4 @@
-package rpg.project.lib.api.client.components;
+package rpg.project.lib.api.client;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;

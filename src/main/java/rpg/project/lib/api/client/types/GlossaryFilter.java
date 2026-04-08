@@ -1,6 +1,7 @@
 package rpg.project.lib.api.client.types;
 
-import java.util.Collection;
+import net.minecraft.resources.Identifier;
+import rpg.project.lib.api.data.ObjectType;
 
 @FunctionalInterface
 public interface GlossaryFilter {
@@ -24,47 +25,36 @@ public interface GlossaryFilter {
 
     static class Filter {
         private String textFilter = "";
-        private SELECTION selection = null;
-        private OBJECT objectType = null;
-        private String skill = "";
-        private GuiEnumGroup enumGroup = null;
+        private ObjectType objectType = null;
+        private SystemOptions selection = null;
+        private Identifier systemID = null;
 
         public Filter(String textFilter) {this.textFilter = textFilter;}
-        public Filter(String textFilter, SELECTION selection) {this.textFilter = textFilter; this.selection = selection;}
-        public Filter(String textFilter, OBJECT objectTYpe) {this.textFilter = textFilter; this.objectType = objectTYpe;}
-        public Filter(String textFilter, GuiEnumGroup group) {this.textFilter = textFilter; this.enumGroup = group;}
-        public Filter(String textFilter, String skill) {this.textFilter = textFilter; this.skill = skill;}
+        public Filter(String textFilter, SystemOptions selection) {this.textFilter = textFilter; this.selection = selection;}
+        public Filter(String textFilter, ObjectType objectTYpe) {this.textFilter = textFilter; this.objectType = objectTYpe;}
+        public Filter(String textFilter, SystemOptions selection, Identifier systemID) {this.textFilter = textFilter; this.selection = selection; this.systemID = systemID;}
 
-        public Filter with(SELECTION selection) {this.selection = selection; return this;}
-        public Filter with(OBJECT objectType) {this.objectType = objectType; return this;}
-        public Filter with(GuiEnumGroup group) {this.enumGroup = group; return this;}
-        public Filter with(String skill) {this.skill = skill; return this;}
+        public Filter with(String searchTerm) {this.textFilter = searchTerm; return this;}
+        public Filter with(SystemOptions selection) {this.selection = selection; return this;}
+        public Filter with(ObjectType objectType) {this.objectType = objectType; return this;}
+        public Filter with(Identifier systemID) {this.systemID = systemID; return this;}
 
         public String getTextFilter() {return textFilter;}
-        public SELECTION getSelection() {return selection;}
-        public OBJECT getObjectType() {return objectType; }
-        public String getSkill() {return skill;}
-        public GuiEnumGroup getEnumGroup() {return enumGroup;}
+        public SystemOptions getSelection() {return selection;}
+        public ObjectType getObjectType() {return objectType; }
+        public Identifier getSystemID() {return systemID;}
 
         public boolean matchesTextFilter(String str) {
             return textFilter.isEmpty() || str.contains(textFilter);
         }
-        public boolean matchesSkill(Collection<String> skills) {return skill.isEmpty() || skills.contains(skill);}
-        public boolean matchesSkill(String skillMatch) {return skill.isEmpty() || skill.equals(skillMatch);}
+        public boolean matchesSystemID(Identifier id) {return !id.equals(SystemOptions.BLANK) && id.equals(this.systemID);}
 
-        public boolean matchesObject(OBJECT obj) {
-            return objectType == null || objectType == OBJECT.NONE || objectType == obj;
+        public boolean matchesObject(ObjectType obj) {
+            return objectType == null || objectType == obj;
         }
 
-        public boolean matchesSelection(SELECTION sel) {
-            return selection == null || selection == SELECTION.NONE || selection == sel;
-        }
-
-        public boolean matchesEnum(GuiEnumGroup value) {
-            return enumGroup == null || enumGroup == value;
-        }
-        public boolean matchesEnum(Collection<GuiEnumGroup> value) {
-            return enumGroup == null || value.contains(enumGroup);
+        public boolean matchesSelection(SystemOptions sel) {
+            return selection == null || selection == SystemOptions.NONE || selection == sel;
         }
     }
 }

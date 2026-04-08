@@ -1,4 +1,4 @@
-package rpg.project.lib.api.client.components;
+package rpg.project.lib.api.client;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -7,7 +7,6 @@ import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import rpg.project.lib.api.client.ResponsiveLayout;
 import rpg.project.lib.api.client.types.GlossaryFilter;
 import rpg.project.lib.api.client.wrappers.BoxDimensions;
 import rpg.project.lib.api.client.wrappers.Positioner;

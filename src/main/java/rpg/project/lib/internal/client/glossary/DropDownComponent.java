@@ -54,6 +54,7 @@ public class DropDownComponent<T extends DropDownComponent.SelectionEntry<?>> ex
             selected.render(graphics, getX(), getY(), width, false, getFGColor(), alpha);
         else {
             graphics.enableScissor(this.getX(), this.getY(), this.getRight(), this.getBottom());
+            //TODO draw scrolling string
             graphics.textRenderer().accept(TextAlignment.LEFT,getX() + 6, getY() + (height - 8) / 2, title.copy().withColor(getFGColor() | Mth.ceil(alpha * 255.0F) << 24));
             graphics.disableScissor();
         }

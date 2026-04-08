@@ -4,7 +4,6 @@ import java.util.List;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
@@ -13,7 +12,7 @@ import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.abilities.AbilitySystem;
 import rpg.project.lib.api.abilities.AbilityUtils;
-import rpg.project.lib.api.client.components.ClientUtils;
+import rpg.project.lib.api.client.ClientUtils;
 import rpg.project.lib.api.client.components.SidePanelContentProvider;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.events.EventContext;

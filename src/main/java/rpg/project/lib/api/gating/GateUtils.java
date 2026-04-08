@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import com.mojang.serialization.Codec;
 
 import net.minecraft.core.Registry;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
@@ -16,6 +17,7 @@ import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.internal.registry.GateRegistry;
 import rpg.project.lib.internal.registry.SubSystemCodecRegistry;
+import rpg.project.lib.internal.setup.datagen.LangProvider;
 import rpg.project.lib.internal.util.Reference;
 
 public class GateUtils {
@@ -30,16 +32,18 @@ public class GateUtils {
 	 */
 	public enum Type implements StringRepresentable {
 		/**Specifies gates that cancel or alter events.*/
-		EVENT(GATES_EVENTS),
+		EVENT(GATES_EVENTS, LangProvider.GATE_TYPE_EVENT.asComponent()),
 		/**Specifies gates that permit/deny progression advancement.*/
-		PROGRESS(GATES_PROGRESS),
+		PROGRESS(GATES_PROGRESS, LangProvider.GATE_TYPE_PROGRESSION.asComponent()),
 		/**Specifies gates that permit/deny feature usage*/
-		FEATURE(GATES_FEATURES),
+		FEATURE(GATES_FEATURES, LangProvider.GATE_TYPE_FEATURE.asComponent()),
 		/**Specifies gates that permit/deny ability usage*/
-		ABILITY(GATES_ABILITIES);
+		ABILITY(GATES_ABILITIES, LangProvider.GATE_TYPE_ABILITY.asComponent());
 		public ResourceKey<Registry<GateSystem>> key;
-		Type(ResourceKey<Registry<GateSystem>> registryKey) {
+		public Component translation;
+		Type(ResourceKey<Registry<GateSystem>> registryKey, Component translation) {
 			this.key = registryKey;
+			this.translation = translation;
 		}
 		
 		public static final Codec<Type> CODEC = StringRepresentable.fromEnum(Type::values);
