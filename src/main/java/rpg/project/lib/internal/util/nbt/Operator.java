@@ -17,7 +17,7 @@ public enum Operator implements StringRepresentable{
 	EXISTS(LangProvider.GLOSSARY_NBT_OP_EXISTS),
 	CONTAINS(LangProvider.GLOSSARY_NBT_OP_CONTAINS);
 
-	public LangProvider.Translation translation;
+	public final LangProvider.Translation translation;
 	Operator(LangProvider.Translation translation) {this.translation = translation;}
 	public static final Codec<Operator> CODEC = StringRepresentable.fromEnum(Operator::values);
 	private static final Map<String, Operator> BY_NAME = Arrays.stream(values()).collect(Collectors.toMap(Operator::getSerializedName, s -> s));

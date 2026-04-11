@@ -8,7 +8,6 @@ import net.minecraft.core.RegistryAccess;
 import rpg.project.lib.api.client.EventConditionGlossaryPanel;
 import rpg.project.lib.api.client.ReactiveWidget;
 import rpg.project.lib.api.client.types.DisplayType;
-import rpg.project.lib.api.client.types.PositionType;
 import rpg.project.lib.api.client.wrappers.PositionConstraints;
 import rpg.project.lib.api.client.wrappers.SizeConstraints;
 import rpg.project.lib.api.events.conditions.EventConditionNot;

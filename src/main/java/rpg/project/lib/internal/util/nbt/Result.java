@@ -1,12 +1,9 @@
 package rpg.project.lib.internal.util.nbt;
 
-import java.util.Map;
-
 public record Result(	
 	Operator operator,
 	String comparator, 
-	String comparison,
-	Map<String, Double> values) {
+	String comparison) {
 
 	public boolean compares() {
 		switch (operator) {

@@ -21,7 +21,7 @@ public record EventConditionEntityMatches(ContextKey<?> param, Identifier value)
     ).apply(instance, EventConditionEntityMatches::new));
 
     @Override
-    public EventConditionType getType() {
+    public EventConditionType<? extends EventCondition> getType() {
         return EventCondition.ENTITY_MATCHES.get();
     }
 

@@ -1,6 +1,16 @@
 package rpg.project.lib.internal.util;
 
+import com.mojang.serialization.DynamicOps;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.*;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueOutput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,5 +61,55 @@ public class TagUtils {
         }
         
         return output;
+    }
+
+    public static CompoundTag stackTag(ItemStack stack, Level level) {
+        return stackTag(stack, level.registryAccess());
+    }
+    /**safely obtain the NBT tag or get a new instance
+     *
+     * @param stack the item whose NBT is being obtained
+     * @return an associated tag or new instance
+     */
+    public static CompoundTag stackTag(ItemStack stack, RegistryAccess access) {
+        if (stack.isEmpty()) return new CompoundTag();
+        DynamicOps<Tag> regOps = access.createSerializationContext(NbtOps.INSTANCE);
+        if (stack.getCount() > 99) {
+            var clone = stack.copy();
+            clone.setCount(99);
+            return (CompoundTag) ItemStack.CODEC.encodeStart(regOps, clone).result().orElse(new CompoundTag());
+        }
+        return (CompoundTag) ItemStack.CODEC.encodeStart(regOps, stack).result().orElse(new CompoundTag());
+    }
+    /**safely obtain the NBT tag or get a new instance
+     *
+     * @param entity the entity whose NBT is being obtained
+     * @return an associated tag or new instance
+     */
+    public static CompoundTag entityTag(Entity entity) {
+        TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, HolderLookup.Provider.create(entity.registryAccess().listRegistries()));
+        try {
+            entity.saveWithoutId(output);
+        } catch (Exception _) {
+            MsLoggy.WARN.log(MsLoggy.LOG_CODE.DATA,
+                    "Entity {} could not be serialized on the client.  Some NBT behavior may not work correctly.",
+                    entity.getDisplayName().toString());
+        }
+        return output.buildResult();
+    }
+
+    /**safely obtain the NBT tag or get a new instance
+     *
+     * @param tile the BlockEntity whose NBT is being obtained
+     * @return an associated tag or new instance
+     */
+    public static CompoundTag tileTag(BlockEntity tile) {
+        return tile == null	? new CompoundTag()	: tile.saveWithFullMetadata(tile.getLevel().registryAccess());
+    }
+
+    public static CompoundTag stateTag(BlockState state) {
+        CompoundTag dataOut = new CompoundTag();
+        state.getProperties().forEach(prop -> dataOut.putString(prop.getName(), state.getValue(prop).toString()));
+        return dataOut;
     }
 }

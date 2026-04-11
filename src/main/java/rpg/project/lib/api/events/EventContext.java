@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.mojang.datafixers.util.Pair;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -55,6 +56,7 @@ public class EventContext{
 	public static final ContextKey<Boolean> CANCELLED = new ContextKey<>(Reference.resource("event_cancelled"));
 	public static final ContextKey<Float> CHANGE_AMOUNT = new ContextKey<>(Reference.resource("amount_changed"));
 	public static final ContextKey<Float> MAGNITUDE = new ContextKey<>(Reference.resource("magnitude"));
+	public static final ContextKey<CompoundTag> NBT = new ContextKey<>(Reference.resource("nbt"));
 
 	public ObjectType getSubjectType() {return subjectObject.getFirst();}
 	public Identifier getSubjectID() {return subjectObject.getSecond();}

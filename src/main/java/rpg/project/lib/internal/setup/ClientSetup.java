@@ -12,12 +12,14 @@ import rpg.project.lib.api.events.conditions.EventCondition;
 import rpg.project.lib.api.events.conditions.EventConditionAnd;
 import rpg.project.lib.api.events.conditions.EventConditionAny;
 import rpg.project.lib.api.events.conditions.EventConditionEntityMatches;
+import rpg.project.lib.api.events.conditions.EventConditionNBT;
 import rpg.project.lib.api.events.conditions.EventConditionNot;
 import rpg.project.lib.builtins.vanilla.VanillaProgressionConfigType;
 import rpg.project.lib.builtins.vanilla.client.VanillaProgressionPanel;
 import rpg.project.lib.internal.client.glossary.AndConditionPanel;
 import rpg.project.lib.internal.client.glossary.AnyConditionPanel;
 import rpg.project.lib.internal.client.glossary.EntityMatchConditionPanel;
+import rpg.project.lib.internal.client.glossary.NBTConditionPanel;
 import rpg.project.lib.internal.client.glossary.NotConditionPanel;
 import rpg.project.lib.internal.client.overlays.OverlaySlidePanels;
 import rpg.project.lib.internal.config.Config;
@@ -53,6 +55,7 @@ public class ClientSetup {
             ClientPanelRegistry.registerConditionPanel(EventCondition.ANY_OF.getId(), c -> new AnyConditionPanel((EventConditionAny) c));
             ClientPanelRegistry.registerConditionPanel(EventCondition.NOT.getId(), c -> new NotConditionPanel((EventConditionNot) c));
             ClientPanelRegistry.registerConditionPanel(EventCondition.ENTITY_MATCHES.getId(), c -> new EntityMatchConditionPanel((EventConditionEntityMatches) c));
+            ClientPanelRegistry.registerConditionPanel(EventCondition.NBT.getId(), c -> new NBTConditionPanel((EventConditionNBT) c));
         });
     }
 }

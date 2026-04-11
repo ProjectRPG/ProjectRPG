@@ -4,21 +4,16 @@ import com.mojang.serialization.Codec;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.Identifier;
-import net.neoforged.fml.LogicalSide;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.data.NodeConsumer;
-import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.api.data.TargetSelector;
-import rpg.project.lib.api.enums.RegistrationSide;
 import rpg.project.lib.api.events.EventProvider;
+import rpg.project.lib.api.events.conditions.EventCondition;
 import rpg.project.lib.api.events.conditions.EventConditionType;
 import rpg.project.lib.api.feature.Feature;
-import rpg.project.lib.api.gating.GateSystem;
 import rpg.project.lib.api.party.PartySystem;
-import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.registry.SubSystemCodecRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
 import rpg.project.lib.internal.util.Reference;
@@ -40,7 +35,7 @@ public class APIUtils {
 	 * to register custom events.  Custom events can be referenced by other addons' configurations to apply their
 	 * system implementation behavior to your event specification.*/
 	public static final ResourceKey<Registry<EventProvider<?>>> GAMEPLAY_EVENTS = ResourceKey.createRegistryKey(Reference.resource("gameplay_events"));
-	public static final ResourceKey<Registry<EventConditionType>> EVENT_CONDITIONS = ResourceKey.createRegistryKey(Reference.resource("event_conditions"));
+	public static final ResourceKey<Registry<EventConditionType<? extends EventCondition>>> EVENT_CONDITIONS = ResourceKey.createRegistryKey(Reference.resource("event_conditions"));
 	/**<p>{@link ResourceKey} for use with a {@link DeferredRegister} to register data parsers for all systems within
 	 * Project RPG.  Registry IDs for {@link SubSystemConfigType}s must be identical to their registered systems.
 	 * It is strongly recommended that IDs be descriptive and unique to avoid overlap with other addons.</p>

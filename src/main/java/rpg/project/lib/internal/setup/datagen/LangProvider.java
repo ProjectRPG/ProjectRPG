@@ -90,40 +90,28 @@ public class LangProvider extends LanguageProvider {
 			.addLocale(Locale.EN_US, "When the %s equals %s").build();
 	public static final Translation ENTITY_PARAM_PRPG_ACTOR = Translation.Builder.start("prpg.entity_param.projectrpg.actor")
 			.addLocale(Locale.EN_US, "action doer").build();
+	public static final Translation CONDITION_NBT = Translation.Builder.start("prpg.condition.nbt.header")
+			.addLocale(Locale.EN_US, "If the specific NBT value matches any of the following cases:").build();
 	//endregion===GUI PANEL VALUES=======
 	//region======NBT GLOSSARY===========
-	public static final Translation GLOSSARY_NBT_ENTRY_HEADER = Translation.Builder.start("prpg.gui.glossary.nbt.entry.header")
-			.addLocale(Locale.EN_US, "Logic for Entry #%s").build();
-	public static final Translation GLOSSARY_NBT_BTP_ADD = Translation.Builder.start("prpg.gui.glossary.nbt.btp.add")
-			.addLocale(Locale.EN_US, "Adds this result to the previous result").build();
-	public static final Translation GLOSSARY_NBT_BTP_SUB = Translation.Builder.start("prpg.gui.glossary.nbt.btp.sub")
-			.addLocale(Locale.EN_US, "Subtracts this result from the previous result").build();
-	public static final Translation GLOSSARY_NBT_BTP_HIGH = Translation.Builder.start("prpg.gui.glossary.nbt.btp.high")
-			.addLocale(Locale.EN_US, "Uses the highest values from this result and the prior one").build();
-	public static final Translation GLOSSARY_NBT_BTP_REPL = Translation.Builder.start("prpg.gui.glossary.nbt.btp.replace")
-			.addLocale(Locale.EN_US, "Ignores previous results and uses this one instead").build();
-	public static final Translation GLOSSARY_NBT_CASE_ADD = Translation.Builder.start("prpg.gui.glossary.nbt.case.add")
-			.addLocale(Locale.EN_US, "The following results will add together if multiple are true:").build();
-	public static final Translation GLOSSARY_NBT_CASE_NOADD = Translation.Builder.start("prpg.gui.glossary.nbt.case.noadd")
-			.addLocale(Locale.EN_US, "The result will be the highest value from these cases:").build();
-	public static final Translation GLOSSARY_NBT_CASE_PATH = Translation.Builder.start("prpg.gui.glossary.nbt.case.path")
-			.addLocale(Locale.EN_US, "For NBT value of: %s").build();
-	public static final Translation GLOSSARY_NBT_ANY_OF = Translation.Builder.start("prpg.gui.glossary.nbt.op.anyof")
-			.addLocale(Locale.EN_US, "any of [%s]").build();
+	public static final Translation GLOSSARY_NBT_PATH = Translation.Builder.start("prpg.gui.glossary.nbt.path")
+			.addLocale(Locale.EN_US, "the value at location(s):").build();
+	public static final Translation GLOSSARY_NBT_CRITERIA = Translation.Builder.start("prpg.gui.glossary.nbt.criteria")
+			.addLocale(Locale.EN_US, "Matches any of the following:").build();
 	public static final Translation GLOSSARY_NBT_OP_EQ = Translation.Builder.start("prpg.gui.glossary.nbt.op.eq")
-			.addLocale(Locale.EN_US, "%s, if value matches %s").build();
+			.addLocale(Locale.EN_US, "value is exactly %s").build();
 	public static final Translation GLOSSARY_NBT_OP_GT = Translation.Builder.start("prpg.gui.glossary.nbt.op.gt")
-			.addLocale(Locale.EN_US, "%s, if value > %s").build();
+			.addLocale(Locale.EN_US, "value > %s").build();
 	public static final Translation GLOSSARY_NBT_OP_LT = Translation.Builder.start("prpg.gui.glossary.nbt.op.lt")
-			.addLocale(Locale.EN_US, "%s, if value < %s").build();
+			.addLocale(Locale.EN_US, "value < %s").build();
 	public static final Translation GLOSSARY_NBT_OP_GTOE = Translation.Builder.start("prpg.gui.glossary.nbt.op.gtoe")
-			.addLocale(Locale.EN_US, "%s, if value >= %s").build();
+			.addLocale(Locale.EN_US, "value >= %s").build();
 	public static final Translation GLOSSARY_NBT_OP_LTOE = Translation.Builder.start("prpg.gui.glossary.nbt.op.ltoe")
-			.addLocale(Locale.EN_US, "%s, if value <= %s").build();
+			.addLocale(Locale.EN_US, "value <= %s").build();
 	public static final Translation GLOSSARY_NBT_OP_EXISTS = Translation.Builder.start("prpg.gui.glossary.nbt.op.exists")
-			.addLocale(Locale.EN_US, "%s, if value is present").build();
+			.addLocale(Locale.EN_US, "value is present").build();
 	public static final Translation GLOSSARY_NBT_OP_CONTAINS = Translation.Builder.start("prpg.gui.glossary.nbt.op.contains")
-			.addLocale(Locale.EN_US, "%s, if value partially contains %s").build();
+			.addLocale(Locale.EN_US, "value partially contains %s").build();
 	//endregion===NBT GLOSSARY===========
 	//region======GATE SYSTEM TYPES======
 	public static final Translation GATE_TYPE_EVENT = Translation.Builder.start("prpg.gating.type.event")

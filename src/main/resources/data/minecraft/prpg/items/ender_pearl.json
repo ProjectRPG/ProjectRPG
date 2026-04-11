@@ -3,7 +3,13 @@
  "progression": [
     {"type":"minecraft:progression",
      "events": {
-       "projectrpg:consume":[{"xp":10000}]
+       "projectrpg:consume":[{"xp":10000}],
+       "projectrpg:use_item":[
+         {"xp": 1000, "conditions": {
+           "any_of": [
+             {"type": "projectrpg:nbt", "logic": [{"paths": ["components{}.minecraft:custom_name"], "criteria": [{"operator":"EQUALS", "comparators":["bob"]}]}]}]
+         }}
+       ]
     }}
  ]
 }
