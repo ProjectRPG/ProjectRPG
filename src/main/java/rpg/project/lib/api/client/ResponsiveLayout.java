@@ -169,11 +169,12 @@ public interface ResponsiveLayout extends Layout {
     }
 
     private void flex() {
-        //TODO implement flex arrangement
+        //maybe implement flex arrangement. TBD
     }
 
-    //TODO make sure to note how sizing is not recursively self-adaptive (for performance) and special attention is needed
-    // for configuring grids so as not to overflow. (eg. don't put grid dimensions in the thousands if you don't have thousands of elements)
+    /**Note that sizing is not recursively self-adaptive (for performance) and special attention is needed for configuring
+     * grids so as not to overflow. (e.g. don't put grid dimensions in the thousands if you don't have thousands of elements)
+     */
     private void grid() {
         int maxRowCount = getChildren().stream().map(poser -> poser.positioning().row()).reduce(Integer::max).orElse(0) +1; //+1 necessary to translate zero index to array size count
         int maxColCount = getChildren().stream().map(poser -> poser.positioning().col()).reduce(Integer::max).orElse(0) +1;

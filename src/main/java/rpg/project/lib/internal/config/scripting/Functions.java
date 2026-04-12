@@ -194,41 +194,4 @@ public class Functions {
             };
         }
     }
-//
-//    public static Map<String, Long> mapValue(String value) {
-//        Map<String, Long> outMap = new HashMap<>();
-//        String[] elements = value.replaceAll("\\)", "").split(",");
-//        for (int i = 0; i <= elements.length-2; i += 2) {
-//            outMap.put(elements[i], Long.valueOf(elements[i+1]));
-//        }
-//        return outMap;
-//    }
-//
-//    public static Map<String, Double> doubleMap(String value) {
-//        Map<String, Double> outMap = new HashMap<>();
-//        String[] elements = value.replaceAll("\\)", "").split(",");
-//        for (int i = 0; i <= elements.length-2; i += 2) {
-//            outMap.put(elements[i], Double.valueOf(elements[i+1]));
-//        }
-//        return outMap;
-//    }
-
-//    public static double getDouble(Map<String, String> values) {
-//        return Double.parseDouble(values.getOrDefault("value", "0"));
-//    }
-//    public static Identifier getId(Map<String, String> values) {
-//        return Reference.resource(values.getOrDefault("value", "pmmo_scripting:missing_value"));
-//    }
-//    public static boolean getBool(Map<String, String> values) {
-//        return Boolean.parseBoolean(values.getOrDefault("value", "false"));
-//    }
-//    public static float getFloat(Map<String, String> values) {
-//        return Float.parseFloat(values.getOrDefault("value", "0"));
-//    }
-//    public static long getLong(Map<String, String> values) {
-//        return Long.parseLong(values.getOrDefault("value", "0"));
-//    }
-//    public static int getInt(Map<String, String> values) {
-//        return Integer.parseInt(values.getOrDefault("value", "0"));
-//    }
 }

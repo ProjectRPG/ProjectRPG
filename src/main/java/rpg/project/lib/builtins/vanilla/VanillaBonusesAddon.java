@@ -39,7 +39,9 @@ public class VanillaBonusesAddon implements ProgressionAddon{
 		allConfigs.add(dimConfig);
 		
 		//TODO figure out what I was doing with this to modify XP
-		return null;
+		//much later me: still has no idea what was going on here.  We are mapping strings to lists of progression data types
+		//then doing...something... with them???
+		return dataIn;
 	}
 
 	private List<VanillaBonusConfig> getItemConfigs(Hub core, Player player) {

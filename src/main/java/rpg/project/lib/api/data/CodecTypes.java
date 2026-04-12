@@ -24,7 +24,7 @@ public class CodecTypes {
 		public String toString() { return "uuid";}
 	};
 	
-	/**In constrast to {@link BlockPos#CODEC}, this
+	/**In contrast to {@link BlockPos#CODEC}, this
 	 * codec type can be used as a map key.*/
 	public static final PrimitiveCodec<BlockPos> BLOCKPOS_CODEC = new PrimitiveCodec<>() {
 		@Override

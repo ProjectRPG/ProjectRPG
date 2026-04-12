@@ -103,7 +103,9 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 	
 	@Override
 	public List<Pair<String, Consumer<Float>>> getProgressionToBeAwarded(Hub core, Identifier eventID, EventContext context) {
-		//TODO factor parties into the xp distribution.
+		/*TODO factor parties into the xp distribution.  Note: this kind of requires a callback if we want other players to get
+		 * awards too, since they may have their own gates and reductions which impact XP gain.  Alternatively, parties as a way
+		 * to get around those limits might be a fun mechanic.*/
 		List<VanillaProgressionConfig.ExpData> eventConfig = core.getProgressionData(VanillaProgressionConfigType.IMPL, ObjectType.EVENT, eventID)
 				.map(config -> ((VanillaProgressionConfig)config).eventToXp().getOrDefault(eventID, List.of())
 						.stream().filter(xpData -> !xpData.conditions().isPresent() || xpData.conditions().get().test(context))

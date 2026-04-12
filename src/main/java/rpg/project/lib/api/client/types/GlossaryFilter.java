@@ -11,13 +11,6 @@ public interface GlossaryFilter {
      * results in the entire object being filtered, this method will
      * return true to let parent classes know the child is filtered.
      *
-     * For example, a class that implements display values for enums
-     * of REQ and XP would still display the opposite value if filtered
-     * by either, but only if both exist.  whereas if the filter was
-     * for a skill and neither REQ nor XP contained the specified skill
-     * the implementation would return true since there is no content
-     * remaining after the filter is applied
-     *
      * @param filter a record of filterable values
      * @return true if this object displays no content after the filter is applied.
      */
@@ -30,9 +23,6 @@ public interface GlossaryFilter {
         private Identifier systemID = null;
 
         public Filter(String textFilter) {this.textFilter = textFilter;}
-        public Filter(String textFilter, SystemOptions selection) {this.textFilter = textFilter; this.selection = selection;}
-        public Filter(String textFilter, ObjectType objectTYpe) {this.textFilter = textFilter; this.objectType = objectTYpe;}
-        public Filter(String textFilter, SystemOptions selection, Identifier systemID) {this.textFilter = textFilter; this.selection = selection; this.systemID = systemID;}
 
         public Filter with(String searchTerm) {this.textFilter = searchTerm; return this;}
         public Filter with(SystemOptions selection) {this.selection = selection; return this;}
