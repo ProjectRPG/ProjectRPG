@@ -16,6 +16,7 @@ import rpg.project.lib.api.client.types.PositionType;
 import rpg.project.lib.api.client.types.SystemOptions;
 import rpg.project.lib.api.client.wrappers.SizeConstraints;
 import rpg.project.lib.api.data.ObjectType;
+import rpg.project.lib.internal.setup.datagen.LangProvider;
 
 public class Glossary extends Screen {
     public Glossary() {
@@ -38,16 +39,16 @@ public class Glossary extends Screen {
         searchBar = new EditBox(font, 8, 11, filterSectionWidth, 20, Component.literal("search bar"));
         searchBar.setResponder(str -> {contentPanel.applyFilter(filter.with(str));});
 
-        systemFilterBox = new DropDownComponent<DropDownComponent.SelectionEntry<SystemOptions>>(9, 31, filterSectionWidth, Component.literal("system_option_box"), selection -> {
+        systemFilterBox = new DropDownComponent<DropDownComponent.SelectionEntry<SystemOptions>>(9, 31, filterSectionWidth, LangProvider.NONE_DROPDOWN.asComponent(), selection -> {
            contentPanel.applyFilter(filter.with(selection.reference).with(SystemOptions.BLANK));
            namespaceFilterBox.setEntries(selection.reference.getEntries(Minecraft.getInstance().player.registryAccess()));
         });
         systemFilterBox.setEntries(SystemOptions.CHOICE_LIST);
-        categoryFilterBox = new DropDownComponent<DropDownComponent.SelectionEntry<ObjectType>>(10, 22, filterSectionWidth, Component.literal("category_filter_box"), selection -> {
+        categoryFilterBox = new DropDownComponent<DropDownComponent.SelectionEntry<ObjectType>>(10, 22, filterSectionWidth, LangProvider.CHOOSE_DROPDOWN.asComponent(), selection -> {
             contentPanel.applyFilter(filter.with(selection.reference));
         });
         categoryFilterBox.setEntries(ObjectType.CHOICE_LIST);
-        namespaceFilterBox = new DropDownComponent<DropDownComponent.SelectionEntry<Identifier>>(categoryFilterBox.getX(), categoryFilterBox.getY() + 42, filterSectionWidth, Component.literal("event_filter_box"), selection -> {
+        namespaceFilterBox = new DropDownComponent<DropDownComponent.SelectionEntry<Identifier>>(categoryFilterBox.getX(), categoryFilterBox.getY() + 42, filterSectionWidth, LangProvider.CHOOSE_ID.asComponent(), selection -> {
             contentPanel.applyFilter(filter.with(selection.reference));
         });
 

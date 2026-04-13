@@ -50,14 +50,14 @@ public class DropDownComponent<T extends DropDownComponent.SelectionEntry<?>> ex
         Identifier location = BUTTON_SPRITES.get(this.isActive(), this.isMouseOver(mouseX, mouseY));
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, location, this.getX(), this.getY(), this.getWidth(), this.getHeight()/*, 20, 4, 200, 20, 0, 66*/);
 
+        graphics.enableScissor(this.getX(), this.getY(), this.getRight(), this.getBottom());
         if (selected != null)
-            selected.render(graphics, getX(), getY(), width, false, getFGColor(), alpha);
+            selected.render(graphics, getX(), getY(), getWidth(), false, getFGColor(), alpha);
         else {
-            graphics.enableScissor(this.getX(), this.getY(), this.getRight(), this.getBottom());
-            //TODO draw scrolling string
-            graphics.textRenderer().accept(TextAlignment.LEFT,getX() + 6, getY() + (height - 8) / 2, title.copy().withColor(getFGColor() | Mth.ceil(alpha * 255.0F) << 24));
-            graphics.disableScissor();
+            graphics.textRenderer().acceptScrolling(title.copy().withColor(getFGColor() | Mth.ceil(alpha * 255.0F) << 24),
+                    (this.getRight()-getX())/2, getX() + 6, this.getRight(), getY(), getY() + 20);
         }
+        graphics.disableScissor();
 
         if (extended) {
             graphics.pose().translate(0, 0);
@@ -184,7 +184,6 @@ public class DropDownComponent<T extends DropDownComponent.SelectionEntry<?>> ex
         public void render(GuiGraphicsExtractor graphics, int x, int y, int width, boolean hovered, int fgColor, float alpha) {
             if (hovered)
                 graphics.fill(RenderPipelines.GUI, x, y, x + width, y + ENTRY_HEIGHT, 0xFFA0A0A0);
-
             graphics.textRenderer().accept(TextAlignment.LEFT, x + 6, y + 6, message.copy().withColor(fgColor | Mth.ceil(alpha * 255.0F) << 24));
         }
 

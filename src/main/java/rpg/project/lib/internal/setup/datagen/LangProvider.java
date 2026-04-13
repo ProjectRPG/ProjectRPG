@@ -54,6 +54,10 @@ public class LangProvider extends LanguageProvider {
 	//region======GLOSSARY VALUES========
 	public static final Translation NONE_DROPDOWN = Translation.Builder.start("prpg.glossary.dropdown.none")
 			.addLocale(Locale.EN_US, "Choose a System").build();
+	public static final Translation CHOOSE_DROPDOWN = Translation.Builder.start("prpg.glossary.dropdown.choose")
+			.addLocale(Locale.EN_US, "Choose a Type").build();
+	public static final Translation CHOOSE_ID = Translation.Builder.start("prpg.glossary.dropdown.choose_id")
+			.addLocale(Locale.EN_US, "Filter by Addon").build();
 	public static final Translation ABILITY_DROPDOWN = Translation.Builder.start("prpg.glossary.dropdown.ability")
 			.addLocale(Locale.EN_US, "Player Abilities").build();
 	public static final Translation FEATURE_DROPDOWN = Translation.Builder.start("prpg.glossary.dropdown.features")
