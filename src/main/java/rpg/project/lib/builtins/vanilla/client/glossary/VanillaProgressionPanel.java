@@ -1,4 +1,4 @@
-package rpg.project.lib.builtins.vanilla.client;
+package rpg.project.lib.builtins.vanilla.client.glossary;
 
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;

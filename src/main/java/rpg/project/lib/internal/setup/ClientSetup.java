@@ -14,8 +14,10 @@ import rpg.project.lib.api.events.conditions.EventConditionAny;
 import rpg.project.lib.api.events.conditions.EventConditionEntityMatches;
 import rpg.project.lib.api.events.conditions.EventConditionNBT;
 import rpg.project.lib.api.events.conditions.EventConditionNot;
+import rpg.project.lib.builtins.vanilla.VanillaAbilityConfigType;
 import rpg.project.lib.builtins.vanilla.VanillaProgressionConfigType;
-import rpg.project.lib.builtins.vanilla.client.VanillaProgressionPanel;
+import rpg.project.lib.builtins.vanilla.client.glossary.VanillaAbilityPanel;
+import rpg.project.lib.builtins.vanilla.client.glossary.VanillaProgressionPanel;
 import rpg.project.lib.internal.client.glossary.AndConditionPanel;
 import rpg.project.lib.internal.client.glossary.AnyConditionPanel;
 import rpg.project.lib.internal.client.glossary.EntityMatchConditionPanel;
@@ -50,6 +52,7 @@ public class ClientSetup {
     public static void registerPanels(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             ClientPanelRegistry.registerProgressionPanel(VanillaProgressionConfigType.ID, VanillaProgressionPanel::new);
+            ClientPanelRegistry.registerAbilityPanel(VanillaAbilityConfigType.ID, VanillaAbilityPanel::new);
 
             ClientPanelRegistry.registerConditionPanel(EventCondition.ALL_OF.getId(), c -> new AndConditionPanel((EventConditionAnd) c));
             ClientPanelRegistry.registerConditionPanel(EventCondition.ANY_OF.getId(), c -> new AnyConditionPanel((EventConditionAny) c));

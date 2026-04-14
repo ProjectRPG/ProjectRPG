@@ -8,8 +8,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
-import rpg.project.lib.builtins.vanilla.VanillaAbilityPanel;
-import rpg.project.lib.builtins.vanilla.VanillaProgressionPanel;
+import rpg.project.lib.builtins.vanilla.client.sidepanels.VanillaProgressionPanel;
 import rpg.project.lib.internal.setup.datagen.LangProvider;
 import rpg.project.lib.internal.util.Reference;
 

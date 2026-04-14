@@ -2,20 +2,14 @@ package rpg.project.lib.builtins.vanilla;
 
 import java.util.ArrayList;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.DataProvider;
-import net.minecraft.server.permissions.LevelBasedPermissionSet;
-import net.minecraft.server.permissions.PermissionLevel;
 import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.level.saveddata.SavedDataType;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
-import org.apache.logging.log4j.LogManager;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -29,8 +23,6 @@ import java.util.List;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -38,13 +30,13 @@ import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.client.components.SidePanelContentProvider;
 import rpg.project.lib.api.data.CodecTypes;
 import rpg.project.lib.api.data.ObjectType;
-import rpg.project.lib.api.data.SubSystemConfig;
 import rpg.project.lib.api.data.SubSystemConfigType;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.api.events.ProgressionAdvanceEvent;
 import rpg.project.lib.api.progression.ProgressionSystem;
 import rpg.project.lib.builtins.vanilla.VanillaProgressionConfigType.VanillaProgressionConfig;
 import rpg.project.lib.builtins.vanilla.VanillaProgressionDataType.VanillaProgressionData;
+import rpg.project.lib.builtins.vanilla.client.sidepanels.VanillaProgressionPanel;
 import rpg.project.lib.builtins.vanilla.network.VanillaProgressionSync;
 import rpg.project.lib.internal.network.Networking;
 

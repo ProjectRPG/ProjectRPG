@@ -17,6 +17,7 @@ import rpg.project.lib.api.client.components.SidePanelContentProvider;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.builtins.vanilla.VanillaAbilityConfigType.VanillaAbilityConfig;
+import rpg.project.lib.builtins.vanilla.client.sidepanels.VanillaAbilityPanel;
 import rpg.project.lib.internal.setup.datagen.LangProvider;
 
 public class VanillaAbilitySystem implements AbilitySystem{

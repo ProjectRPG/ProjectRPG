@@ -1,9 +1,7 @@
-package rpg.project.lib.builtins.vanilla;
+package rpg.project.lib.builtins.vanilla.client.sidepanels;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.client.components.SidePanelContentProvider;
@@ -12,12 +10,13 @@ import rpg.project.lib.internal.setup.datagen.LangProvider;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VanillaProgressionPanel implements SidePanelContentProvider {
+public class VanillaAbilityPanel implements SidePanelContentProvider {
     Minecraft mc = Minecraft.getInstance();
     private final List<MutableComponent> gainList = new ArrayList<>();
-    public static final VanillaProgressionPanel INSTANCE = new VanillaProgressionPanel();
-    private VanillaProgressionPanel() {
-        gainList.add(LangProvider.PROGRESSION_SIDE_PANEL_HEADER.asComponent().withStyle(ChatFormatting.BLUE));
+
+    public static final VanillaAbilityPanel INSTANCE = new VanillaAbilityPanel();
+    private VanillaAbilityPanel() {
+        gainList.add(LangProvider.ABILITY_SIDE_PANEL_HEADER.asComponent());
     }
 
     public void addLine(MutableComponent component) {
@@ -25,11 +24,12 @@ public class VanillaProgressionPanel implements SidePanelContentProvider {
         if (gainList.size() > 20)
             gainList.remove(1);
     }
+
     @Override
     public void render(GuiGraphicsExtractor pGuiGraphics, int top, int left, int width, int height, double scale, float pPartialTick, Hub core) {
         int limit = scale == 1d ? 20 : 10;
         for (int i = 0; i < gainList.size() && i < limit; i++) {
-            pGuiGraphics.drawScrollingString(pGuiGraphics.textRenderer(), mc.font, gainList.get(i).withColor(0xFFFFFF), left, width - left, top + (i * 12));
+            pGuiGraphics.drawScrollingString(pGuiGraphics.textRenderer(), mc.font, gainList.get(i).withColor(0xFFFFFF), left, width + left, top + (i * 12));
         }
     }
 }

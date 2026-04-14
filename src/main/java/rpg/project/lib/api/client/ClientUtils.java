@@ -1,8 +1,10 @@
 package rpg.project.lib.api.client;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
+import rpg.project.lib.api.abilities.AbilityUtils;
 
 /**Utilities for the client which safely do not access server-only classes*/
 public class ClientUtils {
@@ -27,5 +29,9 @@ public class ClientUtils {
      */
     public static MutableComponent getAbilityName(Identifier abilityID) {
         return Component.translatable("ability."+abilityID.toString().replace(":","."));
+    }
+
+    public static MutableComponent getAbilityName(CompoundTag config) {
+        return getAbilityName(Identifier.parse(config.getStringOr(AbilityUtils.TYPE, "prpg:missing")));
     }
 }
