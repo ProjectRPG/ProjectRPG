@@ -26,29 +26,20 @@ public class RegistryUtil {
 		return access.lookupOrThrow(registry).getKey(source);
 	}
 
-	public static Identifier getId(RegistryAccess access, ItemStack stack) {
-		return getId(access, Registries.ITEM, stack.getItem());
+	public static Identifier getId(RegistryAccess access, Item item) {
+		return getId(access, Registries.ITEM, item);
 	}
+	public static Identifier getId(RegistryAccess access, ItemStack stack) {getId(access, stack.getItem());}
 
-	public static Identifier getId(RegistryAccess access, Block stack) {
-		return getId(access, Registries.BLOCK, stack);
+	public static Identifier getId(RegistryAccess access, Block block) {
+		return getId(access, Registries.BLOCK, block);
 	}
+	public static Identifier getId(RegistryAccess access, BlockState state) {getId(access, state.getBlock());}
 
-	public static Identifier getId(ItemStack stack) {
-		return getId(stack.getItem());
+	public static Identifier getId(RegistryAccess access, EntityType<?> entity) {
+		return getId(access, Registries.ENTITY_TYPE, entity);
 	}
-
-	public static Identifier getId(Item item) {
-		return BuiltInRegistries.ITEM.getKey(item);
-	}
-
-	public static Identifier getId(BlockState blockState) {
-		return getId(blockState.getBlock());
-	}
-
-	public static Identifier getId(Block block) {
-		return BuiltInRegistries.BLOCK.getKey(block);
-	}
+	public static Identifier getId(RegistryAccess access, Entity entity) {return getId(access, entity.getType());}
 
 	public static Identifier getId(Holder<?> biome) {
 		return biome.unwrapKey().get().identifier();
@@ -56,14 +47,6 @@ public class RegistryUtil {
 
 	public static Identifier getId(SoundEvent sound) {
 		return BuiltInRegistries.SOUND_EVENT.getKey(sound);
-	}
-
-	public static Identifier getId(Entity entity) {
-		return getId(entity.getType());
-	}
-
-	public static Identifier getId(EntityType<?> entity) {
-		return BuiltInRegistries.ENTITY_TYPE.getKey(entity);
 	}
 
 	public static Identifier getDimension(LevelAccessor level) {

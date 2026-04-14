@@ -74,7 +74,7 @@ public class EventFactories {
 				EventPriority.LOWEST,
 				AnvilCraftEvent.Post.class,
 				context -> true,
-				event -> EventContext.build(RegistryUtil.getId(event.getOutput()), EventContext.ITEMSTACK, event.getOutput(), event.getEntity(), event.getEntity().level())
+				event -> EventContext.build(RegistryUtil.getId(event.getEntity().registryAccess(), event.getOutput()), EventContext.ITEMSTACK, event.getOutput(), event.getEntity(), event.getEntity().level())
 						.withParam(EventContext.NBT, TagUtils.stackTag(event.getOutput(), event.getEntity().registryAccess())).create(),
 				(e, v) -> {},
 				(event, vars) -> {}
@@ -84,7 +84,7 @@ public class EventFactories {
 				EventPriority.LOWEST,
 				BlockEvent.BreakEvent.class,
 				context -> true,
-				event -> EventContext.build(RegistryUtil.getId(event.getState()), LootContextParams.BLOCK_STATE, event.getState(), event.getPlayer(), event.getLevel())
+				event -> EventContext.build(RegistryUtil.getId(event.getPlayer().registryAccess(), event.getState()), LootContextParams.BLOCK_STATE, event.getState(), event.getPlayer(), event.getLevel())
 						.withParam(LootContextParams.ORIGIN, event.getPos().getCenter())
 						.withParam(EventContext.NBT, TagUtils.mergeTags(TagUtils.stateTag(event.getState()), TagUtils.tileTag(event.getPlayer().level().getBlockEntity(event.getPos())))).create(),
 				EventFactories::fullCancel,
@@ -95,7 +95,7 @@ public class EventFactories {
 				EventPriority.LOWEST,
 				PlayerEvent.BreakSpeed.class,
 				context -> true,
-				event -> EventContext.build(RegistryUtil.getId(event.getState()), LootContextParams.BLOCK_STATE, event.getState(), event.getEntity(), event.getEntity().level())
+				event -> EventContext.build(RegistryUtil.getId(event.getEntity().registryAccess(), event.getState()), LootContextParams.BLOCK_STATE, event.getState(), event.getEntity(), event.getEntity().level())
 						.withParam(LootContextParams.ORIGIN, event.getPosition().orElse(BlockPos.ZERO).getCenter())
 						.withParam(EventContext.NBT, TagUtils.mergeTags(TagUtils.stateTag(event.getState()), TagUtils.tileTag(event.getEntity().level().getBlockEntity(event.getPosition().get())))).create(),
 				EventFactories::fullCancel,
@@ -109,7 +109,7 @@ public class EventFactories {
 				EventPriority.LOWEST,
 				BlockEvent.EntityPlaceEvent.class,
 				context -> true,
-				event -> EventContext.build(RegistryUtil.getId(event.getState()), LootContextParams.BLOCK_STATE, event.getState(), orNull(event.getEntity()), event.getLevel())
+				event -> EventContext.build(RegistryUtil.getId(event.getEntity().registryAccess(), event.getState()), LootContextParams.BLOCK_STATE, event.getState(), orNull(event.getEntity()), event.getLevel())
 						.withParam(LootContextParams.ORIGIN, event.getPos().getCenter())
 						.withParam(EventContext.NBT, TagUtils.mergeTags(TagUtils.stateTag(event.getState()), TagUtils.tileTag(event.getEntity().level().getBlockEntity(event.getPos())))).create(),
 				EventFactories::fullCancel,
@@ -138,7 +138,7 @@ public class EventFactories {
 				EventPriority.LOWEST,
 				BabyEntitySpawnEvent.class,
 				context -> true,
-				event -> EventContext.build(RegistryUtil.getId(event.getChild()), EventContext.BABY, event.getChild(), event.getCausedByPlayer(), event.getCausedByPlayer().level())
+				event -> EventContext.build(RegistryUtil.getId(event.getCausedByPlayer().registryAccess(), event.getChild()), EventContext.BABY, event.getChild(), event.getCausedByPlayer(), event.getCausedByPlayer().level())
 						.withParam(EventContext.PARENT_A, event.getParentA())
 						.withParam(EventContext.PARENT_B, event.getParentB())
 						.withParam(EventContext.NBT, TagUtils.entityTag(event.getChild())).create(),
@@ -150,7 +150,7 @@ public class EventFactories {
 				EventPriority.LOWEST,
 				AnimalTameEvent.class,
 				context -> true,
-				event -> EventContext.build(RegistryUtil.getId(event.getAnimal()), LootContextParams.THIS_ENTITY, event.getAnimal(), event.getTamer(), event.getAnimal().level())
+				event -> EventContext.build(RegistryUtil.getId(event.getEntity().registryAccess(), event.getAnimal()), LootContextParams.THIS_ENTITY, event.getAnimal(), event.getTamer(), event.getAnimal().level())
 						.withParam(EventContext.NBT, TagUtils.entityTag(event.getAnimal())).create(),
 				EventFactories::fullCancel,
 				(e, c) -> {}
@@ -160,7 +160,7 @@ public class EventFactories {
 				EventPriority.LOWEST,
 				PlayerBrewedPotionEvent.class,
 				context -> true,
-				event -> EventContext.build(RegistryUtil.getId(event.getStack()), EventContext.ITEMSTACK, event.getStack(), event.getEntity(), event.getEntity().level())
+				event -> EventContext.build(RegistryUtil.getId(event.getEntity().registryAccess(), event.getStack()), EventContext.ITEMSTACK, event.getStack(), event.getEntity(), event.getEntity().level())
 						.withParam(EventContext.NBT, TagUtils.stackTag(event.getStack(), event.getEntity().registryAccess())).create(),
 				(e, c) -> {},
 				(e, c) -> {}
@@ -171,7 +171,7 @@ public class EventFactories {
 				LivingEntityUseItemEvent.Finish.class,
 				//TODO test that FOOD does not have a default value that would create a never-null scenario
 				context -> context.getParam(EventContext.ITEMSTACK).has(DataComponents.FOOD),
-				event -> EventContext.build(RegistryUtil.getId(event.getItem()), EventContext.ITEMSTACK, event.getItem(), orNull(event.getEntity()), event.getEntity().level())
+				event -> EventContext.build(RegistryUtil.getId(event.getEntity().registryAccess(), event.getItem()), EventContext.ITEMSTACK, event.getItem(), orNull(event.getEntity()), event.getEntity().level())
 						.withParam(EventContext.NBT, TagUtils.stackTag(event.getItem(), event.getEntity().registryAccess())).create(),
 				(e,v) -> {},
 				(e,v) -> {}
@@ -181,7 +181,7 @@ public class EventFactories {
 				EventPriority.LOWEST,
 				PlayerEvent.ItemCraftedEvent.class,
 				context -> true,
-				event -> EventContext.build(RegistryUtil.getId(event.getCrafting()), EventContext.ITEMSTACK, event.getCrafting(), event.getEntity(), event.getEntity().level())
+				event -> EventContext.build(RegistryUtil.getId(event.getEntity().registryAccess(), event.getCrafting()), EventContext.ITEMSTACK, event.getCrafting(), event.getEntity(), event.getEntity().level())
 						.withParam(EventContext.NBT, TagUtils.stackTag(event.getCrafting(), event.getEntity().registryAccess())).create(),
 				(e, v) -> {},
 				(e, v) -> {}
@@ -191,7 +191,7 @@ public class EventFactories {
 				EventPriority.LOWEST,
 				LivingDeathEvent.class,
 				context -> true,
-				event -> EventContext.build(RegistryUtil.getId(event.getEntity()), LootContextParams.THIS_ENTITY, event.getEntity(), orNull(event.getSource().getEntity()), event.getEntity().level())
+				event -> EventContext.build(RegistryUtil.getId(event.getEntity().registryAccess(), event.getEntity()), LootContextParams.THIS_ENTITY, event.getEntity(), orNull(event.getSource().getEntity()), event.getEntity().level())
 						.withParam(EventContext.NBT, TagUtils.entityTag(event.getEntity())).create(),
 				EventFactories::fullCancel,
 				(e, v) -> {}
@@ -212,7 +212,7 @@ public class EventFactories {
 				EventPriority.LOWEST,
 				ItemFishedEvent.class,
 				context -> true,
-				event -> EventContext.build(RegistryUtil.getId(event.getDrops().getFirst()), EventContext.ITEMSTACK, event.getDrops().getFirst(), event.getEntity(), event.getEntity().level())
+				event -> EventContext.build(RegistryUtil.getId(event.getEntity().registryAccess(), event.getDrops().getFirst()), EventContext.ITEMSTACK, event.getDrops().getFirst(), event.getEntity(), event.getEntity().level())
 						.withParam(EventContext.NBT, TagUtils.stackTag(event.getDrops().getFirst(), event.getEntity().registryAccess())).create(),
 				EventFactories::fullCancel,
 				(e, c) -> {}
@@ -271,7 +271,7 @@ public class EventFactories {
 			EventPriority.LOWEST,
 			AttackEntityEvent.class,
 			context -> true,
-			event -> EventContext.build(RegistryUtil.getId(event.getTarget()), LootContextParams.THIS_ENTITY, event.getTarget(), event.getEntity(), event.getEntity().level())
+			event -> EventContext.build(RegistryUtil.getId(event.getEntity().registryAccess(), event.getTarget()), LootContextParams.THIS_ENTITY, event.getTarget(), event.getEntity(), event.getEntity().level())
 					.withParam(EventContext.NBT, TagUtils.entityTag(event.getTarget())).create(),
 			EventFactories::fullCancel,
 			(e, c) -> {}
@@ -281,7 +281,7 @@ public class EventFactories {
 			EventPriority.LOWEST,
 			LivingDamageEvent.Pre.class,
 			context -> true,
-			event -> EventContext.build(RegistryUtil.getId(event.getEntity()), LootContextParams.THIS_ENTITY, event.getEntity(), orNull(event.getSource().getEntity()), event.getEntity().level())
+			event -> EventContext.build(RegistryUtil.getId(event.getEntity().registryAccess(), event.getEntity()), LootContextParams.THIS_ENTITY, event.getEntity(), orNull(event.getSource().getEntity()), event.getEntity().level())
 					.withParam(LootContextParams.DAMAGE_SOURCE, event.getSource())
 					.withDynamicParam(EventContext.CHANGE_AMOUNT, event.getNewDamage())
 					.withParam(EventContext.NBT, TagUtils.entityTag(event.getEntity())).create(),
@@ -293,7 +293,7 @@ public class EventFactories {
 			EventPriority.LOWEST,
 			LivingDamageEvent.Pre.class,
 			context -> context.getParam(LootContextParams.THIS_ENTITY) != null,
-			event -> EventContext.build(event.getSource().getEntity() == null ? Reference.resource("null") : RegistryUtil.getId(event.getSource().getEntity()), LootContextParams.THIS_ENTITY, event.getSource().getEntity(), orNull(event.getEntity()), event.getEntity().level())
+			event -> EventContext.build(event.getSource().getEntity() == null ? Reference.resource("null") : RegistryUtil.getId(event.getEntity().registryAccess(), event.getSource().getEntity()), LootContextParams.THIS_ENTITY, event.getSource().getEntity(), orNull(event.getEntity()), event.getEntity().level())
 					.withParam(LootContextParams.DAMAGE_SOURCE, event.getSource())
 					.withDynamicParam(EventContext.CHANGE_AMOUNT, event.getNewDamage())
 					.withParam(EventContext.NBT, event.getSource().getEntity() == null ? new CompoundTag() : TagUtils.entityTag(event.getSource().getEntity())).create(),
@@ -462,7 +462,7 @@ public class EventFactories {
 				EventPriority.LOWEST,
 				LivingEntityUseItemEvent.Finish.class,
 				context -> true,
-				event -> EventContext.build(RegistryUtil.getId(event.getItem()), EventContext.ITEMSTACK, event.getItem(), orNull(event.getEntity()), event.getEntity().level())
+				event -> EventContext.build(RegistryUtil.getId(event.getEntity().registryAccess(), event.getItem()), EventContext.ITEMSTACK, event.getItem(), orNull(event.getEntity()), event.getEntity().level())
 						.withParam(EventContext.NBT, TagUtils.stackTag(event.getItem(), event.getEntity().registryAccess())).create(),
 				(e, c) -> {},
 				(e, c) -> {}
@@ -472,7 +472,7 @@ public class EventFactories {
 				EventPriority.LOWEST,
 				PlayerInteractEvent.RightClickItem.class,
 				context -> true,
-				event -> EventContext.build(RegistryUtil.getId(event.getItemStack()), EventContext.ITEMSTACK, event.getItemStack(), orNull(event.getEntity()), event.getEntity().level())
+				event -> EventContext.build(RegistryUtil.getId(event.getEntity().registryAccess(), event.getItemStack()), EventContext.ITEMSTACK, event.getItemStack(), orNull(event.getEntity()), event.getEntity().level())
 						.withParam(EventContext.NBT, TagUtils.stackTag(event.getItemStack(), event.getEntity().registryAccess())).create(),
 				(e, c) -> {},
 				(e, c) -> {}
@@ -482,7 +482,7 @@ public class EventFactories {
 				EventPriority.LOWEST,
 				PlayerEnchantItemEvent.class,
 				context -> true,
-				event -> EventContext.build(RegistryUtil.getId(event.getEnchantedItem()), EventContext.ITEMSTACK, event.getEnchantedItem(), event.getEntity(), event.getEntity().level())
+				event -> EventContext.build(RegistryUtil.getId(event.getEntity().registryAccess(), event.getEnchantedItem()), EventContext.ITEMSTACK, event.getEnchantedItem(), event.getEntity(), event.getEntity().level())
 						.withParam(LootContextParams.ENCHANTMENT_LEVEL, event.getEnchantments().stream().mapToInt(instance -> instance.level()).max().orElse(0))
 						.withParam(EventContext.NBT, TagUtils.stackTag(event.getEnchantedItem(), event.getEntity().registryAccess())).create(),
 				(e, c) -> {},
