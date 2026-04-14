@@ -1,0 +1,20 @@
+{
+  "name": "Project RPG",
+  "description": "A hub mod for adding RPG elements to Minecraft through addons",
+  "version": "1.0.0",
+  "author": "Caltinor",
+  "license": "All Rights Reserved",
+  "repository": "https://github.com/your-repo",
+  "minecraftVersion": "1.21.1",
+  "modLoader": "NeoForge",
+  "sections": [
+    {
+      "title": "User Guide",
+      "path": "users"
+    },
+    {
+      "title": "Developer Guide",
+      "path": "developers"
+    }
+  ]
+}

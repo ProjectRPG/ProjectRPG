@@ -1,0 +1,38 @@
+# Built-in Abilities
+
+Project RPG provides several built-in abilities that can be configured to activate on events.
+
+## Break Speed
+
+Increases the speed of breaking blocks with tools based on player progress.
+
+- **Configuration**: Specify bonuses for different tool actions (e.g., pickaxe, shovel).
+- **Effect**: Multiplies break speed by (1 + progress level * bonus).
+
+## Effect
+
+Applies potion effects to the player.
+
+- **Configuration**: Effect type, duration, amplifier, etc.
+- **Effect**: Adds the effect with duration based on progress.
+
+## Attribute
+
+Modifies player attributes like health or speed.
+
+- **Configuration**: Attribute ID, base boost, per-level boost, max boost.
+- **Effect**: Adds attribute modifier based on progress.
+
+## Command
+
+Executes commands or functions when activated.
+
+- **Configuration**: Command string or function ID.
+- **Effect**: Runs the command with elevated permissions.
+
+## Modify Value
+
+Modifies numeric values like damage or jump height.
+
+- **Configuration**: Base change, per-level change, max boost, damage types (for damage).
+- **Effect**: Adds to the change amount based on progress.

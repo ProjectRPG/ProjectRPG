@@ -1,0 +1,31 @@
+# APIs
+
+Project RPG provides APIs for addons to implement RPG systems. Implement interfaces and register them.
+
+## Core Interfaces
+- **ProgressionSystem<T>**: Manages player progress in containers. Implement `getProgress`, `setProgress`, `getProgressionToBeAwarded`.
+- **AbilitySystem**: Controls ability activation. Implement how abilities are made available.
+- **GateSystem**: Handles gating for events, progress, features, abilities. Implement `isActionPermitted`.
+- **Feature**: Defines custom callbacks. Record with ID, function, and context check.
+- **EventProvider<T>**: Registers event listeners. Implement `getListenerSpecifications`.
+- **PartySystem**: Manages parties. Implement group logic.
+
+## Registration
+Use registries in `CommonSetup`:
+- `ABILITIES.register(...)` for AbilitySystem.
+- `PROGRESSION_ADDONS.register(...)` for ProgressionAddon.
+- Etc.
+
+Register in your mod's constructor via the event bus.
+
+## Data Types
+- **SubSystemConfig**: Configuration for objects (e.g., items, blocks).
+- **EventContext**: Variables from events (player, subject, etc.).
+- **ProgressionDataType**: Serialization for progress values.
+
+## Hub Access
+Use `Hub` interface for shared resources:
+- `getProgression()`, `getAbility()`, etc.
+- Access configs via `getProgressionData()`.
+
+See source code in `src/main/java/rpg/project/lib/api/` for full details.

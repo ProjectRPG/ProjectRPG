@@ -1,0 +1,50 @@
+# Getting Started for Developers
+
+This guide helps developers create addons for Project RPG, extending its RPG framework.
+
+## Prerequisites
+- Java 21 (for NeoForge).
+- NeoForge MDK (Mod Development Kit).
+- Familiarity with Minecraft modding and NeoForge APIs.
+- Project RPG as a dependency.
+
+## Setting Up Your Mod
+1. Download NeoForge MDK for 1.21.1.
+2. Create a new mod project.
+3. Add Project RPG as a dependency in `build.gradle`:
+   ```gradle
+   dependencies {
+       implementation 'rpg.project:projectrpg:1.0.0'
+   }
+   ```
+4. In your mod's main class, register systems (see APIs below).
+
+## Basic Structure
+An addon typically implements interfaces like `ProgressionSystem`, `AbilitySystem`, etc.
+- Register in your mod's constructor using the event bus.
+- Use registries provided by Project RPG (e.g., `CommonSetup.ABILITIES.register(...)`).
+
+## Example: Simple Progression Addon
+```java
+@Mod("youraddon")
+public class YourAddon {
+    public YourAddon(IEventBus bus) {
+        // Register a custom progression system
+        CommonSetup.PROGRESSION_ADDONS.register(bus);
+        bus.addListener(this::registerProgression);
+    }
+
+    private void registerProgression(RegisterEvent event) {
+        event.register(YourProgressionAddon.ID, new YourProgressionAddon());
+    }
+}
+```
+
+See [APIs](APIs.mdx) for details and [Examples](Examples.mdx) for code.
+
+## Testing
+- Run in development environment.
+- Test with Project RPG installed.
+- Use `/rpg` commands to verify.
+
+For questions, open issues on GitHub.
