@@ -4,6 +4,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
@@ -12,10 +14,12 @@ import net.neoforged.fml.LogicalSide;
 import rpg.project.lib.api.client.ResponsiveLayout;
 import rpg.project.lib.api.client.types.DisplayType;
 import rpg.project.lib.api.client.types.GlossaryFilter;
+import rpg.project.lib.api.client.types.PositionType;
 import rpg.project.lib.api.client.wrappers.BoxDimensions;
 import rpg.project.lib.api.client.wrappers.Positioner;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.internal.Core;
+import rpg.project.lib.internal.client.glossary.components.BlockHeader;
 import rpg.project.lib.internal.client.glossary.components.ItemHeader;
 import rpg.project.lib.internal.config.readers.MainSystemConfig;
 import rpg.project.lib.internal.util.MsLoggy;
@@ -108,15 +112,16 @@ public class ContentScroll extends ObjectSelectionList<ContentScroll.Panel> impl
                 ItemHeader header = new ItemHeader(stack);
                 return new Panel(new PanelWidget(0x882e332e, width, config, header));
             }).toList(), executor);
-//
-//        RegistryAccess access = Minecraft.getInstance().player.registryAccess();
-//        CompletableFuture<List<Positioner.Layout>> blocks = layoutAsync(() ->
-//                access.lookupOrThrow(Registries.BLOCK).listElements().map(ref -> new Positioner.Layout(
-//                        new BlockObjectPanelWidget(0x882e2f33, width, ref.value()),
-//                        PositionType.STATIC.constraint,
-//                        SizeConstraints.builder().internalHeight().build()
-//                )).toList(), executor);
-//
+
+        RegistryAccess access = Minecraft.getInstance().player.registryAccess();
+        CompletableFuture<List<Panel>> blocks = async(() ->
+                access.lookupOrThrow(Registries.BLOCK).listElements().map(ref -> {
+                    Identifier id = ref.key().identifier();
+                    MainSystemConfig config = core.getLoader().getLoader(ObjectType.BLOCK).getData(id);
+                    BlockHeader header = new BlockHeader(ref.value());
+                    return new Panel(new PanelWidget(0x882e2f33, width, config, header));
+                }).toList(), executor);
+
 //        CompletableFuture<List<Positioner.Layout>> entities = layoutAsync(() ->
 //                access.lookupOrThrow(Registries.ENTITY_TYPE).listElements()
 //                        .map(ref -> ref.value().create(Minecraft.getInstance().level, EntitySpawnReason.COMMAND))
@@ -166,8 +171,8 @@ public class ContentScroll extends ObjectSelectionList<ContentScroll.Panel> impl
 //                        SizeConstraints.builder().internalHeight().build())).toList(), executor);
 //
         CompletableFuture.allOf(
-                items//,
-//                blocks,
+                items,
+                blocks//,
 //                entities,
 //                biomes,
 //                dimensions,
@@ -177,7 +182,7 @@ public class ContentScroll extends ObjectSelectionList<ContentScroll.Panel> impl
         ).thenRun(() -> {
             try {
                 allItems.addAll(items.join());
-//                cache.addAll(blocks.join());
+                allItems.addAll(blocks.join());
 //                cache.addAll(entities.join());
 //                cache.addAll(biomes.join());
 //                cache.addAll(dimensions.join());

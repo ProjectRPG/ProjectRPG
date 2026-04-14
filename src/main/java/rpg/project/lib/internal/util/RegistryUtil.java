@@ -30,6 +30,10 @@ public class RegistryUtil {
 		return getId(access, Registries.ITEM, stack.getItem());
 	}
 
+	public static Identifier getId(RegistryAccess access, Block stack) {
+		return getId(access, Registries.BLOCK, stack);
+	}
+
 	public static Identifier getId(ItemStack stack) {
 		return getId(stack.getItem());
 	}

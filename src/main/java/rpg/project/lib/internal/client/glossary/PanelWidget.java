@@ -83,6 +83,7 @@ public class PanelWidget extends ReactiveWidget {
                 widget.visible = !widget.applyFilter(filter);
         });
         //if either the main object or the children aren't displayed, filter this panel
-        return !objectComponent.visible || visibleChildren().size() <= 1;
+        this.setHeight(visibleChildren().stream().map(poser -> poser.get().getHeight()).reduce(Integer::sum).orElse(0));
+        return !objectComponent.visible || visibleChildren().isEmpty();
     }
 }
