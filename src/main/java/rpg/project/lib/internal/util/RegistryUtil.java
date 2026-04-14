@@ -29,12 +29,12 @@ public class RegistryUtil {
 	public static Identifier getId(RegistryAccess access, Item item) {
 		return getId(access, Registries.ITEM, item);
 	}
-	public static Identifier getId(RegistryAccess access, ItemStack stack) {getId(access, stack.getItem());}
+	public static Identifier getId(RegistryAccess access, ItemStack stack) {return getId(access, stack.getItem());}
 
 	public static Identifier getId(RegistryAccess access, Block block) {
 		return getId(access, Registries.BLOCK, block);
 	}
-	public static Identifier getId(RegistryAccess access, BlockState state) {getId(access, state.getBlock());}
+	public static Identifier getId(RegistryAccess access, BlockState state) {return getId(access, state.getBlock());}
 
 	public static Identifier getId(RegistryAccess access, EntityType<?> entity) {
 		return getId(access, Registries.ENTITY_TYPE, entity);

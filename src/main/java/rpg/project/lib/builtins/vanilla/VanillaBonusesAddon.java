@@ -56,7 +56,7 @@ public class VanillaBonusesAddon implements ProgressionAddon{
 		
 		for (ItemStack stack : wornAndHeld) {
 			if (stack.isEmpty()) continue;
-			core.getProgressionData(VanillaBonusConfigType.IMPL, ObjectType.ITEM, RegistryUtil.getId(stack))
+			core.getProgressionData(VanillaBonusConfigType.IMPL, ObjectType.ITEM, RegistryUtil.getId(player.registryAccess(), stack))
 				.ifPresent(config -> outList.add((VanillaBonusConfig) config));
 		}
 		return outList;

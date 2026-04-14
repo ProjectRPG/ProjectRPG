@@ -8,6 +8,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.fml.LogicalSide;
@@ -20,6 +21,7 @@ import rpg.project.lib.api.client.wrappers.Positioner;
 import rpg.project.lib.api.data.ObjectType;
 import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.client.glossary.components.BlockHeader;
+import rpg.project.lib.internal.client.glossary.components.EntityHeader;
 import rpg.project.lib.internal.client.glossary.components.ItemHeader;
 import rpg.project.lib.internal.config.readers.MainSystemConfig;
 import rpg.project.lib.internal.util.MsLoggy;
@@ -27,6 +29,7 @@ import rpg.project.lib.internal.util.RegistryUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -105,15 +108,15 @@ public class ContentScroll extends ObjectSelectionList<ContentScroll.Panel> impl
 //                .toList();
 //
 //        explanation.forEach(this::addChild);
+        RegistryAccess access = Minecraft.getInstance().player.registryAccess();
         CompletableFuture<List<Panel>> items = async(() ->
             CreativeModeTabs.searchTab().getDisplayItems().stream().map(stack -> {
-                Identifier id = RegistryUtil.getId(stack);
+                Identifier id = RegistryUtil.getId(access, stack);
                 MainSystemConfig config = core.getLoader().getLoader(ObjectType.ITEM).getData(id);
                 ItemHeader header = new ItemHeader(stack);
                 return new Panel(new PanelWidget(0x882e332e, width, config, header));
             }).toList(), executor);
 
-        RegistryAccess access = Minecraft.getInstance().player.registryAccess();
         CompletableFuture<List<Panel>> blocks = async(() ->
                 access.lookupOrThrow(Registries.BLOCK).listElements().map(ref -> {
                     Identifier id = ref.key().identifier();
@@ -122,16 +125,17 @@ public class ContentScroll extends ObjectSelectionList<ContentScroll.Panel> impl
                     return new Panel(new PanelWidget(0x882e2f33, width, config, header));
                 }).toList(), executor);
 
-//        CompletableFuture<List<Positioner.Layout>> entities = layoutAsync(() ->
-//                access.lookupOrThrow(Registries.ENTITY_TYPE).listElements()
-//                        .map(ref -> ref.value().create(Minecraft.getInstance().level, EntitySpawnReason.COMMAND))
-//                        .filter(Objects::nonNull)
-//                        .map(entity -> new Positioner.Layout(
-//                                new EntityObjectPanelWidget(0x88394045, width, entity),
-//                                PositionType.STATIC.constraint,
-//                                SizeConstraints.builder().internalHeight().build())
-//                        ).toList(), executor);
-//
+        CompletableFuture<List<Panel>> entities = async(() ->
+                access.lookupOrThrow(Registries.ENTITY_TYPE).listElements()
+                        .map(ref -> ref.value().create(Minecraft.getInstance().level, EntitySpawnReason.COMMAND))
+                        .filter(Objects::nonNull)
+                        .map(entity -> {
+                            Identifier id = RegistryUtil.getId(access, entity);
+                            MainSystemConfig config = core.getLoader().getLoader(ObjectType.ENTITY).getData(id);
+                            EntityHeader header = new EntityHeader(entity.getType());
+                            return new Panel(new PanelWidget(0x88394045, width, config, header));}
+                        ).toList(), executor);
+
 //        CompletableFuture<List<Positioner.Layout>> biomes = layoutAsync(() ->
 //                access.lookupOrThrow(Registries.BIOME).listElements()
 //                        .filter(Objects::nonNull)
@@ -172,8 +176,8 @@ public class ContentScroll extends ObjectSelectionList<ContentScroll.Panel> impl
 //
         CompletableFuture.allOf(
                 items,
-                blocks//,
-//                entities,
+                blocks,
+                entities//,
 //                biomes,
 //                dimensions,
 //                effects,
@@ -183,7 +187,7 @@ public class ContentScroll extends ObjectSelectionList<ContentScroll.Panel> impl
             try {
                 allItems.addAll(items.join());
                 allItems.addAll(blocks.join());
-//                cache.addAll(entities.join());
+                allItems.addAll(entities.join());
 //                cache.addAll(biomes.join());
 //                cache.addAll(dimensions.join());
 //                cache.addAll(effects.join());
