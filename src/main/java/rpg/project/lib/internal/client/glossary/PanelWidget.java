@@ -45,7 +45,7 @@ public class PanelWidget extends ReactiveWidget {
         }
         //abilities
         for (SubSystemConfig sys : config.abilities()) {
-            SubSystemGlossaryPanel panel = ClientPanelRegistry.getAbilityPanel(sys.getType().getId());
+            SubSystemGlossaryPanel panel = ClientPanelRegistry.getAbilitySystemPanel(sys.getType().getId());
             if (panel == null) continue;
             addChild((AbstractWidget) panel.make(sys),
                     PositionConstraints.offset(10, 0),

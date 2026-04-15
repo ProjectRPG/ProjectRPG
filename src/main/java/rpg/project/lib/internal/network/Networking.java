@@ -37,7 +37,7 @@ public class Networking {
 	
 	public static void registerDataSyncPackets() {
 		Core.get(LogicalSide.SERVER).getLoader().RELOADER.subscribeAsSyncable(CP_ClearData::new);
-		Core.get(LogicalSide.SERVER).getLoader().all().forEach(listener -> listener.subscribeAsSyncable((o) -> new CP_SyncData(ObjectType.ITEM, o)));
+		Core.get(LogicalSide.SERVER).getLoader().all().forEach(entry -> entry.getValue().subscribeAsSyncable((o) -> new CP_SyncData(entry.getKey(), o)));
 	}
 
 	public static void sendToClient(CustomPacketPayload packet, ServerPlayer player) {

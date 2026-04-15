@@ -41,6 +41,9 @@ public class RegistryUtil {
 	}
 	public static Identifier getId(RegistryAccess access, Entity entity) {return getId(access, entity.getType());}
 
+	public static Identifier getId(RegistryAccess access, Enchantment enchant) {
+		return getId(access, Registries.ENCHANTMENT, enchant);
+	}
 	public static Identifier getId(Holder<?> biome) {
 		return biome.unwrapKey().get().identifier();
 	}

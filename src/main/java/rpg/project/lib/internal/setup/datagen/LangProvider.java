@@ -52,6 +52,11 @@ public class LangProvider extends LanguageProvider {
 	public static final Translation EXAMPLE = Translation.Builder.start("key.key.key")
 			.addLocale(Locale.EN_US, "Translated Text").build();
 	//region======GLOSSARY VALUES========
+	public static final Translation LOADING_HEADER = Translation.Builder.start("pmmo.gui.glossary.loading.header")
+			.addLocale(Locale.EN_US, "Loading Glossary").build();
+	public static final Translation LOADING_EXPLANATION = Translation.Builder.start("pmmo.gui.glossary.loading.explain")
+			.addLocale(Locale.EN_US, "Please wait while the glossary loads.  Once the glossary loads, opening the glossary again will be instant.  If you leave the world or the server reloads data, this loading screen will appear again to update your glossary.").build();
+
 	public static final Translation NONE_DROPDOWN = Translation.Builder.start("prpg.glossary.dropdown.none")
 			.addLocale(Locale.EN_US, "Choose a System").build();
 	public static final Translation CHOOSE_DROPDOWN = Translation.Builder.start("prpg.glossary.dropdown.choose")

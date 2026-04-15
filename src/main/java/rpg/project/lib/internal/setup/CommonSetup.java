@@ -91,7 +91,7 @@ public class CommonSetup {
 	public static void onAddReloadListeners(AddServerReloadListenersEvent event) {
 		Core.get(LogicalSide.SERVER).getLoader().RELOADER = new ExecutableListener(event.getRegistryAccess(), DataLoader.RELOADER_FUNCTION);
 		event.addListener(Reference.resource("reloader"), Core.get(LogicalSide.SERVER).getLoader().RELOADER);
-		Core.get(LogicalSide.SERVER).getLoader().all().forEach(listener -> event.addListener(Reference.resource(listener.folderName), listener));
+		Core.get(LogicalSide.SERVER).getLoader().all().forEach(listener -> event.addListener(Reference.resource(listener.getValue().folderName), listener.getValue()));
 		Networking.registerDataSyncPackets();
 	}
 }

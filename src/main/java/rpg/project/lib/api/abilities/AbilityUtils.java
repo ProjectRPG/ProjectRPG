@@ -14,6 +14,7 @@ import net.minecraft.world.entity.player.Player;
 
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.events.EventContext;
+import rpg.project.lib.internal.registry.ClientPanelRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
 import rpg.project.lib.internal.util.Reference;
 
@@ -71,6 +72,13 @@ public class AbilityUtils {
      */
     public static void registerAbilitySystem(Supplier<AbilitySystem> system) {
     	CommonSetup.abilitySupplier = system;
+    }
+
+    public static void registerAbilityPanel(Identifier abilityID, AbilityPanelProvider panelProvider) {
+        ClientPanelRegistry.registerAbilityPanel(abilityID, panelProvider);
+    }
+    public static AbilityPanelProvider getAbilityPanel(Identifier abilityID) {
+        return ClientPanelRegistry.getAbilityPanel(abilityID);
     }
 
     public static AbilityGetter get(RegistryAccess access) {
