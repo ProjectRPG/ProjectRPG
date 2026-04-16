@@ -14,6 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.abilities.AbilitySystem;
@@ -109,7 +110,7 @@ public class Core implements Hub {
 	public void executeAbility(Identifier abilityID, Player player, CompoundTag dataIn, EventContext context, Identifier eventID) {
 		if (player == null) return;
 
-		Ability ability = AbilityUtils.get(player.level().registryAccess()).getAbility(abilityID);
+		Ability ability = player.level().registryAccess().lookupOrThrow(APIUtils.ABILITY).getOptional(abilityID).orElse(Ability.empty());
 		CompoundTag config = ability.propertyDefaults().copy().merge(dataIn);
 		if (ability.start(player, config, context)) {
 			this.getAbility().abilityActivationCallback(ability, config.copy(), player, context, eventID);

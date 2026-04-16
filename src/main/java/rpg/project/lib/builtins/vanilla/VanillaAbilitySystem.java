@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
+import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.Hub;
 import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.abilities.AbilitySystem;
@@ -35,7 +36,7 @@ public class VanillaAbilitySystem implements AbilitySystem{
 	public void abilityActivationCallback(Ability ability, CompoundTag data, Player player, EventContext context, Identifier eventID) {
 		VanillaAbilityPanel panel = (VanillaAbilityPanel) getSidePanelProvider();
 		panel.addLine(LangProvider.ABILITY_SIDE_PANEL_EVENT_HEADER.asComponent(
-			ClientUtils.getAbilityName(AbilityUtils.get(player.level().registryAccess()).registry().getKey(ability)),
+			ClientUtils.getAbilityName(player.level().registryAccess().lookupOrThrow(APIUtils.ABILITY).getKey(ability)),
 			ClientUtils.getEventName(eventID)
 		).setStyle(Style.EMPTY.withBold(true).withColor(TextColor.fromLegacyFormat(ChatFormatting.BLUE))));
 		ability.status().apply(player, data, context).forEach(panel::addLine);

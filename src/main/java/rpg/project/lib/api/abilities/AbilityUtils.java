@@ -1,19 +1,8 @@
 package rpg.project.lib.api.abilities;
 
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
-
-import java.util.List;
 import java.util.function.Supplier;
-
 import net.minecraft.util.context.ContextKey;
-import net.minecraft.world.entity.player.Player;
-
-import rpg.project.lib.api.APIUtils;
-import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.internal.registry.ClientPanelRegistry;
 import rpg.project.lib.internal.setup.CommonSetup;
 import rpg.project.lib.internal.util.Reference;
@@ -74,36 +63,28 @@ public class AbilityUtils {
     	CommonSetup.abilitySupplier = system;
     }
 
+    /**Registers a GUI provider for rendering ability information in the glossary.  This is
+     * an optional registration step when creating abilities.  Project RPG provides a default
+     * implementation of the GUI provider which uses your ability's description plus the key-
+     * value information from the config.
+     *
+     * If your ability requires more nuanced explanation of its config values, it is strongly
+     * recommended that you register a provider using this method.
+     *
+     * @param abilityID the same ID as your ability
+     * @param panelProvider the provider.
+     */
     public static void registerAbilityPanel(Identifier abilityID, AbilityPanelProvider panelProvider) {
         ClientPanelRegistry.registerAbilityPanel(abilityID, panelProvider);
     }
+
+    /**Helper method for implementations of AbilitySystem to obtain ability providers as
+     * applicable to their configurations.
+     *
+     * @param abilityID the ability ID being queried
+     * @return the registered provider or the default provider if not present.
+     */
     public static AbilityPanelProvider getAbilityPanel(Identifier abilityID) {
         return ClientPanelRegistry.getAbilityPanel(abilityID);
-    }
-
-    public static AbilityGetter get(RegistryAccess access) {
-        return new AbilityGetter(access.lookupOrThrow(APIUtils.ABILITY));
-    }
-
-    public record AbilityGetter(Registry<Ability> registry) {
-        public MutableComponent getDescription(Identifier id) {
-            return registry().getOptional(id).orElse(Ability.empty()).description();
-        }
-
-        public List<MutableComponent> getStatusLines(Identifier id, Player player, CompoundTag settings, EventContext context) {
-            return registry().getOptional(id).orElse(Ability.empty()).status().apply(player, settings, context);
-        }
-
-        public List<CompoundTag> getDefaults() {
-            return registry().entrySet().stream().map(entry -> {
-                var nbt = entry.getValue().propertyDefaults().copy();
-                nbt.putString(AbilityUtils.TYPE, entry.getKey().identifier().toString());
-                return nbt;
-            }).toList();
-        }
-
-        public Ability getAbility(Identifier id) {
-            return registry().getOptional(id).orElse(Ability.empty());
-        }
     }
 }

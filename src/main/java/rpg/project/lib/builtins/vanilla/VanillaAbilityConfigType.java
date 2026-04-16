@@ -43,9 +43,11 @@ public record VanillaAbilityConfigType() implements SubSystemConfigType {
 
 	@Override
 	public SubSystemConfig getDefault(RegistryAccess access) {return
-			new VanillaAbilityConfig(AbilityUtils.get(access).getDefaults().stream()
-					.map(compound -> new VanillaAbilityConfig.ConditionalAbility(compound, Optional.empty()))
-					.toList());}
+			new VanillaAbilityConfig(access.lookupOrThrow(APIUtils.ABILITY).entrySet().stream().map(entry -> {
+				var nbt = entry.getValue().propertyDefaults().copy();
+				nbt.putString(AbilityUtils.TYPE, entry.getKey().identifier().toString());
+				return nbt;
+			}).map(compound -> new VanillaAbilityConfig.ConditionalAbility(compound, Optional.empty())).toList());}
 
 	@Override
 	public EnumSet<APIUtils.SystemType> applicableSystemTypes() {

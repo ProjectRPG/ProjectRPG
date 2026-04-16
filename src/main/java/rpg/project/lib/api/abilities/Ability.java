@@ -3,7 +3,6 @@ package rpg.project.lib.api.abilities;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.DoubleTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
@@ -14,7 +13,6 @@ import rpg.project.lib.api.events.EventContext;
 import rpg.project.lib.internal.Core;
 
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 /**<p>Abilities are special behavior that can be activated
