@@ -60,11 +60,11 @@ public record Ability(
         /**A displayable explanation of what the ability does.*/
         MutableComponent description,
         /**Consumes the player and configuration setting to produce information
-     * about the ability that best reflects attributes of the ability when
-     * invoked.  This should be used to provide information to the player 
-     * about how the ability will behave specifical for them.  For example:
-     * how much an attributes will be boosted, the strength behind a manuever
-     * or the quantity of some form of output.*/
+         * about the ability that best reflects attributes of the ability when
+         * invoked.  This should be used to provide information to the player
+         * about how the ability will behave specifical for them.  For example:
+         * how much an attributes will be boosted, the strength behind a maneuver
+         * or the quantity of some form of output.*/
         TriFunction<Player, CompoundTag, EventContext, List<MutableComponent>> status,
         /**Dictates what side this perk can operate on.  */
         RegistrationSide side) {

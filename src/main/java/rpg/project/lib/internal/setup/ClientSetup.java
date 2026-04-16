@@ -14,6 +14,8 @@ import rpg.project.lib.api.events.conditions.EventConditionAny;
 import rpg.project.lib.api.events.conditions.EventConditionEntityMatches;
 import rpg.project.lib.api.events.conditions.EventConditionNBT;
 import rpg.project.lib.api.events.conditions.EventConditionNot;
+import rpg.project.lib.builtins.abilitypanels.AttributeAbilityPanel;
+import rpg.project.lib.builtins.abilitypanels.EffectAbilityPanel;
 import rpg.project.lib.builtins.vanilla.VanillaAbilityConfigType;
 import rpg.project.lib.builtins.vanilla.VanillaProgressionConfigType;
 import rpg.project.lib.builtins.vanilla.client.glossary.VanillaAbilityPanel;
@@ -53,6 +55,9 @@ public class ClientSetup {
         event.enqueueWork(() -> {
             ClientPanelRegistry.registerProgressionPanel(VanillaProgressionConfigType.ID, VanillaProgressionPanel::new);
             ClientPanelRegistry.registerAbilityPanel(VanillaAbilityConfigType.ID, VanillaAbilityPanel::new);
+
+            ClientPanelRegistry.registerAbilityPanel(Reference.resource("effect"), EffectAbilityPanel::new);
+            ClientPanelRegistry.registerAbilityPanel(Reference.resource("attribute"), AttributeAbilityPanel::new);
 
             ClientPanelRegistry.registerConditionPanel(EventCondition.ALL_OF.getId(), c -> new AndConditionPanel((EventConditionAnd) c));
             ClientPanelRegistry.registerConditionPanel(EventCondition.ANY_OF.getId(), c -> new AnyConditionPanel((EventConditionAny) c));

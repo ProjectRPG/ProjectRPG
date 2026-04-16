@@ -227,6 +227,8 @@ public class LangProvider extends LanguageProvider {
 			.addLocale(Locale.EN_US, "You have added %s to the %s party.").build();
 	//endregion PARTY SYSTEM
 	//region=======ABILITIES=======
+	public static final Translation PERK_DURATION = Translation.Builder.start("ability.keyword.duration")
+			.addLocale(Locale.EN_US, "Duration").build();
 	public static final Translation PERK_EFFECT = Translation.Builder.start("ability.projectrpg.effect")
 			.addLocale(Locale.EN_US, "Status Effect").build();
 	public static final Translation PERK_EFFECT_DESC = Translation.Builder.start("ability.projectrpg.effect.description")
@@ -235,10 +237,22 @@ public class LangProvider extends LanguageProvider {
 			.addLocale(Locale.EN_US, "Effect: %s").build();
 	public static final Translation PERK_EFFECT_STATUS_2 = Translation.Builder.start("ability.projectrpg.effect.status2")
 			.addLocale(Locale.EN_US, "Lvl:%s for %ss").build();
+	public static final Translation PERK_EFFECT_STATUS_3 = Translation.Builder.start("ability.projectrpg.effect.status3")
+			.addLocale(Locale.EN_US, "Ambient: %s | Visible: %s").build();
 	public static final Translation ATTRIBUTE_DESC = Translation.Builder.start("ability.projectrpg.attribute")
 			.addLocale(Locale.EN_US, "Player Attribute").build();
+	public static final Translation ATTRIBUTE_STATUS0 = Translation.Builder.start("ability.projectrpg.attribute.status0")
+			.addLocale(Locale.EN_US, "Attribute: %s").build();
 	public static final Translation ATTRIBUTE_STATUS1 = Translation.Builder.start("ability.projectrpg.attribute.status1")
 			.addLocale(Locale.EN_US, "%s modified by %s").build();
+	public static final Translation ATTRIBUTE_STATUS2 = Translation.Builder.start("ability.projectrpg.attribute.status2")
+			.addLocale(Locale.EN_US, "Gain %s +  (%s per progress level) [up to %s]").build();
+	public static final Translation ATTRIBUTE_STATUS3 = Translation.Builder.start("ability.projectrpg.attribute.status3")
+			.addLocale(Locale.EN_US, "%s progress used in calculation").build();
+	public static final Translation ATTRIBUTE_MULTIPLICATIVE = Translation.Builder.start("ability.projectrpg.attribute.status.multi")
+			.addLocale(Locale.EN_US, "Value multiplied by base attribute").build();
+	public static final Translation ATTRIBUTE_ADDITIVE = Translation.Builder.start("ability.projectrpg.attribute.status.additive")
+			.addLocale(Locale.EN_US, "Value added to base attribute").build();
 	public static final Translation COMMAND_DESC = Translation.Builder.start("ability.projectrpg.command")
 			.addLocale(Locale.EN_US, "Execute Command/Function").build();
 	public static final Translation COMMAND_STATUS_1 = Translation.Builder.start("ability.projectrpg.cmd.status1")

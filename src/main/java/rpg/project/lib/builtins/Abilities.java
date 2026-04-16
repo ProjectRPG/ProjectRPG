@@ -31,20 +31,17 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
-import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.abilities.AbilityFunction;
 import rpg.project.lib.api.abilities.AbilityUtils;
 import rpg.project.lib.api.enums.RegistrationSide;
 import rpg.project.lib.api.events.EventContext;
-import rpg.project.lib.api.events.ProgressionAdvanceEvent;
 import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.setup.CommonSetup;
 import rpg.project.lib.internal.setup.datagen.LangProvider;
 import rpg.project.lib.internal.util.Reference;
 import rpg.project.lib.internal.util.RegistryUtil;
 import rpg.project.lib.internal.util.TagBuilder;
-import rpg.project.lib.internal.util.TagUtils;
 
 public class Abilities {
 	public static void init() {
