@@ -1,50 +1,25 @@
 # Getting Started for Developers
 
-This guide helps developers create addons for Project RPG, extending its RPG framework.
+## Overview
+Project RPG is a framework which lets users pick and choose the RPG elements they want in their world by selecting Project RPG addon mods which have the features they want.  The elements users can customize are as follows
 
-## Prerequisites
-- Java 21 (for NeoForge).
-- NeoForge MDK (Mod Development Kit).
-- Familiarity with Minecraft modding and NeoForge APIs.
-- Project RPG as a dependency.
+|System|Purpose|
+|:---:|:---|
+|Progression| How players advance |
+|Progression Addons| Modifiers for Advancement |
+|Gates| Prevents or limits gameplay for players |
+|Abilities| special abilities players have or use|
+|Features| Hooks into Project RPG for non-RPG content|
+|Parties|Player grouping mechanics|
+|Events|Triggers for RPG behavior|
 
-## Setting Up Your Mod
-1. Download NeoForge MDK for 1.21.1.
-2. Create a new mod project.
-3. Add Project RPG as a dependency in `build.gradle`:
-   ```gradle
-   dependencies {
-       implementation 'rpg.project:projectrpg:1.0.0'
-   }
-   ```
-4. In your mod's main class, register systems (see APIs below).
+It is strongly recommended that a mod implement only one of these elements.  The framework is intended for players to swap out addons as needed to get the specific experience they desire.  An addon which implements more than one element may contain a feature the user wants and one they don't, which undermines the user choice that this framework aims to provide.  If you do consolidated elements into a single mod, it is strongly advised that you provide configuration options allowing individual parts to be disabled.
 
-## Basic Structure
-An addon typically implements interfaces like `ProgressionSystem`, `AbilitySystem`, etc.
-- Register in your mod's constructor using the event bus.
-- Use registries provided by Project RPG (e.g., `CommonSetup.ABILITIES.register(...)`).
-
-## Example: Simple Progression Addon
-```java
-@Mod("youraddon")
-public class YourAddon {
-    public YourAddon(IEventBus bus) {
-        // Register a custom progression system
-        CommonSetup.PROGRESSION_ADDONS.register(bus);
-        bus.addListener(this::registerProgression);
-    }
-
-    private void registerProgression(RegisterEvent event) {
-        event.register(YourProgressionAddon.ID, new YourProgressionAddon());
-    }
-}
-```
-
-See [APIs](APIs.mdx) for details and [Examples](Examples.mdx) for code.
-
-## Testing
-- Run in development environment.
-- Test with Project RPG installed.
-- Use `/rpg` commands to verify.
-
-For questions, open issues on GitHub.
+## System-Specific Implementation Guides
+- [Progression]()
+- [Progression Addons]()
+- [Gates]()
+- [Abilities]()
+- [Features]()
+- [Parties]()
+- [Events]()

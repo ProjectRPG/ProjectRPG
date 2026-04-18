@@ -18,6 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**This is part of Project RPG's proprietary responsive GUI layer.  Implemented on top
+ * of vanilla's widget system, so as to be compatible with screens, this {@link Layout}
+ * provides a base for GUI elements which can self-adjust their size and position to fit
+ * the available space according to their specified constraints without the need for
+ * individual widgets to implement their own callbacks or resizing logic.
+ *
+ */
 public interface ResponsiveLayout extends Layout {
     class Impl implements ResponsiveLayout {
         //Determines how children are arranged in the layout

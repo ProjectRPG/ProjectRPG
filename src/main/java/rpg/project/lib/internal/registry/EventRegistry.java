@@ -49,8 +49,10 @@ public class EventRegistry {
 		MsLoggy.DEBUG.log(LOG_CODE.EVENT, "Firing Event: {} with Context: {}", eventID, context);
 		//Process EVENT gates
 		CancellationType eventCancellationStatus = GateRegistry.isEventPermitted(core, eventID, context);
-		if (eventCancellationStatus != CancellationType.NONE)
+		if (eventCancellationStatus != CancellationType.NONE) {
 			spec.cancellationCallback().accept(event, eventCancellationStatus);
+			return;
+		}
 
 		for (Feature feature : core.getFeaturesForContext(eventID, context)) {
 			float gating = GateRegistry.isFeaturePermitted(core, eventID, context, feature);

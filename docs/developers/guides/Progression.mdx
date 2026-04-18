@@ -1,0 +1,135 @@
+# Implementing A Progression System
+
+## Overview
+The Progression system is the governing system for how players advance while they play.  There is only one system active in any given modpack.  If two systems are included in a pack, a race condition will decide which is used.  Players are advised to pick only one.  However, like all Project RPG systems, replacing the Progression System only resets progress in that system and has no effect on the functionality of other addons.
+
+## ProgressionSystem Object
+The progression system contains the following properties/methods
+
+### `T` in `ProgressionSystem<T extends ProgressionDataType>`
+this is the implementation of how progression data is serialized.  This is critical for allowing players to configure your specific system's values.
+
+For example, the vanilla system that ships with Project RPG uses the vanilla XP system an serializes simply to
+```json
+{"value": 123}
+```
+However, a progression system modeled after something like Project MMO, would need to specify skills and values and would look like
+```json
+{
+   "combat": 123,
+   "endurance": 456
+}
+```
+In contrast, your progression system may work with something that doesn't use numbers at all.  Your system might use advancements that reset after a certain amount of time, and your config looks like
+```json
+{
+    "advancement": "custom:kill_zombie",
+    "lifespan": 3000
+}
+
+### `T getProgress`
+This is the most common method used by other systems.  Gates will use this to test if a player has the required progress to perform an action, abilities may use this to scale their effects based on the progress amount.  In all cases, the object is your implementation of `ProgressionDataType`.
+
+### `void setProgress(UUID playerID, String container, T value)`
+This sets the progression value.  However, this is also the first time we are seeing "containers".  Containers are the abstract means by which progression can be compartmentalized.  A progression system can completely ignore containers, as the vanilla implementation does, or it can use them to create progression groups.
+
+### `List<Pair<String, Consumer<Float>> getProgressionToBeAwarded(Hub core, Identifier eventID, EventContext context)`
+This is the single most important method of the progression system.  This is what the event listeners used to invoke progression.  What should be obvious is that the method is provided event-related information such as the event ID, the context, and access to other systems via the Hub.  What it returns has more nuance.
+
+First, the `List<...>`
+Since all configurations share the same parent via `MainSystemConfig`, progression comes to the system in the form of an array.  Because users can provide multiple instances of configurations for the same system, it is possible that a lookup for progression from the data looks like this
+```json
+[
+    {"type":"my:progression_addon", "value": {"my_progression_data_type":"valueA"}},
+    {"type":"my:progression_addon", "value": {"my_progression_data_type":"valueB"}},
+    {"type":"some_other:system_type", "value":{"their:type":"theirValue"}}
+]
+```
+When your system implementation queries the config for your progression types, it will get back multiple.  You will need to iterate on them individually.
+
+Second, the `Pair<String, Consumer<Float>>`
+This is the container for this iteration's configuration and a callback to consume the gate value.  If you have not read the `Gates` section yet, gates provide their respectively gated systems with a float value between `0.0` and `1.0`.  This represents a "percentage gated".  Therefore if a progression gate were to return a value of `0.5` the assumption is that the user has configured their gate to instruct your progression system to only award half of the expected progression amount.  It is up to you to determine what partial progression means to your system.  In the vanilla context, this is just a percent of the value.  In the context of our hypothetical advancements-with-expiration system, it might mean reducing the time until expiration.
+
+The consumer is where you implement your committal of progress.  Using the built-in vanilla example, our implementation looks like
+```java
+(float_from_gates) -> player.addExperience(configuredAmount * float_from_gates);
+```
+
+### `getCommmands`
+Allows you to tell Project RPG what commands you want to expose for interacting with progression.  You do not need to implement anything, but expect that users, especially admins, will want some means to alter player progression.   You may also choose to implement a GUI instead, which is fine.
+
+### `getSidePanelProvider`
+The provider is a widget that is wrapped by Project RPG in a hidable HUD element.  It is entirely up to you what displays here.  The expected behavior is that users can see what progress they earned as they play.  You can make this into a simple log, like the default implementation, or you can make this an interactive GUI.  NOTE: this displays as a HUD overlay, so interaction will not involve the mouse.
+
+### Example Mod Implementation
+```java
+//Note, this is done as a single file for example purposes, but each class can, and
+//should, be its own file.  Especially as it relates to GUI elements as sidedness is
+//an important factor to consider.
+@Mod("my_addon")
+public class MyProgressionSystemAddon {
+    //For our systems to be readable by user configurations, we need to register them
+    DeferredRegister<SubSystemConfigType> CONFIGS = DeferredRegister.create(APIUtils.SUBSYSTEM_CODECS, "my_addon");
+    CONFIGS.register("progression", ExampleSystemConfigType::new);
+    CONFIGS.register("progress", ExampleSystemDataType::new);
+
+    public MyProgressionSystemAddon(IEventBus bus, ModContainer container) {
+        CONFIGS.register(bus);
+        bus.registerListener(this::CommonSetup);
+    }
+
+    public void CommonSetup(FMLCommonSetupEvent event) {
+        ProgressionUtils.registerProgressionSystem(ExampleSystem::new);
+    }
+
+    //this is the implmentation of the data type only
+    public record ExampleSystemDataType() implements SubSystemConfigType {
+        //override methods here
+
+        public record ExampleSystemData(...) implements ProgressionDataType {
+            //override methods here
+
+            private ExampleSystemData applyGate(float gate) {
+                //just a reference for below
+            }
+        }
+    }
+
+    //this is the implementation of the serialization of our system
+    public record ExampleSystemConfigType() implements SubSystemConfigType {
+        //override methods here
+
+        public record ExampleSystemConfig(ExampleSystemData data) implements SubSystemConfig {
+            //override methods here
+        }
+    }
+
+    //this is our actual system
+    public ExampleSystem implements ProgressionSystem<ExampleDataType> {
+        //override methods here
+
+        private void updateProgress(ExampleSystemData data) {
+            MyModSaveSystem.save(data);
+        }
+
+        @Override
+        public List<Pair<String, Consumer<Float>>> getProgressionToBeAwarded(Hub core, Identifier eventID, EventContext context) {
+            //here is an example of getting config data and what to return;
+            ExampleSystemData configData = core.getProgressionData(ExampleSystemConfig.TYPE, ObjectType.EVENT, eventID).data();
+            ExampleSystemData actorData = core.getProgressionData(ExampleSystemConfig.TYPE, context.getSubjectType(), context.getSubjectID()).data();
+
+            List<Pair<String, Consumer<Float>> output = new ArrayList<>();
+            List<ProgressionAddon> addons = core.getProgressionAddons();
+
+            //As noted above, unless we use the addons, they don't do anything
+            addons.forEach(addon -> configData.setXp(addon.modifyProgression(core, context, configData.copy()).data()));
+            addons.forEach(addon -> actorData.setXp(addon.modifyProgression(core, context, actorData.copy()).data()));
+
+            //here we handle the gates
+            output.add("unused_container_value", gateValue -> this.updateProgress(configData.applyGate(gateValue)));
+            output.add("unused_container_value", gateValue -> this.updateProgress(actorData.applyGate(gateValue)));
+
+            return output;
+        }
+    }
+}

@@ -17,6 +17,16 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
+/**Project RPG uses a proprietary responsiveness layer over the vanilla widget system.
+ * This layer allows for dynamically shaped and self-adjusting GUI elements without the
+ * need for explicit repositioning and size adjusting on the individual widgets. All
+ * callbacks and object nesting are handled.
+ *
+ * While this is mainly just used in the glossary of Project RPG, the system is fully
+ * utilizable to addons for their own interfaces.  For more detail on using the system
+ * to its fullest, {@see ResponsiveLayout}
+ *
+ */
 public abstract class ReactiveWidget extends AbstractWidget implements GlossaryFilter, ResponsiveLayout {
     protected static final SizeConstraints textConstraint = SizeConstraints.builder().absoluteHeight(12).build();
     private final List<Positioner<?>> children = new ArrayList<>();

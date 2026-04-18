@@ -31,6 +31,11 @@ public class ClientUtils {
         return Component.translatable("ability."+abilityID.toString().replace(":","."));
     }
 
+    /**Helper method to extract the name from the raw config setting.
+     *
+     * @param config the data as supplied from the event.
+     * @return a translatable component of the ability name
+     */
     public static MutableComponent getAbilityName(CompoundTag config) {
         return getAbilityName(Identifier.parse(config.getStringOr(AbilityUtils.TYPE, "prpg:missing")));
     }

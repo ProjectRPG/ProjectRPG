@@ -1,0 +1,48 @@
+# System Overview
+The following is a technical overview of how the various systems in Project RPG relate to each other and create a unified experience.a
+
+## Events
+All behavior stems from NeoForge events.  Project RPG listens to all events for which there is an `EventListenerSpecification` registered.
+
+### EventListenerSpecification
+Project RPG and addons register event listeners via deferred register using `APIUtils.GAMEPLAY_EVENTS` registry key.
+
+During setup, Project RPG registers all of the listeners to their respective NeoForge event.  When those events occur during gameplay, the event sequence executes.  The sequence is detailed in the following section.  The following table outlines what an event specification consists of.EventListenerSpecification
+
+|Property| How it's used|
+|:---|:---|
+|registryID|The ID used by configs to specify this implementation as the event they apply to|
+|priority|As when implementing event listeners natively, implementations may need to manage their own order of execution|
+|validEventClass| the class this is registered to listen under|
+|validEventContext|A predicate which tests if the specific NeoForge invocation of the event matches the context this event expects.  This is used to sub-define event behavior so that users can watch for events that match their use case.|
+|contextFactory|Creates an event context, which translates raw event variables into parameters that Project RPG addons and their configs can rely upon|
+|cancellationCallback|Specific behavior for what to do if an addon asserts that this event should be cancelled, such as when a gate prohibits a behavior|
+|contextCallback|The event's ability to apply addon-altered properties back to the event.  For example applying a damage reduction during an entity damage event|
+
+## The Event Sequence
+When a NeoForge event fires and there is a Project RPG event listening, the following sequence takes place
+
+1. The specification's event context is created.
+2. the specification's `validEventContext` runs to determine if this event is valid for execution.
+   - If no, the event exits and no systems are interacted with
+3. if yes, `Event Gates` are invoked
+4. if the event gate returns an event cancellation, the specification's cancellationCallback is invoked and the event ends.
+5. if not cancelled, `Features` are iterated over
+   - `Feature Gates` are executed
+   - If not gated, the feature executes
+6. then, ability system is queried for relevant abilities
+   - `Ability Gates` are executed for each
+   - If not gated, the ability activates
+7. then, the progression system is queried for potential progress awards
+8. each progress award is run through `Progression Gates` for any denials or reductions
+9. progress is awarded accordingly
+10. the specification's contextCallback is executed to complete the sequence
+
+## Delegated Systems
+There are two types of systems that rely entirely on other systems to be functional. `ProgressionAddon` and `PartySystem`.
+
+### ProgressionAddons
+Because a `ProgressionSystem` can manifest in many ways as defined by the author of that addon, ProgressionAddons depend on that implementation to invoke them whenever it makes sense for the progression system.  Therefore, it is entirely possible for a progression system to completely ignore addons.
+
+### PartySystem
+Likewise, the party system is simply a means for organizing players.  It is up to systems like progression, gates, and features to decide if party affiliation is relevant to the features they are implementing.  As such, the party system exists to be polled when relevant but may serve no purpose if no addon utilizes it.
