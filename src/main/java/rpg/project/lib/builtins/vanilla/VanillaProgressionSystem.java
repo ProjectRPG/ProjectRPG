@@ -111,7 +111,7 @@ public class VanillaProgressionSystem implements ProgressionSystem<VanillaProgre
 		final List<Pair<String, Consumer<Float>>> output = new ArrayList<>();
 		compositeData.forEach(config -> {
 			core.getProgressionAddons().forEach(addon -> {
-				config.setXp(((VanillaProgressionData)addon.modifyProgression(core, context, new VanillaProgressionData(config.xp()))).exp());
+				config.setXp(addon.modifyProgression(core, context, new VanillaProgressionData(config.xp())).exp());
 			});
 			output.add(Pair.of(container, gate -> {
 				int xp = (int)((float)config.xp() * gate);

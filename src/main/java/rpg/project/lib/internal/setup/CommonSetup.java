@@ -8,16 +8,12 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.RegisterEvent;
 import rpg.project.lib.api.APIUtils;
 import rpg.project.lib.api.abilities.Ability;
 import rpg.project.lib.api.abilities.AbilitySystem;
@@ -29,13 +25,8 @@ import rpg.project.lib.api.party.PartySystem;
 import rpg.project.lib.api.progression.ProgressionAddon;
 import rpg.project.lib.api.progression.ProgressionSystem;
 import rpg.project.lib.api.progression.ProgressionUtils;
-import rpg.project.lib.builtins.Abilities;
-import rpg.project.lib.builtins.vanilla.VanillaAbilityConfigType;
 import rpg.project.lib.builtins.vanilla.VanillaAbilitySystem;
-import rpg.project.lib.builtins.vanilla.VanillaPartyConfigType;
 import rpg.project.lib.builtins.vanilla.VanillaPartySystem;
-import rpg.project.lib.builtins.vanilla.VanillaProgressionConfigType;
-import rpg.project.lib.builtins.vanilla.VanillaProgressionDataType;
 import rpg.project.lib.builtins.vanilla.VanillaProgressionSystem;
 import rpg.project.lib.internal.Core;
 import rpg.project.lib.internal.commands.CmdRoot;
@@ -43,7 +34,6 @@ import rpg.project.lib.internal.config.readers.DataLoader;
 import rpg.project.lib.internal.config.readers.ExecutableListener;
 import rpg.project.lib.internal.network.Networking;
 import rpg.project.lib.internal.registry.EventRegistry;
-import rpg.project.lib.internal.registry.SubSystemCodecRegistry;
 import rpg.project.lib.internal.setup.datagen.LangProvider;
 import rpg.project.lib.internal.setup.datagen.LangProvider.Locale;
 import rpg.project.lib.internal.util.Reference;
@@ -59,9 +49,9 @@ public class CommonSetup {
 	public static final DeferredRegister<GateSystem> GATES_ABILITIES = DeferredRegister.create(GateUtils.GATES_ABILITIES, Reference.MODID);
 	public static final DeferredRegister<ProgressionAddon> PROGRESSION_ADDONS = DeferredRegister.create(ProgressionUtils.PROGRESSION_ADDON, Reference.MODID);
 
-	public static Supplier<PartySystem> partySupplier = () -> new VanillaPartySystem();
-	public static Supplier<ProgressionSystem<?>> progressionSupplier = () -> new VanillaProgressionSystem();
-	public static Supplier<AbilitySystem> abilitySupplier = () -> new VanillaAbilitySystem();
+	public static Supplier<PartySystem> partySupplier = VanillaPartySystem::new;
+	public static Supplier<ProgressionSystem<?>> progressionSupplier = VanillaProgressionSystem::new;
+	public static Supplier<AbilitySystem> abilitySupplier = VanillaAbilitySystem::new;
 
 	/**Registered to MOD BUS in mod constructor*/
 	public static void gatherData(GatherDataEvent.Client event) {

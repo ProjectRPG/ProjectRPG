@@ -45,6 +45,7 @@ public class EventContext{
 		this.contextParams = contextParams;
 		this.dynamicParams = dynamicParams;
 	}
+	public static final ContextKey<Identifier> EVENT_ID = new ContextKey<>(Reference.resource("event"));
 	public static final ContextKey<Player> PLAYER = new ContextKey<>(Reference.resource("actor"));
 	public static final ContextKey<LevelAccessor> LEVEL = new ContextKey<>(Reference.resource("event_level"));
 	public static final ContextKey<ItemStack> ITEMSTACK = new ContextKey<>(Reference.resource("itemstack"));
@@ -115,8 +116,9 @@ public class EventContext{
 	 * @return a new {@link ContextBuilder}
 	 * @param <T> the object class of the subject object.
 	 */
-	public static <T> ContextBuilder build(Identifier subjectID, ContextKey<T> subjectParam, T subject, Player actor, LevelAccessor level) {
+	public static <T> ContextBuilder build(Identifier eventID, Identifier subjectID, ContextKey<T> subjectParam, T subject, Player actor, LevelAccessor level) {
 		return new ContextBuilder(subjectID, subjectParam, subject)
+				.withParam(EVENT_ID, eventID)
 				.withParam(PLAYER, actor)
 				.withParam(LEVEL, level);
 	}
@@ -129,8 +131,9 @@ public class EventContext{
 	 * @param level the level from the event.
 	 * @return a new {@link ContextBuilder}
 	 */
-	public static ContextBuilder self(Player actor, LevelAccessor level) {
+	public static ContextBuilder self(Identifier eventID, Player actor, LevelAccessor level) {
 		return new ContextBuilder(Identifier.withDefaultNamespace("player"), PLAYER, actor)
+				.withParam(EVENT_ID, eventID)
 				.withParam(LEVEL, level);
 	}
 

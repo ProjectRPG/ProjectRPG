@@ -9,7 +9,7 @@ import rpg.project.lib.api.events.EventContext;
  * progression addon is to modify the input before it
  * is committed.</p>
  * <p>Examples of progression addons include providing 
- * contextual bonuses to experience or transfering progress
+ * contextual bonuses to experience or transferring progress
  * to another feature such as an item that clones progress
  * while held.</p>
  * <p>While addons have the ability to reduce progress to
@@ -35,5 +35,5 @@ public interface ProgressionAddon {
 	 * @param dataIn the data value being modified
 	 * @return a new modified value
 	 */
-    ProgressionDataType modifyProgression(Hub core, EventContext context, ProgressionDataType dataIn);
+    <T extends ProgressionDataType> T modifyProgression(Hub core, EventContext context, T dataIn);
 }
