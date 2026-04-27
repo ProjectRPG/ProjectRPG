@@ -94,12 +94,13 @@ public interface Hub {
 	 */
 	AbilitySystem getAbility();
 
-	/**
+	/**Returns all features that are configured for the context's subject object and
+	 * filters for those with valid context.  This is used internally during the
+	 * event sequence to pass only features that expect to execute to the gate systems.
 	 *
-	 * @param core
-	 * @param eventID
-	 * @param context
-	 * @return
+	 * @param eventID the event invoking this query
+	 * @param context the context for the event
+	 * @return all configured and valid features for the event and context
 	 */
 	default List<Feature> getFeaturesForContext(Identifier eventID, EventContext context) {
 		List<Feature> validFeatures = new ArrayList<>();

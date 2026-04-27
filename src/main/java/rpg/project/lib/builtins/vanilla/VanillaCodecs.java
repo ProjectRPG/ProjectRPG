@@ -17,7 +17,6 @@ public class VanillaCodecs {
         CODECS.register(VanillaPartyConfigType.ID.getPath(), VanillaPartyConfigType::new);
         CODECS.register(VanillaProgressionConfigType.ID.getPath(), VanillaProgressionConfigType::new);
         CODECS.register(VanillaProgressionDataType.ID.getPath(), VanillaProgressionDataType::new);
-        CODECS.register(VanillaBonusConfigType.ID.getPath(), VanillaBonusConfigType::new);
         CODECS.register(bus);
 
         PROGRESSION_ADDONS.register(VanillaBonusConfigType.ID.getPath(), VanillaBonusesAddon::new);

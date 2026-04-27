@@ -3,6 +3,7 @@ package rpg.project.lib.api.gating;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.mojang.serialization.Codec;
@@ -62,10 +63,10 @@ public class GateUtils {
 	 * @param config a config type for this system
 	 * @param system the system instance itself
 	 */
-	public static void registerGateSystem(RegisterEvent event, SubSystemConfigType config, GateSystem system) {
+	public static void registerGateSystem(RegisterEvent event, SubSystemConfigType config, Supplier<GateSystem> system) {
 		event.register(APIUtils.SUBSYSTEM_CODECS, config.getId(), () -> config);
-		system.applicableGateTypes().forEach(type -> {
-			event.register(type.key, config.getId(), () -> system);
+		system.get().applicableGateTypes().forEach(type -> {
+			event.register(type.key, config.getId(), system);
 		});
 	}
 }
