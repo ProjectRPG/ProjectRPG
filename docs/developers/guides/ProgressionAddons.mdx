@@ -1,0 +1,24 @@
+# Progression Addons
+Only one progression system can be active in a modpack.  Addons exist to augment the progression system's behavior.  There are two common use cases for addons
+1. Modifying Progression
+2. Progression-linked behavior
+
+Progression Addons are registered to the registry under key `ProgressionUtils.PROGRESSION_ADDONS`.  If your addon needs configs, you can also register a progression addon type via `APIUtils.SUBSYSTEM_CODECS`.
+
+A progression addon consists of one method:
+`<T extends ProgressionDataType> T modifyProgression(Hub core, EventContext context, T dataIn);`
+
+If a progression system properly invokes addons, each addon's `modifyProgression` method should be called.
+
+## Modifying Progression
+If your addon is designed to modify progression, you will be leveraging the `modify` function of `ProgressionDataType`.  Depending on what your addon does, you will likely call `dataIn.modify(...)` and pass in the modifier and modification value that matches your desired outcome.
+
+If you registered configs, and are using that to determine how to modify the inbound data, you can use `core.getProgressionData(...)` to get all associated values of your type.
+
+## Progression-linked behavior
+While `modifyProgression` is intended to operate on the inbound data value, that is not required.  An addon can also act as a progression event listener with behavior that invokes in conjunction with the awarding of progression.  For example, an addon may simply update a scoreboard with the highest/last progression value for each player.  In that example, the numbers are not modified, but the values are used in other ways.Progression
+
+## Final Technical Note
+If a progression system invokes addons, it does not do so discriminately.  The `Hub#getProgressionAddons()` method does not filter addons natively.  This means, it is incumbent upon the addon to decide if the context of the progression is relevant for the application of the addon's behavior.  This is why the method includes the event context.
+
+Therefore, it is recommended that addons with configurations also use conditions to help players with matching addon behavior to specific progression invocations.

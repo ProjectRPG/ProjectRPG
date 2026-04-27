@@ -1,0 +1,34 @@
+# Abilities
+Abilities are special behavior tied to players.  While it depends on the ability system, the default behavior of abilities is to activate whenever an event they are configured on occurs.  For example an ability granting attribute bonuses might scale off of progression and be updated each time a tick event fires.
+
+## Basic Ability Structure
+Construction Parameters
+|Parameter|Function|
+|:---|:---|
+|conditions|checks if an ability is allowed to fire per its own internal logic|
+|propertyDefaults|placeholders to act as defaults since players may omit them in configs|
+|start|A function that fires once at the start of an ability invocation|
+|tick|If a "duration" is configured, this function will execute every tick until the duration's tick count has been reached|
+|stop|A function that fires once after start and ticks have finished.  Used for cleanup|
+|description|a component describing what the ability does|
+|status|A function run to give a "current state" of the ability.  Used by UIs|
+|side|the logical side this perk runs on.
+
+### conditions
+Project RPG wraps these conditions in a default condition check.  This check handles things like progresion level limits like min, max, modulus, and milestones as well as a chance-based check.  If your ability requires additional checks, such as confirming the presence of an event context parameter, or the state of something in the player or world, that is what you check in this method.
+
+### propertyDefaults
+These are configurations that are passed to your ability if none are configured by the users.  This is a built-in failsafe for config values so that you don't have to check their presence in conditions.
+
+### start, tick, and stop
+These are the full lifecycle of your ability.  For instant abilities like event modifiers, start may be the only implemented method with NOOP on the other two.  Start is also the only implementation that is called back by events.  Tick and stop run asynchronously to the event sequence.
+
+Tick runs every tick and provides you with how many ticks have elapsed as a parameter.  If there is no duration property on the config, this is skipped.a
+
+Stop is the cleanup function which runs only after an ability has ticked at least once.  For example, if your ability was a temporary damage boost, a user could configure that so they get it after their first mob kill, but only for the next 10 seconds.  Your start function would apply the boost, tick probably wouldn't do anything, and stop would remove the bonus so it ended exactly when the user configured it to.
+
+### side
+Depending on what your ability does, you may want to force sidedness.  For example, if an ability had world behavior but also wanted to render something on screen, that ability might want to register abilities for each side respectively.  Likewise to prevent desync, some should fire on both sides for player experience continuity.
+
+## Builder
+To make abilities easy to create, `Ability.begin(side)` exists to build your ability from scratch.  This comes with default noop functions for start,tick,and stop, always true condition, and empty status/description values.

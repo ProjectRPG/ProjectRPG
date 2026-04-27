@@ -1,0 +1,35 @@
+# Configuration Codecs
+All Project RPG configuration is handled through a single config format that dispatches to subsystem configs.  It will depend entirely on the features of your addon if you need a configuration or not, and whether or not that config is object-specific.  If you need configurations for your features, here's how to create them
+
+## Registering A Config Type
+All configs are registered via a `DeferredRegister` using the registry key of `APIUtils.SUBSYSTEM_CODECS`.
+
+## `SubSystemConfigType` and `SubSystemConfig`
+The type is used to identify your config, whereas the config is the specific implementation of data.  An overly-simplified example would look like this:
+
+```java
+public record MyConfigType() implements SubSystemConfigType {
+    public static final Identifier ID = ....;
+    public static final MyConfigType IMPL = new MyConfigType();
+
+    @Override
+    public Identifier getId() {return ID;}
+
+    @Override
+    public MapCodec<SubSystemConfig> getCodec() {return MyConfig.CODEC;}
+
+    //other override methods as described in the javadocs
+
+    public record MyConfig(Object... myParams) implements SubSystemConfig {
+        public static final MapCodec<SubSystemConfig> CODEC = ....;
+
+        @Override
+        public SubSystemConfigType getType() {return IMPL;}
+
+        @Override
+        public MapCodec<SubSystemConfig> getCodec() {return CODEC;}
+
+        //Other overrides as described in their respective javadocs
+    }
+}
+```

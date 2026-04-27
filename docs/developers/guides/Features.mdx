@@ -1,0 +1,15 @@
+# Features Guide
+Addons can register features to track player actions or modify gameplay based on RPG state, without affecting core progression or abilities.  Examples include a factions mod using features to strengthen land protection based on player behaviors, or a story mod tracking unique actions for narrative progression.
+
+## Registering
+Features are registered using a `DeferredRegister` and the key `APIUtils.FEATURE`
+
+## `Feature` Object
+|Attribute|Purpose|
+|:---|:---|
+|featureID|used to configure your feature on objects in the datapack|
+|execution|a 4-parameter consumer which you encapsulate your behavior|
+|isValidContext|a predicate for whether your feature should execute|
+
+### `FeatureFunction` execution
+This function accepts a `Hub` object, which gives wide exosystem access, the event ID, the event context, and lastly the output of the feature gates that ran before this was invoked.

@@ -10,22 +10,28 @@ The progression system contains the following properties/methods
 this is the implementation of how progression data is serialized.  This is critical for allowing players to configure your specific system's values.
 
 For example, the vanilla system that ships with Project RPG uses the vanilla XP system an serializes simply to
+
 ```json
 {"value": 123}
 ```
+
 However, a progression system modeled after something like Project MMO, would need to specify skills and values and would look like
+
 ```json
 {
    "combat": 123,
    "endurance": 456
 }
 ```
+
 In contrast, your progression system may work with something that doesn't use numbers at all.  Your system might use advancements that reset after a certain amount of time, and your config looks like
+
 ```json
 {
     "advancement": "custom:kill_zombie",
     "lifespan": 3000
 }
+```
 
 ### `T getProgress`
 This is the most common method used by other systems.  Gates will use this to test if a player has the required progress to perform an action, abilities may use this to scale their effects based on the progress amount.  In all cases, the object is your implementation of `ProgressionDataType`.
@@ -38,6 +44,7 @@ This is the single most important method of the progression system.  This is wha
 
 First, the `List<...>`
 Since all configurations share the same parent via `MainSystemConfig`, progression comes to the system in the form of an array.  Because users can provide multiple instances of configurations for the same system, it is possible that a lookup for progression from the data looks like this
+
 ```json
 [
     {"type":"my:progression_addon", "value": {"my_progression_data_type":"valueA"}},
@@ -45,12 +52,14 @@ Since all configurations share the same parent via `MainSystemConfig`, progressi
     {"type":"some_other:system_type", "value":{"their:type":"theirValue"}}
 ]
 ```
+
 When your system implementation queries the config for your progression types, it will get back multiple.  You will need to iterate on them individually.
 
 Second, the `Pair<String, Consumer<Float>>`
 This is the container for this iteration's configuration and a callback to consume the gate value.  If you have not read the `Gates` section yet, gates provide their respectively gated systems with a float value between `0.0` and `1.0`.  This represents a "percentage gated".  Therefore if a progression gate were to return a value of `0.5` the assumption is that the user has configured their gate to instruct your progression system to only award half of the expected progression amount.  It is up to you to determine what partial progression means to your system.  In the vanilla context, this is just a percent of the value.  In the context of our hypothetical advancements-with-expiration system, it might mean reducing the time until expiration.
 
 The consumer is where you implement your committal of progress.  Using the built-in vanilla example, our implementation looks like
+
 ```java
 (float_from_gates) -> player.addExperience(configuredAmount * float_from_gates);
 ```
@@ -62,6 +71,7 @@ Allows you to tell Project RPG what commands you want to expose for interacting 
 The provider is a widget that is wrapped by Project RPG in a hidable HUD element.  It is entirely up to you what displays here.  The expected behavior is that users can see what progress they earned as they play.  You can make this into a simple log, like the default implementation, or you can make this an interactive GUI.  NOTE: this displays as a HUD overlay, so interaction will not involve the mouse.
 
 ### Example Mod Implementation
+
 ```java
 //Note, this is done as a single file for example purposes, but each class can, and
 //should, be its own file.  Especially as it relates to GUI elements as sidedness is
@@ -133,3 +143,7 @@ public class MyProgressionSystemAddon {
         }
     }
 }
+```
+
+## `ProgressionAdvanceEvent`
+This is a Project MMO event which allows other addons to watch for when progression advances.  It is strongly recommended that your implementation post this event where it makes sense.  Players will typically use this as the event to activate abilities such as those that govern attributes.

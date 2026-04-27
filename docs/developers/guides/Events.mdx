@@ -1,0 +1,22 @@
+# Events
+The core driver of Project RPG which tell the entire ecosystem when specific gameplay situations happen.  Project RPG are a wrapper on NeoForge events.  When an addon registers a new event specification, Project RPG wraps the listener it its own logic then registers the wrapped listener to the corresponding NeoForge event.  If you read the [System Overview](../SystemOverview.mdx), then the internal logic is explained there.
+
+### Registering a listener
+using a `DeferredRegister` and the key `APIUtils.GAMEPLAY_EVENTS`, you can provide your own `EventListenerSpecification` implementation.
+
+## `EventListenerSpecification`
+|Paramater|Purpose|
+|:---|:---|
+|registryID|How users will reference your event|
+|priority|delegated to NeoForge Event Bus for event listener ordering|
+|validEventClass|the Event class being registered to|
+|validEventContext|Tests if the NeoForge event posting matches the context for when your event expects to fire|
+|contextFactory|Creates the context object which exposes specific values to the ecosystem as you see fit|
+|cancellationCallback|If your event can be cancelled, lets you decide what that means and lets you pass this back to the NF event|
+|contextCallback|If event information should be updated based on mutations of the context, this is where you apply them to the event|
+
+### Special note on `validEventContext`
+A simple example would be a "myaddon:hurt_by_zombie" where you listen to the `LivingDamageEvent.Post` but filter only if the damage source is a zommbie.  Thus a player who wants to link behavior specifically to being damaged by a zombie would be able to use your addon to specify this.  It's worth noting that many addons will use conditions to let players refine when addon behavior should apply.  These are not mutually exclusive features.  For example, a player may want to award progress to a player when they are hurt by a zombie, but want to conditionally give more progress if the zombie were wearing armor.
+
+### Special note on `contextCallback`
+This is primarily used for events like damage events where a damage reduction/boost needs to be passed back to the event so it can be applied by NeoForge.

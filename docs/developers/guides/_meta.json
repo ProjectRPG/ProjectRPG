@@ -1,3 +1,11 @@
 {
-  "Progression": "Progression System Guide"
+  "Configs": "Configuration Codecs",
+  "Progression": "Progression System Guide",
+  "ProgressionAddons": "Progression Addon Guide",
+  "GateSystem": "Gating Guide",
+  "AbilitySystem": "Abilities System Guide",
+  "Abilities": "Abilities Guide",
+  "Events": "Custom Events",
+  "Features": "Auxiliary Features Guide",
+  "Party": "Party System Guide"
 }

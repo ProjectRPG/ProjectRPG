@@ -1,0 +1,20 @@
+# Gating Guide
+Gating is the system for restricting player behavior.  A gate system can be registered to any/all of the gating types:
+|Type|Impact|
+|:---|:---|
+|Event|Prevents the invocation of events such as denying the ability to break blocks|
+|Progress|Provides reductions to progress that the ProgressionSystem interprets accordingly|
+|Features|Provides reductions to features that the Feature interprets accordingly|
+|Abilities|Prevents ability invocation if HARD_FAIL. otherwise provides the ability with a reduction value which it interprets accordingly|
+
+## Registering GatingSystems
+Because Gates can be used in multiple systems, as defined in your implementation of `GateSystem#applicableGateTypes()`, gates are registered by creating a listener for the `RegisterEvent` and calling `GateUtils#registerGateSystem` inside this event.  This method takes the event instance, your gate's config type, and a supplier for new instances of your system.
+
+## How Gating Works in Project RPG
+The output of a gate system is a simple float value between `0.0` and `1.0`.  You can think of this number as what percent of this action is the player permitted to do.  Therefore `1.0` means they can do the thing 100%, `0.0` means they cannot do the thing at all, and `0.5` means they should only halfway be able to do the thing.
+
+Note: You do not need to know what partial permission is when designing your gate system.  That is for the system receiving your float to decide.
+
+For example, let's assume a your gate system simply defines a level requirement and returns how much of that level they have achieved.  You're smart so you're using container strings to ask the progression system what "level" someone is, and your user has configured that so it references actual containers and level values.  In this case, the user has configured the requirement as level 10 in the container.  When your system checks, the player only has 5 levels.  You calculate they are halfway and return 0.5.
+
+Let's assume this was a progression gate.  The progression system gets a gate value of 0.5 and decides that the user should get half as much xp as they normally would.  Alternatively, let's say your system is also applicable to abilities.  However, the ability system the user has does not do partial gating, so they see a value less than `1.0` and decide the ability should not fire at all.  In either case, your return value is determined independent of the system it's being passed to.

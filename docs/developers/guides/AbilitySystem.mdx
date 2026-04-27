@@ -1,0 +1,17 @@
+# Ability System
+Only one ability system can be in effect in any given modpack.  If multiple are present during loading, a race condition will decide the system.a
+
+## Core Components
+The ability system performs three functions
+1. `getAbilitiesForContext` which provides the event system with the abilities to execute
+2. `abilityActivationCallback` which lets this system know if an event passed to the event system activated
+3. `getSidePanelProvider` which supplies a GUI element for the HUD
+
+### `getAbilitiesForContext`
+As stated above, this is how the event system queries for abilities.  The Ability System decides what abilities to return.  In the built-in vanilla implementation, abilities are only obtained from the event configuration.  Thus abilities tied to other objects are ignored.  A custom implementation might use the subject object in the event context as an additional layer for abilities.  An ability system may also bypass event-driven abilities al-together in favor of key-bind-based abilities.  Alternatively, this method may be used to simply track invocations of events and then provide events conditionally.
+
+### `abilityActivationCallback`
+Once the Abilty System passes it's list of abilities to the event system, that's the end of it's involvement.  Therefore if there were ability activation information needed by the system, this method would be used to receive it.  The vanilla implementation uses this to update the side panel so users can see how abilities have updated.
+
+### `getSidePanelProvider`
+Project RPG renders the output of this method in its own side panel on the HUD.  it is entirely up to you what is displayed here.  The vanilla implementation simply logs ability invocations and their associated status values.
