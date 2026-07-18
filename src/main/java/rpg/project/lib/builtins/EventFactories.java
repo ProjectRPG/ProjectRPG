@@ -30,6 +30,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEnchantItemEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rpg.project.lib.api.abilities.AbilityUtils;
@@ -123,10 +124,10 @@ public class EventFactories {
 		VALUES.add(new EventListenerSpecification<>(
 				BREAK_BLOCK,
 				EventPriority.LOWEST,
-				BlockEvent.BreakEvent.class,
+				BreakBlockEvent.class,
 				context -> true,
 				event -> EventContext.build(BREAK_BLOCK, RegistryUtil.getId(event.getPlayer().registryAccess(), event.getState()), LootContextParams.BLOCK_STATE, event.getState(), event.getPlayer(), event.getLevel())
-						.withParam(LootContextParams.ORIGIN, event.getPos().getCenter())
+						.withParam(LootContextParams.ORIGIN, Vec3.atCenterOf(event.getPos()))
 						.withParam(EventContext.NBT, TagUtils.mergeTags(TagUtils.stateTag(event.getState()), TagUtils.tileTag(event.getPlayer().level().getBlockEntity(event.getPos())))).create(),
 				EventFactories::fullCancel,
 				(event, vars) -> {}
@@ -137,7 +138,7 @@ public class EventFactories {
 				PlayerEvent.BreakSpeed.class,
 				context -> true,
 				event -> EventContext.build(BREAK_SPEED, RegistryUtil.getId(event.getEntity().registryAccess(), event.getState()), LootContextParams.BLOCK_STATE, event.getState(), event.getEntity(), event.getEntity().level())
-						.withParam(LootContextParams.ORIGIN, event.getPosition().orElse(BlockPos.ZERO).getCenter())
+						.withParam(LootContextParams.ORIGIN, Vec3.atCenterOf(event.getPosition().orElse(BlockPos.ZERO)))
 						.withParam(EventContext.NBT, TagUtils.mergeTags(TagUtils.stateTag(event.getState()), TagUtils.tileTag(event.getEntity().level().getBlockEntity(event.getPosition().get())))).create(),
 				EventFactories::fullCancel,
 				(event, context) -> {
@@ -151,7 +152,7 @@ public class EventFactories {
 				BlockEvent.EntityPlaceEvent.class,
 				context -> true,
 				event -> EventContext.build(PLACE_BLOCK, RegistryUtil.getId(event.getEntity().registryAccess(), event.getState()), LootContextParams.BLOCK_STATE, event.getState(), orNull(event.getEntity()), event.getLevel())
-						.withParam(LootContextParams.ORIGIN, event.getPos().getCenter())
+						.withParam(LootContextParams.ORIGIN, Vec3.atCenterOf(event.getPos()))
 						.withParam(EventContext.NBT, TagUtils.mergeTags(TagUtils.stateTag(event.getState()), TagUtils.tileTag(event.getEntity().level().getBlockEntity(event.getPos())))).create(),
 				EventFactories::fullCancel,
 				(event, vars) -> {}

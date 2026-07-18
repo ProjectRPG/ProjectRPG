@@ -54,6 +54,7 @@ public class ContentScroll extends ObjectSelectionList<ContentScroll.Panel> impl
     @Override public List<Positioner<?>> getChildren() {return List.of();}
     @Override public void addChild(Positioner<?> child) {}
     @Override public List<Positioner<?>> visibleChildren() {return List.of();}
+    @Override public void removeChildren() {children().clear();}
 
     /**Wrapper around the {@link PanelWidget}s that render the actual content*/
     public static class Panel extends ObjectSelectionList.Entry<Panel> implements GlossaryFilter {

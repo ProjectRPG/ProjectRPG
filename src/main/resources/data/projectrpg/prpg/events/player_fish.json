@@ -4,5 +4,34 @@
    {"type": "minecraft:abilities", "configurations": [
      {"ability": {"type": "projectrpg:effect", "effect": "minecraft:night_vision", "duration": 500}}
    ]}
- ]
+ ],
+  "gates": {
+    "EVENT": [
+      {
+        "requirements": {},
+        "type": "minecraft:gates"
+      }
+    ],
+    "PROGRESS": [
+      {
+        "type": "minecraft:gates",
+        "strict": false,
+        "requirements": {
+          "exp": {"type":"minecraft:exp", "xp": 30}
+        }
+      }
+    ],
+    "FEATURE": [
+      {
+        "requirements": {},
+        "type": "minecraft:gates"
+      }
+    ],
+    "ABILITY": [
+      {
+        "requirements": {},
+        "type": "minecraft:gates"
+      }
+    ]
+  }
 }

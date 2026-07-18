@@ -66,6 +66,8 @@ public abstract class ReactiveWidget extends AbstractWidget implements GlossaryF
     public List<Positioner<?>> getChildren() {
         return children;
     }
+    @Override
+    public void removeChildren() {children.clear();}
 
     @Override
     public List<Positioner<?>> visibleChildren() {

@@ -24,12 +24,12 @@ import java.util.EnumSet;
  * activation conditions defined by the ability system.</td></tr>
  * </table></p>
  *
- * @param <T> gate object type
  */
 public interface GateSystem {
 	/**<p>Consumes the provided contextual variables to evaluate if
 	 * that context is permissible for the player provided.</p>
-	 * 
+	 *
+	 * @param gateType lets you know what context this gate was used for gates that are multi-typed
 	 * @param context event variables provided by the event.  This
 	 * includes the player associated with this event proc.
 	 * @param core reference to the internal system logic
@@ -38,7 +38,7 @@ public interface GateSystem {
 	 * @return a percentage of success.  0 == no success. 1 == max success.
 	 * some systems may accept larger or smaller numbers.  
 	 */
-	float isActionPermitted(EventContext context, Hub core, Identifier event, String reference);
+	float isActionPermitted(GateUtils.Type gateType, EventContext context, Hub core, Identifier event, String reference);
 	
 	/**<p>Used specifically by the EVENT gating type, this method
 	 * tells the event listener spec which type of cancellation
@@ -53,8 +53,8 @@ public interface GateSystem {
 	 * @param reference an instance of the applicable object being gated
 	 * @return the type of cancellation behavior
 	 */
-	default CancellationType getCancellationResult(EventContext context, Hub core, Identifier event, String reference) {
-		return isActionPermitted(context, core, event, reference) == GateRegistry.HARD_PASS
+	default CancellationType getCancellationResult(GateUtils.Type gateType, EventContext context, Hub core, Identifier event, String reference) {
+		return isActionPermitted(gateType, context, core, event, reference) == GateRegistry.HARD_PASS
 				? CancellationType.NONE
 				: CancellationType.EVENT;
 	}

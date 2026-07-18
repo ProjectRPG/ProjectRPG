@@ -18,7 +18,7 @@ public class KeyPressHandler {
             Config.PROG_MENU_OPEN.set(!Config.PROG_MENU_OPEN.get());
         if (ClientSetup.RIGHT_MENU.isDown())
             Config.ABILITY_MENU_OPEN.set(!Config.ABILITY_MENU_OPEN.get());
-        if (ClientSetup.GLOSSARY.isDown() && Minecraft.getInstance().screen == null)
-            Minecraft.getInstance().setScreen(new Glossary());
+        if (ClientSetup.GLOSSARY.isDown() && Minecraft.getInstance().gui.screen() == null)
+            Minecraft.getInstance().gui.setScreen(new Glossary());
     }
 }

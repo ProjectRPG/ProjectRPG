@@ -50,7 +50,7 @@ public class GateRegistry{
 			return CancellationType.NONE;
 		return CancellationType.resolve(
 				systems.stream()
-				.map(system -> system.getCancellationResult(context, core, event, null))
+				.map(system -> system.getCancellationResult(Type.EVENT, context, core, event, null))
 				.collect(Collectors.toSet()));
 	}
 
@@ -71,7 +71,7 @@ public class GateRegistry{
 		if (systems.isEmpty())
 			return HARD_PASS;
 		return systems.stream()
-				.map(system -> system.isActionPermitted(context, core, event, container))
+				.map(system -> system.isActionPermitted(Type.PROGRESS, context, core, event, container))
 				.min(Comparator.naturalOrder())
 				.orElse(HARD_PASS);
 	}
@@ -91,7 +91,7 @@ public class GateRegistry{
 		if (systems.isEmpty())
 			return HARD_PASS;
 		return systems.stream()
-				.map(system -> system.isActionPermitted(context, core, event, featureReference.featureID().toString()))
+				.map(system -> system.isActionPermitted(Type.FEATURE, context, core, event, featureReference.featureID().toString()))
 				.min(Comparator.naturalOrder())
 				.orElse(HARD_PASS);
 	}
@@ -113,7 +113,7 @@ public class GateRegistry{
 		if (systems.isEmpty())
 			return HARD_PASS;
 		return systems.stream()
-				.map(system -> system.isActionPermitted(context, core, event, ability.toString()))
+				.map(system -> system.isActionPermitted(Type.ABILITY, context, core, event, ability.toString()))
 				.min(Comparator.naturalOrder())
 				.orElse(HARD_PASS);
 	}

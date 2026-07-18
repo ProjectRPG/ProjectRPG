@@ -27,7 +27,7 @@ public class ProjectRPG {
 		EventCondition.CONDITIONS.register(bus);
 		CommonSetup.CODECS.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
 		CommonSetup.CODECS.register(bus);
-		VanillaCodecs.init(bus);
+		VanillaCodecs.init(bus, container);
 		CommonSetup.FEATURES.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
 		CommonSetup.FEATURES.register(bus);
 		CommonSetup.ABILITIES.makeRegistry(builder -> builder.maxId(Integer.MAX_VALUE-1).sync(true));
